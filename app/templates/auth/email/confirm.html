@@ -1,0 +1,8 @@
+<p>Dear {{ user.username }},</p>
+<p>欢迎来到 <b>Flasky</b>!</p>
+<p>确认您的账户 <a href="{{ url_for('auth.confirm', token=token, _external=True) }}">请点击这里</a>.</p>
+<p>您也可以复制下面链接到您的浏览器:</p>
+<p>{{ url_for('auth.confirm', token=token, _external=True) }}</p>
+<p>Sincerely,</p>
+<p>The Flasky Team</p>
+<p><small>注意：此邮件为系统自动发送，请勿回复</small></p>

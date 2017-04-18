@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Flasky - Page Not Found{% endblock %}
+{% block head%}
+{{ super() }}
+<META HTTP-EQUIV="Refresh" CONTENT="5; URL=/"></META>
+{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>页面走丢啦！</h1>
+    <h2>页面将于五秒后自动返回主页，如果没有自动跳转，你也可以手动<a href="/">返回主页</a></h2>
+</div>
+{% endblock %}

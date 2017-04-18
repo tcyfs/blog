@@ -1,0 +1,7 @@
+<p>Dear {{ user.username }},</p>
+<p>确认您的新邮箱 <a href="{{ url_for('auth.change_email', token=token, _external=True) }}">点击这里</a>.</p>
+<p>您也可以复制下面链接到浏览器:</p>
+<p>{{ url_for('auth.change_email', token=token, _external=True) }}</p>
+<p>Sincerely,</p>
+<p>The Flasky Team</p>
+<p><small>注意：此邮件为系统自动发送，请勿回复</small></p>

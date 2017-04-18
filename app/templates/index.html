@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+{% block title %}博客 - 首页{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1 class="animated lightSpeedIn">
+    {% if current_user.is_authenticated() %}欢迎回来，{{ current_user.username }}!
+    {% endif %}
+    </h1>
+</div>
+<div>
+    {% if current_user.can(Permission.WRITE_ARTICLES) %}
+    {{ wtf.quick_form(form1) }}
+    {% endif %}
+</div>
+<div class="post-tabs">
+    <ul class="nav nav-tabs">
+        <li{% if not show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_all' )}}">所有文章</a> </li>
+        {% if current_user.is_authenticated() %}
+        <li{% if show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_followed' )}}">我关注人的文章</a> </li>
+        {% endif %}
+    </ul>
+</div>
+{% include '_posts.html' %}
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, '.index' )}}
+</div>
+{% endif %}
+{% endblock %}
+{% block right_side %}
+{% if current_user.is_authenticated() %}
+<div class="userinfo" style="background-image: url(static\\3.jpg);background-repeat:no-repeat;height: 100px;overflow: hidden;margin-top: 10px">
+    <div class="user-portrait">       
+        <a href="{{ url_for('.user', username=current_user.username) }}">
+            <img class="img-circle profile-thumbnail" src="{{ current_user.gravatar(size=60) }}">
+        </a> 
+    </div>
+    </div>
+    <div class="innerwrap" style="padding: 16px 16px 9px 16px;margin-bottom: 20px">
+    <div class="namebox" style="height: 16px;line-height: 16px;padding-top: 5px;text-align: center;">
+        <a href="{{ url_for('.user', username=current_user.username) }}">{{ current_user.username}}</a>
+    </div>
+    <div class="follow" style="height: 16px;line-height: 16px;padding-top: 5px;text-align: center;">
+        <a href="{{ url_for('.followers', username=current_user.username) }}">粉丝:<span class="badge">{{ current_user.followers.count()-1 }}</span>|</a>
+        <a href="{{ url_for('.followed_by', username=current_user.username) }}">关注:<span class="badge">{{ current_user.followed.count()-1 }}</span>|</a>
+        <a href="{{ url_for('.user', username=current_user.username) }}">博文:<span class="badge">{{ current_user.posts.count() }}</span></a>
+    </div>
+
+    </div>
+    {% else %}
+<div class="widget" >
+    <h4 class="title">
+    登陆获取更多功能
+    <br>
+    </h4>
+    <div class="content community">
+    </div>
+    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+  登录
+</button>
+    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal2">
+  注册
+</button>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">登录</h4>
+      </div>
+      <div class="modal-body">
+        {{ wtf.quick_form(form2) }}
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">注册</h4>
+      </div>
+      <div class="modal-body">
+        {{ wtf.quick_form(form3) }}
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% endif %}
+<div class="widget">
+    <h4 class="title">
+    关于网站的信息
+    <br>
+    </h4>
+    <a href="{{ url_for('.about_web')}}">关于本站</a>
+</div>
+<div class="widget">
+    <h4 class="title">
+    联系我
+    <br>
+    </h4>
+    <p>微博:<a href="http://weibo.com/u/2260131722">@天才也犯傻</a></p>
+    <p>邮箱:<a href="mailto:1574589059@qq.com">1574589059@qq.com</a><p>
+    <p>github:<a href="https://github.com/tcyfs">tcyfs</a></p>
+
+</div>
+
+
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}
+
