@@ -16,17 +16,7 @@ class Config(object):
 
     @staticmethod
     def init_app(app):
-        pass
-
-
-class HerokuConfig(ProductionConfig):
-    @classmethod
-    def init_app(cls,app):
-        form werkzeug.contrib.fixers import ProxyFix
-        app.wsgi_app = ProxyFix(app.wsgi_app)
-
-
-            
+        pass         
         
 class DevelopmentConfig(Config):
     DEBUG = True
