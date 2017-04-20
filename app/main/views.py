@@ -29,7 +29,7 @@ def index():
         if user is not None and user.verify_password(form2.password.data):
             login_user(user, form2.rember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
-        flash(u'邮箱或密码错误')
+        flash(u'邮箱或密码错误0.0')
     if form3.validate_on_submit():
         user = User(email=form3.email.data, username=form3.username.data, password=form3.password.data)
         db.session.add(user)
@@ -37,7 +37,7 @@ def index():
         token = user.generate_confirmation_token()
         send_email(user.email, u'确认您的账户', 'auth/email/confirm', user=user, token=token)
         flash(u'确认信息邮件已发送至您的邮箱.')
-        return redirect(url_for('main.index'))
+        return redirect(url_for('auth.login'))
     page = request.args.get('page', 1, type=int)
     show_followed = False
     if current_user.is_authenticated():
