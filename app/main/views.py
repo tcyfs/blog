@@ -19,19 +19,19 @@ def index():
     form1 = PostForm()
     form2 = forms.LoginForm()
     form3 = forms.RegistrationForm()
-    if current_user.can(Permission.WRITE_ARTICLES) and form1.validate_on_submit():
+    if current_user.can(Permission.WRITE_ARTICLES) and form1.submit1.data and form1.validate_on_submit():
         post = Post(body=form1.body.data, author=current_user._get_current_object())
         db.session.add(post)
         db.session.commit()
         flash(u'提交文章成功.', 'info')
         return redirect(url_for(".index"))
-    if form2.validate_on_submit():
+    if form2.submit2.data and form2.validate_on_submit():
         user = User.query.filter_by(email=form2.email.data).first()
         if user is not None and user.verify_password(form2.password.data):
             login_user(user, form2.rember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
         flash(u'邮箱或密码错误0.0', 'warning')
-    if form3.validate_on_submit():
+    if form3.submit3.data and form3.validate_on_submit():
         user = User(email=form3.email.data, username=form3.username.data, password=form3.password.data)
         db.session.add(user)
         db.session.commit()
