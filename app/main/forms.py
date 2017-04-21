@@ -40,7 +40,7 @@ class EditProfileAdminForm(Form):
 
 class PostForm(Form):
     body = PageDownField(u'发表博文', validators=[DataRequired()])
-    submit = SubmitField(u'提交')
+    submit1 = SubmitField(u'提交')
 
 
 class CommentForm(Form):
