@@ -10,6 +10,21 @@
 <div>
     {{ wtf.quick_form(form) }}
 </div>
+
+<button class="btn btn-danger" onclick="myFunction()" style="margin-top: 10px;">删除文章</button>
+
+<p id="demo"></p>
+
+<script>
+function myFunction()
+{
+if (confirm('确定删除文章，删除后不可恢复') ){
+    location.assign('{{ url_for(".delete_post",id=id)}}');
+}else{
+	location.reload(); 
+}
+}
+</script>
 {% endblock %}
 
 {% block scripts %}

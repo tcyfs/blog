@@ -23,20 +23,21 @@ def index():
         post = Post(body=form1.body.data, author=current_user._get_current_object())
         db.session.add(post)
         db.session.commit()
+        flash(u'提交文章成功.', 'info')
         return redirect(url_for(".index"))
     if form2.validate_on_submit():
         user = User.query.filter_by(email=form2.email.data).first()
         if user is not None and user.verify_password(form2.password.data):
             login_user(user, form2.rember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
-        flash(u'邮箱或密码错误0.0')
+        flash(u'邮箱或密码错误0.0', 'warning')
     if form3.validate_on_submit():
         user = User(email=form3.email.data, username=form3.username.data, password=form3.password.data)
         db.session.add(user)
         db.session.commit()
         token = user.generate_confirmation_token()
         send_email(user.email, u'确认您的账户', 'auth/email/confirm', user=user, token=token)
-        flash(u'确认信息邮件已发送至您的邮箱.')
+        flash(u'确认信息邮件已发送至您的邮箱.', 'info')
         return redirect(url_for('auth.login'))
     page = request.args.get('page', 1, type=int)
     show_followed = False
@@ -71,7 +72,7 @@ def edit_profile():
         current_user.about_me = form.about_me.data
         db.session.add(current_user)
         db.session.commit()
-        flash(u'个人信息修改成功')
+        flash(u'个人信息修改成功', 'success')
         return redirect(url_for('.user', username=current_user.username))
     form.name.data = current_user.name
     form.location.data = current_user.location
@@ -95,7 +96,7 @@ def edit_profile_admin(id):
         user.about_me = form.about_me.data
         db.session.add(user)
         db.session.commit()
-        flash(u'信息修改成功.')
+        flash(u'信息修改成功.','success')
         return redirect(url_for('.user', username=user.username))
     form.email.data = user.email
     form.username.data = user.username
@@ -115,7 +116,7 @@ def post(id):
         comment = Comment(body=form.body.data, post=post, author=current_user._get_current_object())
         db.session.add(comment)
         db.session.commit()
-        flash(u'评论提交成功')
+        flash(u'评论提交成功','success')
         return redirect(url_for('.post', id=post.id, page=-1))
     page = request.args.get('page', 1, type=int)
     if page == -1:
@@ -125,6 +126,16 @@ def post(id):
     comments = pagination.items
     return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination)
 
+@main.route('/delete_post/<int:id>', methods=['GET','POST'])
+@login_required
+def delete_post(id):
+    post = Post.query.get_or_404(id)
+    if current_user != post.author and not current_user.can(Permission.ADMINISTER):
+        abort(403)
+    db.session.delete(post)
+    db.session.commit()
+    flash(u'文章已删除', 'danger')
+    return redirect(url_for('main.index'))
 
 @main.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -133,15 +144,14 @@ def edit(id):
     if current_user != post.author and not current_user.can(Permission.ADMINISTER):
         abort(403)
     form = PostForm()
-    print post.id
     if form.validate_on_submit():
         post.body = form.body.data
         db.session.add(post)
         db.session.commit()
-        flash(u'文章修改成功!')
+        flash(u'文章修改成功!','success')
         return redirect(url_for('.post', id=post.id))
     form.body.data = post.body
-    return render_template('edit_post.html', form=form)
+    return render_template('edit_post.html', form=form,id=post.id)
 
 
 @main.route('/follow/<username>')
@@ -150,13 +160,13 @@ def edit(id):
 def follow(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash(u'用户不存在')
+        flash(u'用户不存在','warning')
         return redirect(url_for('.index'))
     if current_user.is_following(user):
-        flash(u'你已经关注了此用户')
+        flash(u'你已经关注了此用户', 'info')
         return redirect(url_for('.user', username=username))
     current_user.follow(user)
-    flash(u'关注 %s 成功.' % username)
+    flash(u'关注 %s 成功.' % username, 'success')
     return redirect(url_for('.user', username=username))
 
 
@@ -166,13 +176,13 @@ def follow(username):
 def unfollow(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash(u'用户不存在')
+        flash(u'用户不存在', 'warning')
         return redirect(url_for('.index'))
     if not current_user.is_following(user):
-        flash(u'你没有关注此用户')
+        flash(u'你没有关注此用户','info')
         return redirect(url_for('.user', username=username))
     current_user.unfollow(user)
-    flash(u'取消关注 %s 成功.' % username)
+    flash(u'取消关注 %s 成功.' % username, 'info')
     return redirect(url_for('.user', username=username))
 
 
@@ -180,7 +190,7 @@ def unfollow(username):
 def followers(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash(u'用户不存在')
+        flash(u'用户不存在', 'warning')
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)
     pagination = user.followers.paginate(
@@ -197,7 +207,7 @@ def followers(username):
 def followed_by(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash(u'用户不存在')
+        flash(u'用户不存在', 'warning')
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)
     pagination = user.followed.paginate(
