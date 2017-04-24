@@ -1,14 +1,18 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block title %}Flasky - Edit Post{% endblock %}
+{% block title %}编辑文章{% endblock %}
 
 {% block page_content %}
 <div class="page-header">
     <h1>修改文章</h1>
 </div>
 <div>
-    {{ wtf.quick_form(form) }}
+    <form class="form" method="POST">
+    {{ form.hidden_tag() }}
+    {{ wtf.form_field(form.body, class="ckeditor") }}
+    {{ wtf.form_field(form.submit1) }}
+    </form>
 </div>
 
 <button class="btn btn-danger" onclick="myFunction()" style="margin-top: 10px;">删除文章</button>
@@ -30,4 +34,5 @@ if (confirm('确定删除文章，删除后不可恢复') ){
 {% block scripts %}
 {{ super() }}
 {{ pagedown.include_pagedown() }}
+<script src="//cdn.ckeditor.com/4.5.11/standard/ckeditor.js"></script>
 {% endblock %}

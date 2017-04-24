@@ -61,7 +61,11 @@
 </div>
 <div>
     {% if current_user.can(Permission.WRITE_ARTICLES) %}
-    {{ wtf.quick_form(form1) }}
+    <form class="form" method="POST">
+    {{ form1.hidden_tag() }}
+    {{ wtf.form_field(form1.body, class="ckeditor") }}
+    {{ wtf.form_field(form1.submit1) }}
+</form>
     {% endif %}
 </div>
 <div class="post-tabs">
@@ -165,5 +169,6 @@
 {% block scripts %}
 {{ super() }}
 {{ pagedown.include_pagedown() }}
+<script src="//cdn.ckeditor.com/4.5.11/standard/ckeditor.js"></script>
 {% endblock %}
 

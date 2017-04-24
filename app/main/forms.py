@@ -39,10 +39,10 @@ class EditProfileAdminForm(Form):
 
 
 class PostForm(Form):
-    body = PageDownField(u'发表博文', validators=[DataRequired()])
+    body = TextAreaField(u'发表博文', validators=[DataRequired()],  render_kw={'placeholder': u'此刻在想什么呢？'})
     submit1 = SubmitField(u'提交')
 
 
 class CommentForm(Form):
-    body = StringField('', validators=[DataRequired()])
+    body = StringField('', validators=[DataRequired()], render_kw={'placeholder': u'写下你的评论'})
     submit = SubmitField(u'提交')
