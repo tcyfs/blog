@@ -6,7 +6,7 @@
 {{ super() }}
 <link rel="shortcut icon" href="{{ url_for('static', filename='cat.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename='cat.ico') }}" type="image/x-icon">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='10th.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='11th.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='hover.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
 {% endblock %}
@@ -53,13 +53,14 @@
 </nav>
 {% endblock %}
 {% block content %}
-<div class="page-header">
-    <h1>注册</h1>
-</div>
+
 <div class="row">
 <div class="col-md-4"></div>
 
 <div class="col-md-4">
+<div class="page-header">
+    <h1>注册</h1>
+</div>
     {{ wtf.quick_form(form) }}
 </div>
 </div>

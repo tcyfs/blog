@@ -6,7 +6,7 @@
 {{ super() }}
 <link rel="shortcut icon" href="{{ url_for('static', filename='cat.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename='cat.ico') }}" type="image/x-icon">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='10th.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='11th.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='hover.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
 {% endblock %}
@@ -44,7 +44,7 @@
                 </li>
 
                 {% else %}
-                <li><a href="{{ url_for('auth.login' )}}" class="hvr-wobble-skew"><span class="glyphicon glyphicon-log-in"></span>&nbsp;登录 </a></li>
+                <li><a href="{{ url_for('auth.register' )}}" class="hvr-wobble-skew"><span class="glyphicon glyphicon-registration-mark"></span>&nbsp;注册 </a></li>
                 {% endif %}
             </ul>
 
@@ -59,12 +59,14 @@
         {{ message }}
     </div>
     {% endfor %}
+<div class="row">
+
+
+<div class="col-md-4"></div>
+<div class="col-md-4">
 <div class="page-header">
     <h1>登录</h1>
 </div>
-<div class="row">
-<div class="col-md-4"></div>
-<div class="col-md-4">
     {{ wtf.quick_form(form) }}
 <br>
     <p>忘记密码?<a href="{{ url_for('auth.password_reset_request' )}}">点击这里找回密码. </a></p>
