@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block navbar %}
-<nav class="navbar-inverse navbar-fixed-top" role="navigation">
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -79,4 +79,27 @@
 {{ super() }}
 {{ moment.include_moment() }}
 {{ moment.lang('zh-CN') }}
+<script type="text/javascript">
+$(document).ready(function(){
+    dropdownOpen();//调用
+});
+/**
+ * 鼠标划过就展开子菜单，免得需要点击才能展开
+ */
+function dropdownOpen() {
+
+    var $dropdownLi = $('li.dropdown');
+
+    $dropdownLi.mouseover(function() {
+        $(this).addClass('open');
+    }).mouseout(function() {
+        $(this).removeClass('open');
+    });
+}
+
+$(document).ready(function(){
+    $(document).off('click.bs.dropdown.data-api');
+});
+
+</script>
 {% endblock %}
