@@ -32,7 +32,8 @@ def upfile(username):
     posts = user.posts.order_by(Post.timestamp.desc()).all()
     if request.method == 'POST' and 'photo' in request.files:
         filename = photos.save(request.files['photo'])
-        file_url = photos.url(filename)
+        file_url = "static\\userspic\\"+filename
+        print file_url
         current_user.photo = file_url
         db.session.add(current_user)
         db.session.commit()
