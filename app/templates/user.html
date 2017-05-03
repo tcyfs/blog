@@ -2,7 +2,11 @@
 {% block title %}{{ user.username }}{% endblock %}
 {% block page_content %}
 <div class="page-header">
+    {% if user.photo %}
+    <img class="img-rounded profile-thumbnail" src="{{ user.photo }}" style="width: 256px; height: 256px">
+    {% else %}
     <img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size=256) }}">
+    {% endif %}
     <div class="profile-header">
     <h1>{{ user.username }}!</h1>
     {% if user.name or user.location %}
@@ -37,6 +41,7 @@
     <p>
         {% if user == current_user %}
         <a class="btn btn-default hvr-curl-top-left" href="{{ url_for('.edit_profile') }}">修改个人信息</a>
+        <a class="btn btn-default hvr-curl-top-left" href="{{ url_for('.upfile', username=user.username) }}">修改头像</a>
         {% endif %}
         {% if current_user.is_administrator() %}
         <a class="btn btn-danger" href="{{ url_for('.edit_profile_admin', id=user.id) }}">修改信息 [管理员]</a>

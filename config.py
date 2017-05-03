@@ -13,6 +13,8 @@ class Config(object):
     FLASKY_FOLLOWERS_PER_PAGE = 50
     FLASKY_COMMENTS_PER_PAGE = 10
     SSL_DISABLE = False
+    UPLOADED_PHOTOS_DEST = "D:\\sinaapp\\flaskblog\\app\\static\\userspic"
+
 
     @staticmethod
     def init_app(app):

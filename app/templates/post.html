@@ -10,7 +10,11 @@
     <li class="post">
         <div class="post-thumbnail">
             <a href="{{ url_for('.user', username=post.author.username) }}">
-                <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=40) }}">
+            {% if post.author.photo %}
+                <img class="img-rounded profile-thumbnail" src="{{ post.author.photo }}" style="height: 40px; width: 40px">
+            {% else %}
+                <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=40)}}">
+            {% endif %}
             </a>
         </div>
         <div class="post-content">
@@ -46,6 +50,8 @@
 <div class="comment-form">
     {{ wtf.quick_form(form) }}
 </div>
+{% else %}
+<h3>发表评论，请先<a href="{{ url_for('auth.login' )}}">登录</a></h3>
 {% endif %}
 {% include '_comments.html' %}
 {% if pagination %}

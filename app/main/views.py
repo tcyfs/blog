@@ -1,6 +1,9 @@
 # -*-coding:utf-8-*-
+import os
 from datetime import datetime
 from flask import render_template, abort, redirect, flash, url_for, request, current_app, make_response
+from .. import photos
+from werkzeug import secure_filename
 from flask_login import login_required, current_user, login_user
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm
@@ -11,6 +14,31 @@ from ..models import User, Role, Post, Permission, Comment
 from ..decorators import admin_required, permission_required
 
 
+html =  '''
+    <!DOCTYPE html>
+    <title>Upload File</title>
+    <h1>图片上传</h1>
+    <form method=post enctype=multipart/form-data>
+         <input type=file name=photo>
+         <input type=submit value=上传>
+    </form>
+    '''
+
+@main.route('/upfile/<username>',methods = ['GET','POST'])
+def upfile(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        abort(404)
+    posts = user.posts.order_by(Post.timestamp.desc()).all()
+    if request.method == 'POST' and 'photo' in request.files:
+        filename = photos.save(request.files['photo'])
+        file_url = photos.url(filename)
+        current_user.photo = file_url
+        db.session.add(current_user)
+        db.session.commit()
+        return render_template('user.html', user=user, posts=posts)
+        #return html + '<br><img src=' + file_url + '>'
+    return html
 @main.route('/about_web')
 def about_web():
     return render_template('about_web.html')
