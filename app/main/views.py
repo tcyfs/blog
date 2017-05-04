@@ -36,8 +36,8 @@ def upfile(username):
         current_user.photo = file_url
         db.session.add(current_user)
         db.session.commit()
-        return render_template('user.html', user=user, posts=posts)
-        #return html + '<br><img src=' + file_url + '>'
+        #return render_template('user.html', user=user, posts=posts)
+        return html + '<br><img src=' + file_url + '>'
     return html
 @main.route('/about_web')
 def about_web():

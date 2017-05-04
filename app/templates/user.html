@@ -27,7 +27,7 @@
     <p>
         {% if current_user.can(Permission.FOLLOW) and user != current_user %}
         {% if not current_user.is_following(user) %}
-        <a href="{{ url_for('.follow' ,username=user.username) }}" class="btn btn-primary hvr-radial-out">关注</a>
+        <a href="{{ url_for('.follow' ,username=user.username) }}" class="btn btn-primary hvr-radial-out" style="color: #ea1d2c;">关注</a>
         {% else %}
         <a href="{{ url_for('.unfollow', username=user.username) }}" class="btn btn-default hvr-radial-out">取消关注</a>
         {% endif %}
