@@ -88,7 +88,12 @@
 <div class="userinfo" style="background-image: url(static\\5.jpg);background-repeat:no-repeat;height: 100px;overflow: hidden;margin-top: 10px">
     <div class="user-portrait">       
         <a href="{{ url_for('.user', username=current_user.username) }}">
+            {% if current_user.photo %}
+            <img class="img-circle profile-thumbnail" src="{{ current_user.photo }}" style="height: 60px; width: 60px">
+            {% else %}
             <img class="img-circle profile-thumbnail" src="{{ current_user.gravatar(size=60) }}">
+            {% endif %}
+
         </a> 
     </div>
     </div>
