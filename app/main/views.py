@@ -31,14 +31,18 @@ def upfile(username):
         abort(404)
     posts = user.posts.order_by(Post.timestamp.desc()).all()
     if request.method == 'POST' and 'photo' in request.files:
-        filename = photos.save(request.files['photo'])
-        file_url = photos.url(filename)
-        current_user.photo = file_url
-        db.session.add(current_user)
-        db.session.commit()
-        #return render_template('user.html', user=user, posts=posts)
-        return html + '<br><img src=' + file_url + '>'
-    return html
+        try:
+            filename = photos.save(request.files['photo'])
+            file_url = photos.url(filename)
+            current_user.photo = file_url
+            db.session.add(current_user)
+            db.session.commit()
+            return render_template('user.html', user=user, posts=posts)
+            #return html + '<br><img src=' + file_url + '>'
+        except:
+            flash(u'上传失败，请确认上传文件是图片','warning')
+            return render_template('upload.html')
+    return render_template('upload.html')
 @main.route('/about_web')
 def about_web():
     return render_template('about_web.html')
