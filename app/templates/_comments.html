@@ -3,7 +3,11 @@
     <li class="comment">
         <div class="comment-thumbnail">
             <a href="{{ url_for('.user', username=comment.author.username) }}">
-                <img class="img-rounded profile-thumbnail" src="{{ comment.author.gravatar(size=40) }}">
+            {% if comment.author.photo %}
+                <img class="img-rounded profile-thumbnail" src="{{ comment.author.photo}}" style="height: 40px; width: 40px">
+            {% else %}
+                <img class="img-rounded profile-thumbnail" src="{{ comment.author.gravatar(size=40)}}">
+            {% endif %}
             </a>
         </div>
         <div class="comment-content">
