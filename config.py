@@ -13,7 +13,7 @@ class Config(object):
     FLASKY_FOLLOWERS_PER_PAGE = 50
     FLASKY_COMMENTS_PER_PAGE = 10
     SSL_DISABLE = False
-    UPLOADED_PHOTOS_DEST = os.getcwd()+'/static/userspic'
+    UPLOADED_PHOTOS_DEST = os.getcwd()+'/app/static/userspic'
 
 
     @staticmethod

@@ -14,16 +14,6 @@ from ..models import User, Role, Post, Permission, Comment
 from ..decorators import admin_required, permission_required
 
 
-html =  '''
-    <!DOCTYPE html>
-    <title>Upload File</title>
-    <h1>图片上传</h1>
-    <form method=post enctype=multipart/form-data>
-         <input type=file name=photo>
-         <input type=submit value=上传>
-    </form>
-    '''
-
 @main.route('/upfile/<username>',methods = ['GET','POST'])
 def upfile(username):
     user = User.query.filter_by(username=username).first()
@@ -38,7 +28,7 @@ def upfile(username):
             db.session.add(current_user)
             db.session.commit()
             return render_template('user.html', user=user, posts=posts)
-            #return html + '<br><img src=' + file_url + '>'
+            
         except:
             flash(u'上传失败，请确认上传文件是图片','warning')
             return render_template('upload.html')
