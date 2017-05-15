@@ -1,4 +1,4 @@
-<ul class="comments">
+<ul id="pl" class="comments" style="display: none;">
     {% for comment in comments %}
     <li class="comment">
         <div class="comment-thumbnail">
@@ -25,7 +25,23 @@
                 {% endif %}
                 {% endif %}
             </div>
-            <div  class="btn-group" role="toolbar" aria-label="..."><button type="button" class="btn btn-default" >回复</button></div>
+                <script>
+                $(document).ready(function(){
+                $("#recomment{{ comment.id }}").click(function(){
+                $("#{{ comment.id }}").toggle();
+                });
+                });
+                </script>
+
+            <button id="recomment{{ comment.id}}">回复</button>      
+            <div id="{{ comment.id}}" style="display: none;">
+            {{ wtf.quick_form(form1) }}
+            </div>
+            
+ 
+
+            {% include '_recomments.html' %}
+            
             {% if moderate %}
             <br>
             {% if comment.disabled %}
@@ -39,3 +55,5 @@
     </li>
     {% endfor %}
 </ul>
+
+

@@ -106,9 +106,12 @@
         <a href="{{ url_for('.followed_by', username=current_user.username) }}">关注:<span class="badge">{{ current_user.followed.count()-1 }}</span>|</a>
         <a href="{{ url_for('.user', username=current_user.username) }}">博文:<span class="badge">{{ current_user.posts.count() }}</span></a>
     </div>
-
+    <div>
+    <embed src="http://chabudai.sakura.ne.jp/blogparts/honehoneclock/honehone_clock_tr.swf" width="240" height="80" style="margin-top: 10px"></embed>
+    </div>
     </div>
     {% else %}
+    <embed src="http://chabudai.sakura.ne.jp/blogparts/honehoneclock/honehone_clock_tr.swf" width="240" height="80" style="margin-top: 10px"></embed>
 <div class="widget" >
     <h4 class="title">
     登陆获取更多功能
@@ -158,6 +161,7 @@
     </h4>
     <a href="{{ url_for('.about_web')}}">关于本站</a>
 </div>
+
 <div class="widget">
     <h4 class="title">
     联系我

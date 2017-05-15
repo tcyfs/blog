@@ -6,11 +6,11 @@ from .. import photos
 from werkzeug import secure_filename
 from flask_login import login_required, current_user, login_user
 from . import main
-from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm
+from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm, ReCommentForm
 from ..auth import forms
 from ..email import send_email
 from .. import db
-from ..models import User, Role, Post, Permission, Comment
+from ..models import User, Role, Post, Permission, Comment, ReComment
 from ..decorators import admin_required, permission_required
 
 
@@ -134,19 +134,37 @@ def edit_profile_admin(id):
 def post(id):
     post = Post.query.get_or_404(id)
     form = CommentForm()
-    if form.validate_on_submit():
+    
+    if form.submit.data and form.validate_on_submit():
         comment = Comment(body=form.body.data, post=post, author=current_user._get_current_object())
         db.session.add(comment)
         db.session.commit()
         flash(u'评论提交成功','success')
         return redirect(url_for('.post', id=post.id, page=-1))
+
     page = request.args.get('page', 1, type=int)
     if page == -1:
         page = (post.comments.count()-1) // current_app.config['FLASKY_COMMENTS_PER_PAGE']+1
     pagination = post.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
                                                                           error_out=False)
     comments = pagination.items
-    return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination)
+    for comment in comments:
+        form1 = ReCommentForm()
+        if form1.submit1.data and form1.validate_on_submit():
+            recomment = ReComment(body=form.body.data, comment=comment,author=current_user._get_current_object())
+            db.session.add(recomment)
+            db.session.commit()
+            flash(u'回复成功','success')
+            return redirect(url_for('.post', id=post.id))
+    """for comment in comments:
+        if request.method == "POST":
+            recomment = ReComment(body=request.form.get(str(comment.id),"testtest"), comment=comment,author=current_user._get_current_object())
+            db.session.add(recomment)
+            db.session.commit()
+            flash(u'回复成功','success')
+            return redirect(url_for('.post', id=post.id))"""
+
+    return render_template('post.html', posts=[post], form=form, form1=form1,  comments=comments, pagination=pagination, ReComment=ReComment)
 
 @main.route('/delete_post/<int:id>', methods=['GET','POST'])
 @login_required
@@ -158,6 +176,18 @@ def delete_post(id):
     db.session.commit()
     flash(u'文章已删除', 'danger')
     return redirect(url_for('main.index'))
+
+@main.route('/delete_recomment/<int:id>', methods=['GET','POST'])
+@login_required
+def delete_recomment(id):
+    recomment = ReComment.query.get_or_404(id)
+    #if current_user != post.author and not current_user.can(Permission.ADMINISTER):
+    #    abort(403)
+    db.session.delete(recomment)
+    db.session.commit()
+    flash(u'回复已删除', 'danger')
+    return redirect(url_for('main.index'))
+
 
 @main.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -262,11 +292,12 @@ def show_followed():
 @login_required
 @permission_required(Permission.MODERATE_COMMENTS)
 def moderate():
+    form1 = ReComment()
     page = request.args.get('page', 1, type=int)
     pagination = Comment.query.order_by(Comment.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
                                                                            error_out=False)
     comments = pagination.items
-    return render_template('moderate.html', comments=comments, pagination=pagination, page=page)
+    return render_template('moderate.html', comments=comments,form1=form1, pagination=pagination, page=page)
 
 
 @main.route('/moderate/enable/<int:id>')

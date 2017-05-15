@@ -37,7 +37,14 @@
                     <span class="label label-danger">编辑【管理员】</span>
                 </a>
                 {% endif%}
-                <a href="{{ url_for('.post', id=post.id)}}#comments">
+                <script>
+                $(document).ready(function(){
+                $("#hide").click(function(){
+                $("#pl").toggle();
+                });
+                });
+                </script>
+                <a id="hide" href="{{ url_for('.post', id=post.id)}}#comments">
                     <span class="label label-primary">{{ post.comments.count() }}评论</span>
                 </a>
             </div>
@@ -54,9 +61,11 @@
 <h3>发表评论，请先<a href="{{ url_for('auth.login' )}}">登录</a></h3>
 {% endif %}
 {% include '_comments.html' %}
+
 {% if pagination %}
 <div class="pagination">
     {{ macros.pagination_widget(pagination, '.post', fragment='#comments', id=posts[0].id) }}
 </div>
 {% endif %}
+
 {% endblock %}

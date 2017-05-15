@@ -1,0 +1,28 @@
+<ul id="repl" class="recomments">
+    {% for recomment in comment.recomments.order_by(ReComment.timestamp.asc()).all() %}
+    <li class="recomment">
+        <div class="comment-thumbnail">
+            <a href="{{ url_for('.user', username=recomment.author.username) }}">
+            {% if recomment.author.photo %}
+                <img class="img-rounded profile-thumbnail" src="{{ recomment.author.photo}}" style="height: 40px; width: 40px">
+            {% else %}
+                <img class="img-rounded profile-thumbnail" src="{{ recomment.author.gravatar(size=40)}}">
+            {% endif %}
+            </a>
+        </div>
+        <div class="comment-content">
+            <div class="comment-date">{{ moment(recomment.timestamp).fromNow() }}</div>
+            <div class="comment-author"><a href="{{ url_for('.user', username=recomment.author.username) }}">{{ recomment.author.username }}</a></div>
+            <div class="comment-body">
+                
+                {% if recomment.body_html %}
+                    回复<a href="{{ url_for('.user', username=comment.author.username) }}">{{ comment.author.username }}</a>：{{ recomment.body_html | safe }}
+                {% else %}
+                    {{ recomment.body }}
+                {% endif %}
+            </div>
+            <a href="{{ url_for('.delete_recomment', id=recomment.id) }}">delete</a>
+
+    </li>
+    {% endfor %}
+</ul>
