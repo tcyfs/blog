@@ -21,7 +21,9 @@
                     {{ recomment.body }}
                 {% endif %}
             </div>
-            <a href="{{ url_for('.delete_recomment', id=recomment.id) }}">delete</a>
+            {% if current_user == recomment.author or current_user.is_administrator() %}
+            <a href="{{ url_for('.delete_recomment', id=recomment.id) }}">删除</a>
+            {% endif %}
 
     </li>
     {% endfor %}

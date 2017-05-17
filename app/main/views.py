@@ -188,6 +188,17 @@ def delete_recomment(id):
     flash(u'回复已删除', 'danger')
     return redirect(url_for('main.index'))
 
+@main.route('/delete_comment/<int:id>', methods=['GET','POST'])
+@login_required
+def delete_comment(id):
+    comment = Comment.query.get_or_404(id)
+    #if current_user != post.author and not current_user.can(Permission.ADMINISTER):
+    #    abort(403)
+    db.session.delete(comment)
+    db.session.commit()
+    flash(u'评论已删除', 'danger')
+    return redirect(url_for('.post', id=comment.post_id))
+
 
 @main.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
