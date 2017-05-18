@@ -25,6 +25,7 @@
                 {% endif %}
                 {% endif %}
             </div>
+            {% if moderate or not comment.disabled %}
             {% if current_user == comment.author or current_user.is_administrator() %}
             <a href="{{ url_for('.delete_comment', id=comment.id) }}">删除</a>
             {% endif %}
@@ -41,6 +42,7 @@
             <div id="{{ comment.id}}" style="display: none;">
             {{ wtf.quick_form(form1) }}
             </div>
+            {% endif %}
             {% endif %}
             
  

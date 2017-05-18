@@ -1,6 +1,6 @@
 <ul id="repl" class="recomments">
     {% for recomment in comment.recomments.order_by(ReComment.timestamp.asc()).all() %}
-    <li class="recomment">
+    <li class="recomment"  style="list-style-type:none;">
         <div class="comment-thumbnail">
             <a href="{{ url_for('.user', username=recomment.author.username) }}">
             {% if recomment.author.photo %}
