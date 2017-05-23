@@ -72,7 +72,7 @@
                                 url:$SCRIPT_ROOT + '/post/'+{{comment.post_id}},
                                 dataType: 'html',
                                 success:function(data){
-                                    $("#repl{{comment.id}}").prepend('<li id=re'+{{comment.id}}+'class="recomment"  style="list-style-type:none;">'+$(data).find('#re{{comment.id}}').html()+'</li>');
+                                    $("#repl{{comment.id}}").prepend('<li id="re{{comment.id}}" class="recomment"  style="list-style-type:none;">'+$(data).find('#re{{comment.id}}').html()+'</li>');
                                     
                                 }
                             })
