@@ -152,12 +152,15 @@ def post(id):
     return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination, ReComment=ReComment)
 
 @main.route('/recomment/<int:id>', methods=['POST'])
+@@login_required
 def recomment(id):
     comment = Comment.query.get_or_404(id)
     """Add two numbers server side, ridiculous but well..."""
     #a = request.args.get('a')
     data = json.loads(request.form.get('data'))
     a = data['a']
+    if a.strip() == '':
+        return 'input nothing'
     recomment = ReComment(body=a, comment=comment,author=current_user._get_current_object())
     db.session.add(recomment)
     db.session.commit()
@@ -180,12 +183,13 @@ def delete_post(id):
 @login_required
 def delete_recomment(id):
     recomment = ReComment.query.get_or_404(id)
+    comment = Comment.query.get_or_404(recomment.comment_id)
     #if current_user != post.author and not current_user.can(Permission.ADMINISTER):
     #    abort(403)
     db.session.delete(recomment)
     db.session.commit()
     flash(u'回复已删除', 'danger')
-    return redirect(url_for('main.index'))
+    return redirect(url_for('.post', id=comment.post_id))
 
 @main.route('/delete_comment/<int:id>', methods=['GET','POST'])
 @login_required
