@@ -1,4 +1,4 @@
-<ul id="pl" class="comments" style="display: none;">
+<ul id="pl" class="comments">
     {% for comment in comments %}
     <li class="comment">
         <div class="comment-thumbnail">
@@ -15,22 +15,33 @@
             <div class="comment-author"><a href="{{ url_for('.user', username=comment.author.username) }}">{{ comment.author.username }}</a></div>
             <div class="comment-body">
                 {% if comment.disabled %}
+                {% if current_user == comment.author or current_user.is_administrator() %}
+                <p style="color: red"><i>系统提示：这条评论已被屏蔽,其他人不可见</i></p>
+                {% if comment.body_html %}
+                {{ comment.body_html | safe }}
+                {% else %}
+                {{ comment.body }}
+                {% endif %}
+                {% else %}
                 <p><i>这条评论已被屏蔽</i></p>
                 {% endif %}
-                {% if moderate or not comment.disabled %}
-                {% if comment.body_html %}
-                    {{ comment.body_html | safe }}
                 {% else %}
-                    {{ comment.body }}
+                {% if comment.body_html %}
+                {{ comment.body_html | safe }}
+                {% else %}
+                {{ comment.body }}
                 {% endif %}
+               
                 {% endif %}
+                
             </div>
-            {% if moderate or not comment.disabled %}
             {% if current_user == comment.author or current_user.is_administrator() %}
-            <a href="{{ url_for('.delete_comment', id=comment.id) }}">删除</a>
+            <a href="{{ url_for('.delete_comment', id=comment.id) }}" style="color: #e14d4d;">删除</a>
             {% endif %}
+            {% if not comment.disabled %}
             {% if current_user.can(Permission.COMMENT) %}
                 <script>
+                
                 $(document).ready(function(){
                 $("#recomment{{ comment.id }}").click(function(){
                 $("#{{ comment.id }}").toggle();
@@ -38,25 +49,58 @@
                 });
                 </script>
 
+
             <button id="recomment{{ comment.id}}">回复</button>      
             <div id="{{ comment.id}}" style="display: none;">
-            {{ wtf.quick_form(form1) }}
+            <script type="text/javascript">
+            var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+            $(function(){
+                $("#calculate{{ comment.id }}").click(function(){
+                    var a=$('input[name="a{{comment.id}}"]').val();
+                    var data={
+                        data: JSON.stringify({
+                            'a': a
+                        }),
+                    }
+                    $.ajax({
+                        url: $SCRIPT_ROOT + '/recomment/'+{{comment.id}},
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        success:function(data){
+                            $.ajax({
+                                url:$SCRIPT_ROOT + '/post/'+{{comment.post_id}},
+                                dataType: 'html',
+                                success:function(data){
+                                    $("#repl{{comment.id}}").prepend('<li id=re'+{{comment.id}}+'class="recomment"  style="list-style-type:none;">'+$(data).find('#re{{comment.id}}').html()+'</li>');
+                                    
+                                }
+                            })
+                            
+
+                        },
+                        error:function(res){
+                            console.log(res);
+                            console.log(1)
+                        }
+
+                    })
+                })
+            })
+            </script>
+<p>
+  <input type="text" size="80" name="a{{comment.id}}">
+</p>
+<button id="calculate{{ comment.id }}">回复</button>
+
+
+
+
             </div>
             {% endif %}
             {% endif %}
-            
- 
-
             {% include '_recomments.html' %}
             
-            {% if moderate %}
-            <br>
-            {% if comment.disabled %}
-            <a class="btn btn-default btn-xs" href="{{ url_for('.moderate_enable', id=comment.id, page=page)}}">可见</a>
-            {% else %}
-            <a class="btn btn-danger btn-xs" href="{{ url_for('.moderate_disable', id=comment.id, page=page)}}">隐藏</a>
-            {% endif %}
-            {% endif %}
         </div>
 
     </li>

@@ -1,6 +1,6 @@
-<ul id="repl" class="recomments">
-    {% for recomment in comment.recomments.order_by(ReComment.timestamp.asc()).all() %}
-    <li class="recomment"  style="list-style-type:none;">
+<ul id="repl{{comment.id}}" class="recomments">
+    {% for recomment in comment.recomments.order_by(ReComment.timestamp.desc()).all() %}
+    <li id=re{{comment.id}} class="recomment"  style="list-style-type:none;">
         <div class="comment-thumbnail">
             <a href="{{ url_for('.user', username=recomment.author.username) }}">
             {% if recomment.author.photo %}
@@ -11,7 +11,7 @@
             </a>
         </div>
         <div class="comment-content">
-            <div class="comment-date">{{ moment(recomment.timestamp).fromNow() }}</div>
+            <div class="comment-date">{{ moment(recomment.timestamp).fromNow(refresh=True) }}</div>
             <div class="comment-author"><a href="{{ url_for('.user', username=recomment.author.username) }}">{{ recomment.author.username }}</a></div>
             <div class="comment-body">
                 
@@ -22,8 +22,9 @@
                 {% endif %}
             </div>
             {% if current_user == recomment.author or current_user.is_administrator() %}
-            <a href="{{ url_for('.delete_recomment', id=recomment.id) }}">删除</a>
+            <a href="{{ url_for('.delete_recomment', id=recomment.id) }}" style="color: #e14d4d;">删除</a>
             {% endif %}
+            
 
     </li>
     {% endfor %}

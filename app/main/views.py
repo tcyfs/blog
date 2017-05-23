@@ -1,7 +1,8 @@
 # -*-coding:utf-8-*-
 import os
+import json
 from datetime import datetime
-from flask import render_template, abort, redirect, flash, url_for, request, current_app, make_response
+from flask import render_template, abort, redirect, flash, url_for, request, current_app, make_response,jsonify
 from .. import photos
 from werkzeug import secure_filename
 from flask_login import login_required, current_user, login_user
@@ -145,26 +146,24 @@ def post(id):
     page = request.args.get('page', 1, type=int)
     if page == -1:
         page = (post.comments.count()-1) // current_app.config['FLASKY_COMMENTS_PER_PAGE']+1
-    pagination = post.comments.order_by(Comment.timestamp.asc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
+    pagination = post.comments.order_by(Comment.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
                                                                           error_out=False)
     comments = pagination.items
-    for comment in comments:
-        form1 = ReCommentForm()
-        if form1.submit1.data and form1.validate_on_submit():
-            recomment = ReComment(body=form.body.data, comment=comment,author=current_user._get_current_object())
-            db.session.add(recomment)
-            db.session.commit()
-            flash(u'回复成功','success')
-            return redirect(url_for('.post', id=post.id))
-    """for comment in comments:
-        if request.method == "POST":
-            recomment = ReComment(body=request.form.get(str(comment.id),"testtest"), comment=comment,author=current_user._get_current_object())
-            db.session.add(recomment)
-            db.session.commit()
-            flash(u'回复成功','success')
-            return redirect(url_for('.post', id=post.id))"""
+    return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination, ReComment=ReComment)
 
-    return render_template('post.html', posts=[post], form=form, form1=form1,  comments=comments, pagination=pagination, ReComment=ReComment)
+@main.route('/recomment/<int:id>', methods=['POST'])
+def recomment(id):
+    comment = Comment.query.get_or_404(id)
+    """Add two numbers server side, ridiculous but well..."""
+    #a = request.args.get('a')
+    data = json.loads(request.form.get('data'))
+    a = data['a']
+    recomment = ReComment(body=a, comment=comment,author=current_user._get_current_object())
+    db.session.add(recomment)
+    db.session.commit()
+    return jsonify(result=a)
+    #return redirect(url_for('.post', id=comment.post_id))
+
 
 @main.route('/delete_post/<int:id>', methods=['GET','POST'])
 @login_required
@@ -303,12 +302,11 @@ def show_followed():
 @login_required
 @permission_required(Permission.MODERATE_COMMENTS)
 def moderate():
-    form1 = ReComment()
     page = request.args.get('page', 1, type=int)
     pagination = Comment.query.order_by(Comment.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
                                                                            error_out=False)
     comments = pagination.items
-    return render_template('moderate.html', comments=comments,form1=form1, pagination=pagination, page=page)
+    return render_template('moderate.html', comments=comments, pagination=pagination, page=page)
 
 
 @main.route('/moderate/enable/<int:id>')
