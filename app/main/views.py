@@ -152,7 +152,7 @@ def post(id):
     return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination, ReComment=ReComment)
 
 @main.route('/recomment/<int:id>', methods=['POST'])
-@@login_required
+@login_required
 def recomment(id):
     comment = Comment.query.get_or_404(id)
     """Add two numbers server side, ridiculous but well..."""
