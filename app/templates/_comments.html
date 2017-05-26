@@ -39,12 +39,12 @@
             {% if current_user == comment.author or current_user.is_administrator() %}
             <script type="text/javascript">
                 $("#comment_bar{{comment.id}}").hover(function(){
-                $("#delcomment{{comment.id}}").css("display","");
+                $("#delcomment{{comment.id}}").css("visibility","visible");
               },function(){
-                $("#delcomment{{comment.id}}").css("display","none");
+                $("#delcomment{{comment.id}}").css("visibility","hidden");
               });
             </script>
-            <a id="delcomment{{comment.id}}" href="{{ url_for('.delete_comment', id=comment.id) }}" style="color: #e14d4d; display: none; float: left" >删除</a>
+            <a id="delcomment{{comment.id}}" href="{{ url_for('.delete_comment', id=comment.id) }}" style="color: #e14d4d; visibility: hidden;" >删除</a>
             {% endif %}
             {% if not comment.disabled %}
             {% if current_user.can(Permission.COMMENT) %}
@@ -58,7 +58,7 @@
                 </script>
 
 
-            <a href="javascript:void(0)" id="recomment{{ comment.id}}" style="display: block; padding-left: 40px; color:black">回复</a>      
+            <a href="javascript:void(0)" id="recomment{{ comment.id}}" style="color:black; padding-left: 10px">回复</a>      
             <div id="{{ comment.id}}" style="display: none;">
             <script type="text/javascript">
             var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};

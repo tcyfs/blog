@@ -56,14 +56,14 @@
             {% if current_user == recomment.author or current_user.is_administrator() %}
             <script type="text/javascript">
                 $("#recomment_bar{{recomment.id}}").hover(function(){
-                $("#delrecomment{{recomment.id}}").css("display","");
+                $("#delrecomment{{recomment.id}}").css("visibility","visible");
               },function(){
-                $("#delrecomment{{recomment.id}}").css("display","none");
+                $("#delrecomment{{recomment.id}}").css("visibility","hidden");
               });
             </script>
-            <a id="delrecomment{{recomment.id}}" href="{{ url_for('.delete_recomment', id=recomment.id) }}" style="color: #e14d4d; display: none; float: left">删除</a>
+            <a id="delrecomment{{recomment.id}}" href="{{ url_for('.delete_recomment', id=recomment.id) }}" style="color: #e14d4d; visibility: hidden;">删除</a>
             {% endif %}
-            {% if not comment.disabled %}
+            {% if not recomment.disabled %}
             {% if current_user.can(Permission.COMMENT) %}
             <script>
                 $(document).ready(function(){
@@ -72,7 +72,7 @@
                 });
                 });
             </script>
-            <a href="javascript:void(0)" id="reply{{ recomment.id}}" style="display: block; padding-left: 40px; color: black">回复</a> 
+            <a href="javascript:void(0)" id="reply{{ recomment.id}}" style="padding-left: 10px; color: black">回复</a> 
             <div id="{{ recomment.id}}" style="display: none;">
             <script type="text/javascript">
              var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};

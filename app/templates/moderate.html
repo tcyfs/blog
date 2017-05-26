@@ -77,9 +77,9 @@
                     {% if moderate %}
                     <br>
                     {% if recomment.disabled %}
-                    <a class="btn btn-default btn-xs" href="{{ url_for('.moderate_enable', id=recomment.id, page=page)}}">可见</a>
+                    <a class="btn btn-default btn-xs" href="{{ url_for('.moderate_enablere', id=recomment.id, page=page)}}">可见</a>
                     {% else %}
-                    <a class="btn btn-danger btn-xs" href="{{ url_for('.moderate_disable', id=recomment.id, page=page)}}">隐藏</a>
+                    <a class="btn btn-danger btn-xs" href="{{ url_for('.moderate_disablere', id=recomment.id, page=page)}}">隐藏</a>
                     {% endif %}
                     {% endif %}
                     </div>

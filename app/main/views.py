@@ -149,7 +149,7 @@ def post(id):
     pagination = post.comments.order_by(Comment.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
                                                                           error_out=False)
     comments = pagination.items
-    return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination, ReComment=ReComment)
+    return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination, ReComment=ReComment, Comment=Comment)
 
 @main.route('/recomment/<int:id>', methods=['POST'])
 @login_required
@@ -336,7 +336,7 @@ def moderate():
 @login_required
 @permission_required(Permission.MODERATE_COMMENTS)
 def moderate_enable(id):
-    comment = ReComment.query.get(id) or Comment.query.get(id)
+    comment = Comment.query.get_or_404(id)
     comment.disabled = False
     db.session.add(comment)
     db.session.commit()
@@ -348,9 +348,34 @@ def moderate_enable(id):
 @login_required
 @permission_required(Permission.MODERATE_COMMENTS)
 def moderate_disable(id):
-    comment = ReComment.query.get_or_404(id)
+    comment = Comment.query.get_or_404(id)
     comment.disabled = True
     db.session.add(comment)
     db.session.commit()
     return redirect(url_for('.moderate',
                             page=request.args.get('page', 1, type=int)))
+
+
+@main.route('/moderate/enable_re/<int:id>')
+@login_required
+@permission_required(Permission.MODERATE_COMMENTS)
+def moderate_enablere(id):
+    recomment = ReComment.query.get_or_404(id)
+    recomment.disabled = False
+    db.session.add(recomment)
+    db.session.commit()
+    return redirect(url_for('.moderate',
+                            page=request.args.get('page', 1, type=int)))
+
+
+@main.route('/moderate/disable_re/<int:id>')
+@login_required
+@permission_required(Permission.MODERATE_COMMENTS)
+def moderate_disablere(id):
+    recomment = ReComment.query.get_or_404(id)
+    recomment.disabled = True
+    db.session.add(recomment)
+    db.session.commit()
+    return redirect(url_for('.moderate',
+                            page=request.args.get('page', 1, type=int)))
+
