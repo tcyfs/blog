@@ -155,18 +155,31 @@ def post(id):
 @login_required
 def recomment(id):
     comment = Comment.query.get_or_404(id)
-    """Add two numbers server side, ridiculous but well..."""
-    #a = request.args.get('a')
     data = json.loads(request.form.get('data'))
     a = data['a']
     if a.strip() == '':
         return 'input nothing'
-    recomment = ReComment(body=a, comment=comment,author=current_user._get_current_object())
+    recomment = ReComment(body=a, comment=comment,author=current_user._get_current_object(),reply_id=comment.id)
+
     db.session.add(recomment)
     db.session.commit()
     return jsonify(result=a)
     #return redirect(url_for('.post', id=comment.post_id))
 
+@main.route('/reply/<int:id>', methods=['POST'])
+@login_required
+def reply(id):
+    recomment = ReComment.query.get_or_404(id)
+    comment = Comment.query.get_or_404(recomment.comment_id)
+    data = json.loads(request.form.get('data'))
+    a = data['a']
+    if a.strip() == '':
+        return 'input nothing'
+    reply = ReComment(body=a, comment=comment,author=current_user._get_current_object(),reply_id=recomment.id,reply_type="reply")
+    db.session.add(reply)
+    db.session.commit()
+    
+    return jsonify(result=a)
 
 @main.route('/delete_post/<int:id>', methods=['GET','POST'])
 @login_required
@@ -183,7 +196,13 @@ def delete_post(id):
 @login_required
 def delete_recomment(id):
     recomment = ReComment.query.get_or_404(id)
+    replys = ReComment.query.filter_by(reply_id=id).all()
+    for reply in replys:
+        delreply =  ReComment.query.get_or_404(reply.id)
+        db.session.delete(delreply)
+        db.session.commit()
     comment = Comment.query.get_or_404(recomment.comment_id)
+
     #if current_user != post.author and not current_user.can(Permission.ADMINISTER):
     #    abort(403)
     db.session.delete(recomment)
@@ -310,14 +329,14 @@ def moderate():
     pagination = Comment.query.order_by(Comment.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
                                                                            error_out=False)
     comments = pagination.items
-    return render_template('moderate.html', comments=comments, pagination=pagination, page=page)
+    return render_template('moderate.html', comments=comments, pagination=pagination, page=page, ReComment=ReComment)
 
 
 @main.route('/moderate/enable/<int:id>')
 @login_required
 @permission_required(Permission.MODERATE_COMMENTS)
 def moderate_enable(id):
-    comment = Comment.query.get_or_404(id)
+    comment = ReComment.query.get(id) or Comment.query.get(id)
     comment.disabled = False
     db.session.add(comment)
     db.session.commit()
@@ -329,7 +348,7 @@ def moderate_enable(id):
 @login_required
 @permission_required(Permission.MODERATE_COMMENTS)
 def moderate_disable(id):
-    comment = Comment.query.get_or_404(id)
+    comment = ReComment.query.get_or_404(id)
     comment.disabled = True
     db.session.add(comment)
     db.session.commit()

@@ -302,6 +302,8 @@ class ReComment(db.Model):
     body_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     disabled = db.Column(db.Boolean)
+    reply_id = db.Column(db.Integer)
+    reply_type = db.Column(db.Text, default='recomment')
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'))
 

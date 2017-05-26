@@ -43,8 +43,50 @@
             {% else %}
             <a class="btn btn-danger btn-xs" href="{{ url_for('.moderate_disable', id=comment.id, page=page)}}">隐藏</a>
             {% endif %}
-            {% endif %}
-        </div>
+            {% endif %}        
+
+            </div>
+            {% for recomment in comment.recomments.order_by(ReComment.timestamp.desc()).all() %}
+            <ul id="repl{{comment.id}}" class="recomments">
+                
+                <li id=re{{comment.id}} class="recomment"  style="list-style-type:none;">
+                    <div class="comment-thumbnail">
+                        <a href="{{ url_for('.user', username=recomment.author.username) }}">
+                        {% if recomment.author.photo %}
+                        <img class="img-rounded profile-thumbnail" src="{{ recomment.author.photo}}" style="height: 40px; width: 40px">
+                        {% else %}
+                        <img class="img-rounded profile-thumbnail" src="{{ recomment.author.gravatar(size=40)}}">
+                        {% endif %}
+                        </a>
+                    </div>
+                    <div class="comment-content">
+                        <div class="comment-date">{{ moment(recomment.timestamp).fromNow(refresh=True) }}</div>
+                        <div class="comment-author"><a href="{{ url_for('.user', username=recomment.author.username) }}">{{ recomment.author.username }}</a></div>
+                        <div class="comment-body">
+                        {% if recomment.disabled %}
+                        <p><i>这条评论已被屏蔽</i></p>
+                        {% endif %}
+                        {% if moderate or not recomment.disabled %}
+                        {% if recomment.body_html %}
+                        {{ recomment.body_html | safe }}
+                        {% else %}
+                        {{ recomment.body }}
+                        {% endif %}
+                        {% endif %}
+                        </div>
+                    {% if moderate %}
+                    <br>
+                    {% if recomment.disabled %}
+                    <a class="btn btn-default btn-xs" href="{{ url_for('.moderate_enable', id=recomment.id, page=page)}}">可见</a>
+                    {% else %}
+                    <a class="btn btn-danger btn-xs" href="{{ url_for('.moderate_disable', id=recomment.id, page=page)}}">隐藏</a>
+                    {% endif %}
+                    {% endif %}
+                    </div>
+
+                </li>
+            </ul>
+            {% endfor %}
 
     </li>
     {% endfor %}

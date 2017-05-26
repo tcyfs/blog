@@ -14,19 +14,113 @@
             <div class="comment-date">{{ moment(recomment.timestamp).fromNow(refresh=True) }}</div>
             <div class="comment-author"><a href="{{ url_for('.user', username=recomment.author.username) }}">{{ recomment.author.username }}</a></div>
             <div class="comment-body">
-                
+                {% if recomment.disabled %}
+                {% if current_user == recomment.author or current_user.is_administrator() %}
+                <p style="color: red"><i>系统提示：这条评论已被屏蔽,仅本人和管理员可见</i></p>
+                {% if recomment.reply_type=="reply" %}
                 {% if recomment.body_html %}
-                    回复<a href="{{ url_for('.user', username=comment.author.username) }}">{{ comment.author.username }}</a>：{{ recomment.body_html | safe }}
+                回复<a href="{{ url_for('.user', username=ReComment.query.get(recomment.reply_id).author.username) }}">{{ ReComment.query.get(recomment.reply_id).author.username }}</a>：{{ recomment.body_html | safe }}
                 {% else %}
-                    {{ recomment.body }}
+                回复<a href="{{ url_for('.user', username=ReComment.query.get(recomment.reply_id).author.username) }}">{{ ReComment.query.get(recomment.reply_id).author.username }}</a>：{{ recomment.body }}
                 {% endif %}
+                {% else %}
+                {% if recomment.body_html %}
+                回复<a href="{{ url_for('.user', username=Comment.query.get(recomment.reply_id).author.username) }}">{{ Comment.query.get(recomment.reply_id).author.username }}</a>：{{ recomment.body_html | safe }}
+                {% else %}
+                回复<a href="{{ url_for('.user', username=Comment.query.get(recomment.reply_id).author.username) }}">{{ Comment.query.get(recomment.reply_id).author.username }}</a>：{{ recomment.body }}
+                {% endif %}
+                {% endif %}
+                {% else %}
+                <p style="color: red"><i>这条评论已被屏蔽</i></p>
+                {% endif %}
+                {% else %}
+                {% if recomment.reply_type=="reply" %}
+                {% if recomment.body_html %}
+                回复<a href="{{ url_for('.user', username=ReComment.query.get(recomment.reply_id).author.username) }}">{{ ReComment.query.get(recomment.reply_id).author.username }}</a>：{{ recomment.body_html | safe }}
+                {% else %}
+                回复<a href="{{ url_for('.user', username=ReComment.query.get(recomment.reply_id).author.username) }}">{{ ReComment.query.get(recomment.reply_id).author.username }}</a>：{{ recomment.body_html }}
+                {% endif %}
+                {% else %}
+                {% if recomment.body_html %}
+                回复<a href="{{ url_for('.user', username=recomment.author.username) }}">{{ recomment.author.username }}</a>：{{ recomment.body_html | safe }}
+                {% else %}
+                回复<a href="{{ url_for('.user', username=recomment.author.username) }}">{{ recomment.author.username }}</a>：{{ recomment.body }}
+                {% endif %}
+                {% endif %}
+               
+                {% endif %}
+                
+
             </div>
+            <div id="recomment_bar{{recomment.id}}">
             {% if current_user == recomment.author or current_user.is_administrator() %}
-
-            <a href="{{ url_for('.delete_recomment', id=recomment.id) }}" style="color: #e14d4d;">删除</a>
+            <script type="text/javascript">
+                $("#recomment_bar{{recomment.id}}").hover(function(){
+                $("#delrecomment{{recomment.id}}").css("display","");
+              },function(){
+                $("#delrecomment{{recomment.id}}").css("display","none");
+              });
+            </script>
+            <a id="delrecomment{{recomment.id}}" href="{{ url_for('.delete_recomment', id=recomment.id) }}" style="color: #e14d4d; display: none; float: left">删除</a>
             {% endif %}
+            {% if not comment.disabled %}
+            {% if current_user.can(Permission.COMMENT) %}
+            <script>
+                $(document).ready(function(){
+                $("#reply{{ recomment.id }}").click(function(){
+                $("#{{ recomment.id }}").toggle();
+                });
+                });
+            </script>
+            <a href="javascript:void(0)" id="reply{{ recomment.id}}" style="display: block; padding-left: 40px; color: black">回复</a> 
+            <div id="{{ recomment.id}}" style="display: none;">
+            <script type="text/javascript">
+             var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+            $(function(){
+                $("#tj{{ recomment.id }}").click(function(){
+                    var a=$('input[name="r{{recomment.id}}"]').val();
+                    var data={
+                        data: JSON.stringify({
+                            'a': a
+                        }),
+                    }
+                    $.ajax({
+                        url: $SCRIPT_ROOT + '/reply/'+{{ recomment.id }},
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        success:function(data){
+                            $("#{{ recomment.id }}").toggle();
 
+                            $.ajax({
+                                url:$SCRIPT_ROOT + '/post/'+{{comment.post_id}},
+                                dataType: 'html',
+                                success:function(data){
+                                    $("#repl{{comment.id}}").prepend('<li id="re{{comment.id}}" class="recomment"  style="list-style-type:none;">'+$(data).find('#re{{comment.id}}').html()+'</li>');
+                                    
+                                }
+                            })
+                            
+                        },
+                        error:function(){
+                            alert('回复内容不能为空')
+                            
+                        }
+                    })
+                })
+            })
+            </script>
 
+            <p>
+            <input id="b{{recomment.id}}" type="text" size="80" name="r{{ recomment.id }}">
+            </p>
+            <button id="tj{{ recomment.id }}">回复</button>
+            </div>
+            </div>
+            {% endif %}
+            {% endif %}
+            </div>
+             
     </li>
     {% endfor %}
 </ul>

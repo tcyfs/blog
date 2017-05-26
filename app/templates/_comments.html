@@ -10,20 +10,20 @@
             {% endif %}
             </a>
         </div>
-        <div class="comment-content">
+        <div  class="comment-content">
             <div class="comment-date">{{ moment(comment.timestamp).fromNow() }}</div>
             <div class="comment-author"><a href="{{ url_for('.user', username=comment.author.username) }}">{{ comment.author.username }}</a></div>
             <div class="comment-body">
                 {% if comment.disabled %}
                 {% if current_user == comment.author or current_user.is_administrator() %}
-                <p style="color: red"><i>系统提示：这条评论已被屏蔽,其他人不可见</i></p>
+                <p style="color: red"><i>系统提示：这条评论已被屏蔽,仅本人和管理员可见</i></p>
                 {% if comment.body_html %}
                 {{ comment.body_html | safe }}
                 {% else %}
                 {{ comment.body }}
                 {% endif %}
                 {% else %}
-                <p><i>这条评论已被屏蔽</i></p>
+                <p style="color: red"><i>系统提示：这条评论已被屏蔽</i></p>
                 {% endif %}
                 {% else %}
                 {% if comment.body_html %}
@@ -35,8 +35,16 @@
                 {% endif %}
                 
             </div>
+            <div id="comment_bar{{comment.id}}">
             {% if current_user == comment.author or current_user.is_administrator() %}
-            <a href="{{ url_for('.delete_comment', id=comment.id) }}" style="color: #e14d4d;">删除</a>
+            <script type="text/javascript">
+                $("#comment_bar{{comment.id}}").hover(function(){
+                $("#delcomment{{comment.id}}").css("display","");
+              },function(){
+                $("#delcomment{{comment.id}}").css("display","none");
+              });
+            </script>
+            <a id="delcomment{{comment.id}}" href="{{ url_for('.delete_comment', id=comment.id) }}" style="color: #e14d4d; display: none; float: left" >删除</a>
             {% endif %}
             {% if not comment.disabled %}
             {% if current_user.can(Permission.COMMENT) %}
@@ -50,7 +58,7 @@
                 </script>
 
 
-            <button id="recomment{{ comment.id}}">回复</button>      
+            <a href="javascript:void(0)" id="recomment{{ comment.id}}" style="display: block; padding-left: 40px; color:black">回复</a>      
             <div id="{{ comment.id}}" style="display: none;">
             <script type="text/javascript">
             var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
@@ -68,6 +76,8 @@
                         dataType: 'json',
                         data: data,
                         success:function(data){
+                            $('input[name="a{{comment.id}}"]').val("");
+                            $("#{{ comment.id }}").toggle();
                             $.ajax({
                                 url:$SCRIPT_ROOT + '/post/'+{{comment.post_id}},
                                 dataType: 'html',
@@ -77,21 +87,20 @@
                                 }
                             })
                             
-
                         },
                         error:function(){
                             alert('回复内容不能为空')
                             
                         }
-
                     })
                 })
             })
             </script>
 <p>
-  <input type="text" size="80" name="a{{comment.id}}">
+  <input id="b{{comment.id}}" type="text" size="80" name="a{{comment.id}}">
 </p>
 <button id="calculate{{ comment.id }}">回复</button>
+</div>
 
 
 
