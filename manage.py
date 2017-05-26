@@ -34,10 +34,11 @@ def profile(length=25, profile_dir=None):
 @manager.command
 def deploy():
     """Run deployment tasks."""
+    from flask_migrate import init
     from flask_migrate import upgrade
     from app.models import Role, User
     # 把数据库迁移到最新修订版本
-    drop_all()
+    init()
     upgrade()
     # 创建用户角色
     Role.insert_roles()
