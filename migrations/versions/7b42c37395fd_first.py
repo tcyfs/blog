@@ -1,8 +1,8 @@
-"""add reply_id
+"""first
 
-Revision ID: 07a4be41ef6e
+Revision ID: 7b42c37395fd
 Revises: 
-Create Date: 2017-05-25 16:25:01.609000
+Create Date: 2017-05-26 18:08:11.638000
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '07a4be41ef6e'
+revision = '7b42c37395fd'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -84,6 +84,7 @@ def upgrade():
     sa.Column('timestamp', sa.DateTime(), nullable=True),
     sa.Column('disabled', sa.Boolean(), nullable=True),
     sa.Column('reply_id', sa.Integer(), nullable=True),
+    sa.Column('reply_type', sa.Text(), nullable=True),
     sa.Column('author_id', sa.Integer(), nullable=True),
     sa.Column('comment_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['author_id'], ['users.id'], ),

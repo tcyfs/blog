@@ -1,6 +1,5 @@
 # -*-coding:utf-8-*-
 import os
-import shutil
 from app import create_app, db
 from app.models import User, Role, Post, Permission
 from flask_script import Manager, Shell
@@ -36,12 +35,9 @@ def profile(length=25, profile_dir=None):
 def deploy():
     """Run deployment tasks."""
 
-    from flask_migrate import init
     from flask_migrate import upgrade
     from app.models import Role, User
     # 把数据库迁移到最新修订版本
-    shutil.rmtree('migrations')
-    init()
     upgrade()
     # 创建用户角色
     Role.insert_roles()
