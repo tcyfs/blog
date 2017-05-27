@@ -52,14 +52,14 @@
                 
                 $(document).ready(function(){
                 $("#recomment{{ comment.id }}").click(function(){
-                $("#{{ comment.id }}").toggle();
+                $("#rawcomment{{ comment.id }}").toggle();
                 });
                 });
                 </script>
 
 
             <a href="javascript:void(0)" id="recomment{{ comment.id}}" style="color:black; padding-left: 10px">回复</a>      
-            <div id="{{ comment.id}}" style="display: none;">
+            <div id="rawcomment{{ comment.id}}" style="display: none;">
             <script type="text/javascript">
             var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
             $(function(){
@@ -77,7 +77,7 @@
                         data: data,
                         success:function(data){
                             $('input[name="a{{comment.id}}"]').val("");
-                            $("#{{ comment.id }}").toggle();
+                            $("#rawcomment{{ comment.id }}").toggle();
                             $.ajax({
                                 url:$SCRIPT_ROOT + '/post/'+{{comment.post_id}},
                                 dataType: 'html',

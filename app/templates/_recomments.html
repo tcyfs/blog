@@ -68,12 +68,12 @@
             <script>
                 $(document).ready(function(){
                 $("#reply{{ recomment.id }}").click(function(){
-                $("#{{ recomment.id }}").toggle();
+                $("#rawreply{{ recomment.id }}").toggle();
                 });
                 });
             </script>
             <a href="javascript:void(0)" id="reply{{ recomment.id}}" style="padding-left: 10px; color: black">回复</a> 
-            <div id="{{ recomment.id}}" style="display: none;">
+            <div id="rawreply{{ recomment.id}}" style="display: none;">
             <script type="text/javascript">
              var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
             $(function(){
@@ -90,7 +90,8 @@
                         dataType: 'json',
                         data: data,
                         success:function(data){
-                            $("#{{ recomment.id }}").toggle();
+                            $('input[name="r{{recomment.id}}"]').val("");
+                            $("#rawreply{{ recomment.id }}").toggle();
 
                             $.ajax({
                                 url:$SCRIPT_ROOT + '/post/'+{{comment.post_id}},
