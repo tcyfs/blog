@@ -42,9 +42,9 @@
                 {% endif %}
                 {% else %}
                 {% if recomment.body_html %}
-                回复<a href="{{ url_for('.user', username=recomment.author.username) }}">{{ recomment.author.username }}</a>：{{ recomment.body_html | safe }}
+                回复<a href="{{ url_for('.user', username=Comment.query.get(recomment.reply_id).author.username) }}">{{ Comment.query.get(recomment.reply_id).author.username }}</a>：{{ recomment.body_html | safe }}
                 {% else %}
-                回复<a href="{{ url_for('.user', username=recomment.author.username) }}">{{ recomment.author.username }}</a>：{{ recomment.body }}
+                回复<a href="{{ url_for('.user', username=Comment.query.get(recomment.reply_id).author.username) }}">{{ Comment.query.get(recomment.reply_id).author.username }}</a>：{{ recomment.body }}
                 {% endif %}
                 {% endif %}
                
