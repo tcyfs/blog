@@ -60,6 +60,7 @@
                 $(document).ready(function(){
                 $("#reply{{ recomment.id }}").click(function(){
                 $("#rawreply{{ recomment.id }}").toggle();
+                $('#b{{recomment.id}}').focus().select();
                 });
                 });
             </script>
@@ -117,7 +118,7 @@
             </script>
 
             <p>
-            <textarea id="b{{recomment.id}}" type="text" style="width: 98%;border-width: 1px; border-style:solid;border-color:#e4dcdc;overflow-wrap: break-word;overflow: hidden;resize:none; height: 24px " name="r{{ recomment.id }}" onfocus="window.activeobj=this;this.clock=setInterval(function(){activeobj.style.height=activeobj.scrollHeight+'px';},200);" onblur="clearInterval(this.clock);"></textarea>
+            <textarea id="b{{recomment.id}}" style="width: 98%;border-width: 1px; border-style:solid;border-color:#e4dcdc;overflow-wrap: break-word;overflow: hidden;resize:none; height: 24px " name="r{{ recomment.id }}" onfocus="window.activeobj=this;this.clock=setInterval(function(){activeobj.style.height=activeobj.scrollHeight+'px';},200);" onblur="clearInterval(this.clock);"></textarea>
             </p>
             <button id="tj{{ recomment.id }}">回复</button>
             </div>

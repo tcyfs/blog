@@ -44,6 +44,8 @@
                 $(document).ready(function(){
                 $("#recomment{{ comment.id }}").click(function(){
                 $("#rawcomment{{ comment.id }}").toggle();
+                $('#b{{comment.id}}').focus().select();
+                
                 });
                 });
                 </script>
@@ -99,7 +101,7 @@
             })
             </script>
 <p>
-  <textarea id="b{{comment.id}}" type="text" style="width: 98%;border-width: 1px; border-style:solid;border-color:#e4dcdc;overflow-wrap: break-word;overflow: hidden;resize:none; height: 24px " onfocus="window.activeobj=this;this.clock=setInterval(function(){activeobj.style.height=activeobj.scrollHeight+'px';},200);" onblur="clearInterval(this.clock);" name="a{{comment.id}}"></textarea>
+  <textarea id="b{{comment.id}}" style="width: 98%;border-width: 1px; border-style:solid;border-color:#e4dcdc;overflow-wrap: break-word;overflow: hidden;resize:none; height: 24px " onfocus="window.activeobj=this;this.clock=setInterval(function(){activeobj.style.height=activeobj.scrollHeight+'px';},200);" onblur="clearInterval(this.clock);" name="a{{comment.id}}"></textarea>
 </p>
 <button id="calculate{{ comment.id }}">回复</button>
 </div>
