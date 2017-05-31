@@ -78,6 +78,7 @@
                         success:function(data){
                             $('input[name="a{{comment.id}}"]').val("");
                             $("#rawcomment{{ comment.id }}").toggle();
+                            
                             $.ajax({
                                 url:$SCRIPT_ROOT + '/post/'+{{comment.post_id}},
                                 dataType: 'html',

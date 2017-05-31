@@ -56,9 +56,9 @@ ul.comments li.comment {
     padding: 8px;
     border-bottom: 1px solid #e0e0e0;
 }
-li.recomment {border-bottom: 1px solid #e0e0e0;
+li.recomment {border-bottom: 1px solid #cec5b6;
     padding: 8px;
-    background-color: #c3c1bd4d}
+    background-color: #efe5d6}
 ul.comments li.comment:nth-child(1) {
     border-top: 1px solid #e0e0e0;
 }

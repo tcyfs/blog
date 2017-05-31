@@ -22,6 +22,17 @@
                 {% endif %}
             </div>
             <div class="post-footer">
+                {% if post.tag %}
+                
+                <span class="glyphicon glyphicon-tags" style="float: left">
+                
+                {% for i in post.tag.split(',') %}
+                <a href="#"><span class="label label-primary">{{ i }}</span></a>
+                {% endfor %}
+                
+                </span>
+                
+                {% endif %}
                 {% if current_user == post.author %}
                 <a href="{{ url_for('.edit', id=post.id) }}">
                     <span class="label label-primary">编辑</span>
@@ -31,6 +42,7 @@
                     <span class="label label-danger">编辑【管理员】</span>
                 </a>
                 {% endif%}
+                
                 <a href="{{ url_for('.post', id=post.id) }}">
                     <span class="label label-default">查看全文</span>
                 </a>
