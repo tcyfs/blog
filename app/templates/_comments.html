@@ -13,7 +13,7 @@
         <div  class="comment-content">
             <div class="comment-date">{{ moment(comment.timestamp).fromNow() }}</div>
             <div class="comment-author"><a href="{{ url_for('.user', username=comment.author.username) }}">{{ comment.author.username }}</a></div>
-            <div class="comment-body">
+            <div class="comment-body" style="overflow-wrap: break-word;">
                 {% if comment.disabled %}
                 {% if current_user == comment.author or current_user.is_administrator() %}
                 <p style="color: red"><i>系统提示：这条评论已被屏蔽,仅本人和管理员可见</i></p>
@@ -65,7 +65,7 @@
             var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
             $(function(){
                 $("#calculate{{ comment.id }}").click(function(){
-                    var a=$('input[name="a{{comment.id}}"]').val();
+                    var a=$('textarea[name="a{{comment.id}}"]').val();
                     var data={
                         data: JSON.stringify({
                             'a': a
@@ -77,7 +77,7 @@
                         dataType: 'json',
                         data: data,
                         success:function(data){
-                            $('input[name="a{{comment.id}}"]').val("");
+                            $('textarea[name="a{{comment.id}}"]').val("");
                             $("#rawcomment{{ comment.id }}").toggle();
                             
                             $.ajax({
@@ -99,7 +99,7 @@
             })
             </script>
 <p>
-  <input id="b{{comment.id}}" type="text" size="120" name="a{{comment.id}}">
+  <textarea id="b{{comment.id}}" type="text" style="width: 98%;border-width: 1px; border-style:solid;border-color:#e4dcdc;overflow-wrap: break-word;overflow: hidden;resize:none; height: 24px " onfocus="window.activeobj=this;this.clock=setInterval(function(){activeobj.style.height=activeobj.scrollHeight+'px';},200);" onblur="clearInterval(this.clock);" name="a{{comment.id}}"></textarea>
 </p>
 <button id="calculate{{ comment.id }}">回复</button>
 </div>
