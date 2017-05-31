@@ -35,17 +35,8 @@
                 {% endif %}
                 
             </div>
-            <div id="comment_bar{{comment.id}}">
-            {% if current_user == comment.author or current_user.is_administrator() %}
-            <script type="text/javascript">
-                $("#comment_bar{{comment.id}}").hover(function(){
-                $("#delcomment{{comment.id}}").css("visibility","visible");
-              },function(){
-                $("#delcomment{{comment.id}}").css("visibility","hidden");
-              });
-            </script>
-            <a id="delcomment{{comment.id}}" href="{{ url_for('.delete_comment', id=comment.id) }}" style="color: #e14d4d; visibility: hidden;" >删除</a>
-            {% endif %}
+            <div id="comment_bar{{comment.id}}" style="padding-bottom: 20px ">
+            
             {% if not comment.disabled %}
             {% if current_user.can(Permission.COMMENT) %}
                 <script>
@@ -58,7 +49,17 @@
                 </script>
 
 
-            <a href="javascript:void(0)" id="recomment{{ comment.id}}" style="color:black; padding-left: 10px">回复</a>      
+            <a href="javascript:void(0)" id="recomment{{ comment.id}}" style="color:black; padding-left: 8px; float: right">回复</a>
+            {% if current_user == comment.author or current_user.is_administrator() %}
+            <script type="text/javascript">
+                $("#comment_bar{{comment.id}}").hover(function(){
+                $("#delcomment{{comment.id}}").css("visibility","visible");
+              },function(){
+                $("#delcomment{{comment.id}}").css("visibility","hidden");
+              });
+            </script>
+            <a id="delcomment{{comment.id}}" href="{{ url_for('.delete_comment', id=comment.id) }}" style="color: #e14d4d; float: right; visibility: hidden;" >删除</a>
+            {% endif %}      
             <div id="rawcomment{{ comment.id}}" style="display: none;">
             <script type="text/javascript">
             var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
@@ -98,7 +99,7 @@
             })
             </script>
 <p>
-  <input id="b{{comment.id}}" type="text" size="80" name="a{{comment.id}}">
+  <input id="b{{comment.id}}" type="text" size="120" name="a{{comment.id}}">
 </p>
 <button id="calculate{{ comment.id }}">回复</button>
 </div>

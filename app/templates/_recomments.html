@@ -52,17 +52,8 @@
                 
 
             </div>
-            <div id="recomment_bar{{recomment.id}}">
-            {% if current_user == recomment.author or current_user.is_administrator() %}
-            <script type="text/javascript">
-                $("#recomment_bar{{recomment.id}}").hover(function(){
-                $("#delrecomment{{recomment.id}}").css("visibility","visible");
-              },function(){
-                $("#delrecomment{{recomment.id}}").css("visibility","hidden");
-              });
-            </script>
-            <a id="delrecomment{{recomment.id}}" href="{{ url_for('.delete_recomment', id=recomment.id) }}" style="color: #e14d4d; visibility: hidden;">删除</a>
-            {% endif %}
+            <div id="recomment_bar{{recomment.id}}" style="padding-bottom: 15px ">
+            
             {% if not recomment.disabled %}
             {% if current_user.can(Permission.COMMENT) %}
             <script>
@@ -72,7 +63,20 @@
                 });
                 });
             </script>
-            <a href="javascript:void(0)" id="reply{{ recomment.id}}" style="padding-left: 10px; color: black">回复</a> 
+            <a href="javascript:void(0)" id="reply{{ recomment.id}}" style="float: right; padding-left:8px; color: black">回复</a>
+            {% if current_user == recomment.author or current_user.is_administrator() %}
+            <script type="text/javascript">
+                $("#recomment_bar{{recomment.id}}").hover(function(){
+                $("#delrecomment{{recomment.id}}").css("visibility","visible");
+              },function(){
+                $("#delrecomment{{recomment.id}}").css("visibility","hidden");
+              });
+            </script>
+            <div>
+            <a id="delrecomment{{recomment.id}}" href="{{ url_for('.delete_recomment', id=recomment.id) }}" style="float: right;color: #e14d4d; visibility: hidden;">删除</a>
+            <div>
+            {% endif %}
+
             <div id="rawreply{{ recomment.id}}" style="display: none;">
             <script type="text/javascript">
              var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
@@ -113,10 +117,11 @@
             </script>
 
             <p>
-            <input id="b{{recomment.id}}" type="text" size="80" name="r{{ recomment.id }}">
+            <input id="b{{recomment.id}}" type="text" size="102" name="r{{ recomment.id }}">
             </p>
             <button id="tj{{ recomment.id }}">回复</button>
             </div>
+             
             </div>
             {% endif %}
             {% endif %}
