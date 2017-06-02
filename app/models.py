@@ -1,3 +1,4 @@
+# -*-coding:utf-8-*-
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -243,6 +244,8 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+
+
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
@@ -251,6 +254,7 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     comments = db.relationship('Comment', backref='post', lazy='dynamic')
+    recomments = db.relationship('ReComment', backref='post', lazy='dynamic')
 
     @staticmethod
     def generate_fake(count=100):
@@ -306,6 +310,7 @@ class ReComment(db.Model):
     reply_type = db.Column(db.Text, default='recomment')
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
 
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
@@ -313,3 +318,25 @@ class ReComment(db.Model):
         target.body_html = bleach.linkify(bleach.clean(markdown(value, output_format='html'), tags=allowed_tags,
                                                        strip=True))
 db.event.listen(ReComment.body, 'set', ReComment.on_changed_body)
+
+
+registrations = db.Table('registrations',
+                        db.Column('category_id', db.Integer, db.ForeignKey('categorys.id')),
+                        db.Column('post_id', db.Integer, db.ForeignKey('posts.id'))
+                        )
+class Category(db.Model):
+    __tablename__ = 'categorys'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    posts = db.relationship('Post',secondary=registrations,backref=db.backref('categorys', lazy='dynamic'),lazy='dynamic')
+
+
+    @staticmethod
+    def insert_categorys():
+        categorylist = ["Python","Web","Flask",u"数据库",u"杂记","Dota"]
+        for category in  categorylist:
+            postcategory=Category.query.filter_by(name=category).first()
+            if postcategory is None:
+                postcategory=Category(name=category)
+                db.session.add(postcategory)
+            db.session.commit()

@@ -11,7 +11,7 @@ from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm,
 from ..auth import forms
 from ..email import send_email
 from .. import db
-from ..models import User, Role, Post, Permission, Comment, ReComment
+from ..models import User, Role, Post, Permission, Comment, ReComment, Category,registrations
 from ..decorators import admin_required, permission_required
 
 
@@ -39,6 +39,13 @@ def about_web():
     return render_template('about_web.html')
 @main.route('/', methods=['GET', 'POST'])
 def index():
+    for i in Category.query.all():
+        if i.posts.count() == 0:
+            if i.name in ['Python','Flask',u'数据库','Dota','Web',u'杂记']:
+                continue
+            db.session.delete(i)
+            db.session.commit()
+
     form1 = PostForm()
     form2 = forms.LoginForm()
     form3 = forms.RegistrationForm()
@@ -46,6 +53,17 @@ def index():
         post = Post(body=form1.body.data, author=current_user._get_current_object())
         db.session.add(post)
         db.session.commit()
+        for i in form1.tag.data:
+            tag = Category.query.get(i)
+            tag.posts.append(post)
+            db.session.add(tag)
+            db.session.commit()
+        if form1.customtag.data.strip():
+            tag=Category(name=form1.customtag.data)
+            tag.posts.append(post)
+            db.session.add(tag)
+            db.session.commit()
+
         flash(u'提交文章成功.', 'info')
         return redirect(url_for(".index"))
     if form2.submit2.data and form2.validate_on_submit():
@@ -73,7 +91,7 @@ def index():
     pagination = query.order_by(Post.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
                                                                      error_out=False)
     posts = pagination.items
-    return render_template('index.html', form1=form1, form2=form2,form3=form3, posts=posts, show_followed=show_followed, pagination=pagination)
+    return render_template('index.html', form1=form1, form2=form2,form3=form3, posts=posts, show_followed=show_followed, pagination=pagination, Category=Category)
 
 
 @main.route('/user/<username>')
@@ -135,7 +153,6 @@ def edit_profile_admin(id):
 def post(id):
     post = Post.query.get_or_404(id)
     form = CommentForm()
-    
     if form.submit.data and form.validate_on_submit():
         comment = Comment(body=form.body.data, post=post, author=current_user._get_current_object())
         db.session.add(comment)
@@ -149,17 +166,19 @@ def post(id):
     pagination = post.comments.order_by(Comment.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
                                                                           error_out=False)
     comments = pagination.items
-    return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination, ReComment=ReComment, Comment=Comment)
+
+    return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination, ReComment=ReComment, Category=Category)
 
 @main.route('/recomment/<int:id>', methods=['POST'])
 @login_required
 def recomment(id):
     comment = Comment.query.get_or_404(id)
+    post = Post.query.get_or_404(comment.post_id)
     data = json.loads(request.form.get('data'))
     a = data['a']
     if a.strip() == '':
         return 'input nothing'
-    recomment = ReComment(body=a, comment=comment,author=current_user._get_current_object(),reply_id=comment.id)
+    recomment = ReComment(body=a, post=post,comment=comment,author=current_user._get_current_object(),reply_id=comment.id)
 
     db.session.add(recomment)
     db.session.commit()
@@ -171,11 +190,12 @@ def recomment(id):
 def reply(id):
     recomment = ReComment.query.get_or_404(id)
     comment = Comment.query.get_or_404(recomment.comment_id)
+    post = Post.query.get_or_404(comment.post_id)
     data = json.loads(request.form.get('data'))
     a = data['a']
     if a.strip() == '':
         return 'input nothing'
-    reply = ReComment(body=a, comment=comment,author=current_user._get_current_object(),reply_id=recomment.id,reply_type="reply")
+    reply = ReComment(body=a, comment=comment,post=post,author=current_user._get_current_object(),reply_id=recomment.id,reply_type="reply")
     db.session.add(reply)
     db.session.commit()
     
@@ -233,6 +253,19 @@ def edit(id):
         post.body = form.body.data
         db.session.add(post)
         db.session.commit()
+        for i in form.tag.data:
+            tag = Category.query.get(i)
+            if tag in post.categorys.all():
+                post.categorys.remove(tag)
+                post.categorys.append(tag)
+            post.categorys.append(tag)
+            db.session.add(post)
+            db.session.commit()
+        if form.customtag.data.strip():
+            tag=Category(name=form.customtag.data)
+            tag.posts.append(post)
+            db.session.add(tag)
+            db.session.commit()
         flash(u'文章修改成功!','success')
         return redirect(url_for('.post', id=post.id))
     form.body.data = post.body
@@ -378,4 +411,14 @@ def moderate_disablere(id):
     db.session.commit()
     return redirect(url_for('.moderate',
                             page=request.args.get('page', 1, type=int)))
+
+@main.route('/tag/<int:id>')
+def tag(id):
+    tag = Category.query.get_or_404(id)
+    page = request.args.get('page', 1, type=int)
+    query = tag.posts
+    pagination = query.order_by(Post.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+                                                                     error_out=False)
+    posts = pagination.items
+    return render_template('tag.html',posts=posts,pagination=pagination,tag=tag,Category=Category)
 

@@ -1,10 +1,10 @@
 # -*- coding:utf-8 -*-
 from flask_wtf import Form
-from wtforms import StringField, SubmitField, TextField, BooleanField, SelectField, TextAreaField
-from wtforms.validators import DataRequired, Length, Email, Regexp
+from wtforms import StringField, SubmitField, TextField, BooleanField, SelectField, TextAreaField,SelectMultipleField
+from wtforms.validators import DataRequired, Length, Email, Regexp, NoneOf
 from wtforms import ValidationError
 from flask_pagedown.fields import PageDownField
-from ..models import Role, User
+from ..models import Role, User, Category
 
 
 class EditProfileForm(Form):
@@ -39,9 +39,16 @@ class EditProfileAdminForm(Form):
 
 
 class PostForm(Form):
-    body = TextAreaField(u'发表博文', validators=[DataRequired()],  render_kw={'placeholder': u'此刻在想什么呢？'})
+    tag = SelectMultipleField(u'选择文章标签(可多选)', coerce=int)
+    customtag = StringField(u'手动添加更多标签',validators=[Length(0, 10)],render_kw={'placeholder': u'请输入少于10个文字'})
+    body = TextAreaField(u'发表博文', validators=[DataRequired()], render_kw={'placeholder': u'此刻在想什么呢？'})
     submit1 = SubmitField(u'提交')
-
+    def __init__(self, *args, **kwargs):
+        super(PostForm, self).__init__(*args, **kwargs)
+        self.tag.choices = [(1, 'Python'),(2,"Web"),(3,"Flask"),(4,u"数据库"),(5,u"杂记"),(6,"Dota")]
+    def validate_customtag(self, field):
+        if field.data.lower() in ["python","web","flask",u"数据库",u"杂记","dota"]:
+            raise ValidationError(u'列表中存在相似标签，你可以直接选择')
 
 class CommentForm(Form):
     body = StringField('', validators=[DataRequired()], render_kw={'placeholder': u'写下你的评论'})

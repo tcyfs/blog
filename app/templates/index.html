@@ -17,21 +17,21 @@
   <!-- Wrapper for slides -->
   <div class="carousel-inner" role="listbox">
     <div class="item active">
-      <img src="static/8.jpg" alt="图片加载失败" style="width: 100%;height: 500px;">
+      <img src="static/8.jpg" alt="图片加载失败" style="width: 100%;height: 300px;">
         <div class="carousel-caption ">
             <h1 class="animated lightSpeedIn" style="color: ">功能完善中</h1>
             <p class="animated lightSpeedIn">敬请期待</p>
         </div>
     </div>
     <div class="item">
-      <img src="static/9.jpg" alt="图片加载失败" style="width: 100%;height: 500px;">
+      <img src="static/9.jpg" alt="图片加载失败" style="width: 100%;height: 300px;">
       <div class="carousel-caption ">
     <h1 class="animated zoomInDown" style="color: ">鬼知道什么时候做完~ ~ ~ </h1>
     <p class="animated zoomInDown">拖延症是病。。得治</p>
     </div>
     </div>
     <div class="item">
-    <img src="static/10.jpg" alt="图片加载失败" style="width: 100%;height: 500px;">
+    <img src="static/10.jpg" alt="图片加载失败" style="width: 100%;height: 300px;">
           <div class="carousel-caption ">
     <h1 class="animated zoomInDown" style="color: ">接下来做啥 </h1>
     <p class="animated zoomInDown">我也不知道</p>
@@ -64,6 +64,10 @@
     <form class="form" method="POST">
     {{ form1.hidden_tag() }}
     {{ wtf.form_field(form1.body, class="ckeditor") }}
+
+    {{ wtf.form_field(form1.tag) }}
+    {{ wtf.form_field(form1.customtag) }}
+
     {{ wtf.form_field(form1.submit1) }}
 </form>
     {% endif %}
@@ -101,31 +105,15 @@
     <div class="namebox" style="height: 16px;line-height: 16px;padding-top: 5px;text-align: center;">
         <a href="{{ url_for('.user', username=current_user.username) }}">{{ current_user.username}}</a>
     </div>
-    <div class="follow" style="height: 16px;line-height: 16px;padding-top: 5px;text-align: center;">
+    <div class="follow" style="height: 16px;line-height: 16px;padding-top: 5px;text-align: center;padding-bottom: 25px ">
         <a href="{{ url_for('.followers', username=current_user.username) }}">粉丝:<span class="badge">{{ current_user.followers.count()-1 }}</span>|</a>
         <a href="{{ url_for('.followed_by', username=current_user.username) }}">关注:<span class="badge">{{ current_user.followed.count()-1 }}</span>|</a>
         <a href="{{ url_for('.user', username=current_user.username) }}">博文:<span class="badge">{{ current_user.posts.count() }}</span></a>
     </div>
-    <div>
-    <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" id="honehoneclock" width="160" height="70" align="middle">
-    <param name="allowScriptAccess" value="always">
-    <param name="movie" value="http://chabudai.sakura.ne.jp/blogparts/honehoneclock/honehone_clock_tr.swf">
-    <param name="quality" value="high">
-    <param name="bgcolor" value="#ffffff">
-    <param name="wmode" value="transparent">
-    <embed wmode="transparent" src="http://chabudai.sakura.ne.jp/blogparts/honehoneclock/honehone_clock_tr.swf" quality="high" bgcolor="#ffffff" name="honehoneclock" allowscriptaccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" width="240" height="80" align="middle"></object>
-    </div>
-    </div>
+    
+    
     {% else %}
-    <div>
-    <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0" id="honehoneclock" width="160" height="70" align="middle">
-    <param name="allowScriptAccess" value="always">
-    <param name="movie" value="http://chabudai.sakura.ne.jp/blogparts/honehoneclock/honehone_clock_tr.swf">
-    <param name="quality" value="high">
-    <param name="bgcolor" value="#ffffff">
-    <param name="wmode" value="transparent">
-    <embed wmode="transparent" src="http://chabudai.sakura.ne.jp/blogparts/honehoneclock/honehone_clock_tr.swf" quality="high" bgcolor="#ffffff" name="honehoneclock" allowscriptaccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" width="240" height="80" align="middle"></object>
-    </div>
+  
 <div class="widget" >
     <h4 class="title">
     登陆获取更多功能
@@ -171,6 +159,15 @@
 
 <div class="widget">
     <h4 class="title">
+    文章标签
+    <br>
+    </h4>
+    {% for i in Category.query.all() %}
+    <div><a href="{{url_for('.tag', id=i.id)}}" style="line-height: 1.8;color:#2098d1; font-weight: bolder;">{{i.name}}</a><span class="label label-default" style="float:right;">{{i.posts.count()}}</span></div>
+    {% endfor %}
+</div>
+<div class="widget">
+    <h4 class="title">
     关于网站的信息
     <br>
     </h4>
@@ -186,6 +183,10 @@
     <p>github:<a href="https://github.com/tcyfs">tcyfs</a></p>
 
 </div>
+
+ 
+
+
 
 
 {% endblock %}

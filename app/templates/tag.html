@@ -5,16 +5,18 @@
 {% block title %}博客文章{% endblock %}
 
 {% block page_content %}
+<h1>{{tag.name}}</h1>
 <ul class="posts">
     {% for post in posts %}
     <li class="post">
         <div class="post-thumbnail">
             <a href="{{ url_for('.user', username=post.author.username) }}">
             {% if post.author.photo %}
-                <img class="img-rounded profile-thumbnail" src="{{ post.author.photo }}" style="height: 40px; width: 40px">
+                <img class="img-rounded profile-thumbnail" src="{{ post.author.photo}}" style="height: 40px; width: 40px">
             {% else %}
                 <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=40)}}">
             {% endif %}
+            
             </a>
         </div>
         <div class="post-content">
@@ -22,16 +24,16 @@
             <div class="post-author"><a href="{{ url_for('.user', username=post.author.username) }}">{{ post.author.username }}</a></div>
             <div class="post-body" style="">
                 {% if post.body_html %}
-                {{ post.body_html | safe }}
+                {{ post.body_html | safe |truncate(350, True) }}
                 {% else %}
-                {{ post.body}}
+                {{ post.body | striptags |truncate(350, True)}}
                 {% endif %}
             </div>
             <div class="post-footer">
             <span class="glyphicon glyphicon-tags" style="float: left; padding-right: 5px "></span>
-            {% for tag in post.categorys.all() %}
+                {% for tag in post.categorys.all() %}
                 <a href="{{url_for('.tag', id=tag.id)}}" style="float: left; padding-left: 5px"><span class="label label-primary" style="background-color: #5a788e">{{tag.name}}</span></a>
-            {% endfor %}
+                {% endfor %}
                 {% if current_user == post.author %}
                 <a href="{{ url_for('.edit', id=post.id) }}">
                     <span class="label label-primary">编辑</span>
@@ -41,30 +43,26 @@
                     <span class="label label-danger">编辑【管理员】</span>
                 </a>
                 {% endif%}
+                
+                <a href="{{ url_for('.post', id=post.id) }}">
+                    <span class="label label-default">查看全文</span>
+                </a>
                 <a href="{{ url_for('.post', id=post.id)}}#comments">
-                    <span class="label label-primary">{{ post.comments.count()+post.recomments.count() }}评论</span>
+                    <span class="label label-primary">{{ post.comments.count() }}评论</span>
+                </a>
+                <a href="#">
+                    <span class="glyphicon glyphicon-thumbs-up"></span>
                 </a>
             </div>
         </div>
     </li>
     {% endfor %}
 </ul>
-<h4 id="comments">评论</h4>
-{% if current_user.can(Permission.COMMENT) %}
-<div class="comment-form">
-    {{ wtf.quick_form(form) }}
-</div>
-{% else %}
-<h3>发表评论，请先<a href="{{ url_for('auth.login' )}}">登录</a></h3>
-{% endif %}
 
-{% include '_comments.html' %}
-
-{% if pagination %}
 <div class="pagination">
-    {{ macros.pagination_widget(pagination, '.post', fragment='#comments', id=posts[0].id) }}
+    {{ macros.pagination_widget(pagination, '.tag' ,id=tag.id)}}
 </div>
-{% endif %}
+
 
 {% endblock %}
 {% block right_side %}

@@ -22,17 +22,10 @@
                 {% endif %}
             </div>
             <div class="post-footer">
-                {% if post.tag %}
-                
-                <span class="glyphicon glyphicon-tags" style="float: left">
-                
-                {% for i in post.tag.split(',') %}
-                <a href="#"><span class="label label-primary">{{ i }}</span></a>
+            <span class="glyphicon glyphicon-tags" style="float: left; padding-right: 5px "></span>
+                {% for tag in post.categorys.all() %}
+                <a href="{{url_for('.tag', id=tag.id)}}" style="float: left; padding-left: 5px"><span class="label label-primary" style="background-color: #5a788e">{{tag.name}}</span></a>
                 {% endfor %}
-                
-                </span>
-                
-                {% endif %}
                 {% if current_user == post.author %}
                 <a href="{{ url_for('.edit', id=post.id) }}">
                     <span class="label label-primary">编辑</span>
@@ -47,7 +40,10 @@
                     <span class="label label-default">查看全文</span>
                 </a>
                 <a href="{{ url_for('.post', id=post.id)}}#comments">
-                    <span class="label label-primary">{{ post.comments.count() }}评论</span>
+                    <span class="label label-primary">{{post.comments.count()+post.recomments.count()}}评论</span>
+                </a>
+                <a href="#">
+                    <span class="glyphicon glyphicon-thumbs-up"></span>
                 </a>
             </div>
         </div>
