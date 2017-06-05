@@ -13,8 +13,27 @@ from ..email import send_email
 from .. import db
 from ..models import User, Role, Post, Permission, Comment, ReComment, Category,registrations
 from ..decorators import admin_required, permission_required
+from qiniu import Auth, put_file, etag, urlsafe_base64_encode,put_data
+import qiniu.config
+import time
 
+class UploadToQiniu():
+    def __init__(self, file,domian_name='http://oqytm3mqj.bkt.clouddn.com', bucket_name='flaskblog',  expire=3600):
+        self.access_key = 'TvQoGbSnVvStgs6brjwPzCS3nADzEQ_kjSzHGotm'
+        self.secret_key = 'Q--6LAxGsiySHpNxcxBiGh1Ud79-0LvzT3jPpvUu'
+        self.bucket_name = bucket_name
+        self.domian_name = domian_name
+        self.file = file
+        self.expire = expire
 
+    def upload(self):
+        q = Auth(self.access_key, self.secret_key)
+        user = current_user
+        ext = self.file.filename.split('.')[-1]
+        time_ = str(time.time()).replace('.', '')
+        k = time_ + '_' + str(user.id) + '.' + ext 
+        token = q.upload_token(self.bucket_name, k, self.expire)
+        return put_data(token, k, self.file.read())
 @main.route('/upfile/<username>',methods = ['GET','POST'])
 def upfile(username):
     user = User.query.filter_by(username=username).first()
@@ -23,8 +42,10 @@ def upfile(username):
     posts = user.posts.order_by(Post.timestamp.desc()).all()
     if request.method == 'POST' and 'photo' in request.files:
         try:
-            filename = photos.save(request.files['photo'])
-            file_url = photos.url(filename)
+            u = UploadToQiniu(request.files['photo'])  
+            ret, inf = u.upload()
+            key = ret['key']
+            file_url = u.domian_name+'/'+key
             current_user.photo = file_url
             db.session.add(current_user)
             db.session.commit()
@@ -222,24 +243,28 @@ def delete_recomment(id):
         db.session.delete(delreply)
         db.session.commit()
     comment = Comment.query.get_or_404(recomment.comment_id)
-
-    #if current_user != post.author and not current_user.can(Permission.ADMINISTER):
-    #    abort(403)
     db.session.delete(recomment)
     db.session.commit()
-    flash(u'回复已删除', 'danger')
-    return redirect(url_for('.post', id=comment.post_id))
+    try:
+        flash(u'回复已删除', 'danger')
+        return redirect(url_for('.post', id=comment.post_id))
+    except:
+        flash(u'此评论文章不存在', 'danger')
+        return redirect(url_for('main.index'))
 
 @main.route('/delete_comment/<int:id>', methods=['GET','POST'])
 @login_required
 def delete_comment(id):
     comment = Comment.query.get_or_404(id)
-    #if current_user != post.author and not current_user.can(Permission.ADMINISTER):
-    #    abort(403)
     db.session.delete(comment)
     db.session.commit()
-    flash(u'评论已删除', 'danger')
-    return redirect(url_for('.post', id=comment.post_id))
+    try:
+        flash(u'回复已删除', 'danger')
+        return redirect(url_for('.post', id=comment.post_id))
+    except:
+        flash(u'此评论文章不存在', 'danger')
+        return redirect(url_for('main.index'))
+
 
 
 @main.route('/edit/<int:id>', methods=['GET', 'POST'])
