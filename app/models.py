@@ -274,10 +274,11 @@ class Post(db.Model):
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
         allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'pre', 'strong',
-                        'ul', 'h1', 'h2', 'h3', 'p','img']
-        attrs={'img':['src', 'alt']}
+                        'ul', 'h1', 'h2', 'h3', 'p','img','embed']
+        attrs={'*': ['class', 'style'],'img':['src', 'alt'],'a':'href','embed':['src','width','height','type']}
+        styles = ['height', 'width'] 
         target.body_html = bleach.linkify(bleach.clean(markdown(value, output_format='html'), tags=allowed_tags,
-                                                       attributes=attrs, strip=True))
+                                                       attributes=attrs,styles=styles, strip=True))
 db.event.listen(Post.body, 'set', Post.on_changed_body)
 
 

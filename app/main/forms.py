@@ -42,7 +42,7 @@ class PostForm(Form):
     tag = SelectMultipleField(u'选择文章标签(可多选)', coerce=int)
     customtag = StringField(u'手动添加更多标签',validators=[Length(0, 10)],render_kw={'placeholder': u'请输入少于10个文字'})
     body = TextAreaField(u'发表博文', validators=[DataRequired()], render_kw={'placeholder': u'此刻在想什么呢？'})
-    submit1 = SubmitField(u'提交')
+    submit1 = SubmitField(u'发表')
     def __init__(self, *args, **kwargs):
         super(PostForm, self).__init__(*args, **kwargs)
         self.tag.choices = [(1, 'Python'),(2,"Web"),(3,"Flask"),(4,u"数据库"),(5,u"杂记"),(6,"Dota")]

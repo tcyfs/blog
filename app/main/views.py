@@ -2,6 +2,8 @@
 import os
 import json
 from datetime import datetime
+import random
+import urllib
 from flask import render_template, abort, redirect, flash, url_for, request, current_app, make_response,jsonify
 from .. import photos
 from werkzeug import secure_filename
@@ -446,4 +448,30 @@ def tag(id):
                                                                      error_out=False)
     posts = pagination.items
     return render_template('tag.html',posts=posts,pagination=pagination,tag=tag,Category=Category)
+
+def gen_rnd_filename():
+    filename_prefix = datetime.now().strftime('%Y%m%d%H%M%S')
+    return '%s%s' % (filename_prefix, str(random.randrange(1000, 10000)))
+@main.route('/ckupload/', methods=['POST', 'OPTIONS'])
+def ckupload():
+    """CKEditor file upload"""
+    error = ''
+    url = ''
+    callback = request.args.get("CKEditorFuncNum")
+    if request.method == 'POST' and 'upload' in request.files:
+        fileobj = request.files['upload']
+        fname, fext = os.path.splitext(fileobj.filename)
+        rnd_name = '%s%s' % (gen_rnd_filename(), fext)
+        u = UploadToQiniu(fileobj)  
+        ret, inf = u.upload()
+        key = ret['key']
+        url = u.domian_name+'/'+key
+    else:
+        error = 'post error'
+    res = """<script type="text/javascript">
+  window.parent.CKEDITOR.tools.callFunction(%s, '%s', '%s');
+</script>""" % (callback, url, error)
+    response = make_response(res)
+    response.headers["Content-Type"] = "text/html"
+    return response
 
