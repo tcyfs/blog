@@ -3,6 +3,9 @@
 {% block title %}私信{% endblock %}
 {% block page_content %}
 <ul class="messages">
+{% if contectors==[] %}
+<h1>你还没有私信聊天</h1>
+{% endif %}
 {% for contector in contectors %}
 <li class="contector" style="list-style-type:none;">
 <h1><a href="{{ url_for('.se_message',id=contector) }}">与{{ User.query.get(contector).username}}的聊天</a></h1>
