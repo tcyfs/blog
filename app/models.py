@@ -73,6 +73,8 @@ class User(UserMixin, db.Model):
                                 lazy='dynamic', cascade='all, delete-orphan')
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
     recomments = db.relationship('ReComment', backref='author', lazy='dynamic')
+    messages = db.relationship('Message', backref='author', lazy='dynamic',primaryjoin='Message.author_id==User.id')
+    messageds = db.relationship('Message', backref='sendto', lazy='dynamic',primaryjoin='Message.sendto_id==User.id')
 
     @staticmethod
     def generate_fake(count=100):
@@ -281,6 +283,14 @@ class Post(db.Model):
                                                        attributes=attrs,styles=styles, strip=True))
 db.event.listen(Post.body, 'set', Post.on_changed_body)
 
+class Message(db.Model):
+    __tablename__ = 'messages'
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    sendto_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    confirmed = db.Column(db.Boolean,default=False)
 
 class Comment(db.Model):
     __tablename__ = 'comments'

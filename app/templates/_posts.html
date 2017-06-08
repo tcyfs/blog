@@ -1,6 +1,6 @@
 <ul class="posts">
     {% for post in posts %}
-    <li class="post">
+    <li class="post" style="padding-bottom: 30px">
         <div class="post-thumbnail">
             <a href="{{ url_for('.user', username=post.author.username) }}">
             {% if post.author.photo %}

@@ -58,3 +58,7 @@ class CommentForm(Form):
 class ReCommentForm(Form):
     body = StringField('',validators=[DataRequired()],render_kw={'placeholder': u'回复'})
     submit1 = SubmitField(u'提交')
+
+class MessageForm(Form):
+    body = StringField('', validators=[DataRequired()], render_kw={'placeholder': u'回复'})
+    submit = SubmitField(u'发送')

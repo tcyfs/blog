@@ -9,15 +9,16 @@ from .. import photos
 from werkzeug import secure_filename
 from flask_login import login_required, current_user, login_user
 from . import main
-from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm, ReCommentForm
+from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm, ReCommentForm,MessageForm
 from ..auth import forms
 from ..email import send_email
 from .. import db
-from ..models import User, Role, Post, Permission, Comment, ReComment, Category,registrations
+from ..models import User, Role, Post, Permission, Comment, ReComment, Category,registrations, Message
 from ..decorators import admin_required, permission_required
 from qiniu import Auth, put_file, etag, urlsafe_base64_encode,put_data
 import qiniu.config
 import time
+from sqlalchemy.sql import or_
 
 class UploadToQiniu():
     def __init__(self, file,domian_name='http://oqytm3mqj.bkt.clouddn.com', bucket_name='flaskblog',  expire=3600):
@@ -474,4 +475,42 @@ def ckupload():
     response = make_response(res)
     response.headers["Content-Type"] = "text/html"
     return response
+
+
+@main.route('/se_message/<int:id>', methods=['GET', 'POST'])
+@login_required
+def se_message(id):
+    contector = User.query.get_or_404(id)
+    if contector == current_user:
+        flash(u'不能给自己发送私信','danger')
+        return redirect(url_for('.index'))
+    messageds = current_user.messageds.order_by(Message.timestamp.desc()).all()
+    messages = current_user.messages.order_by(Message.timestamp.desc()).all()
+    messgs = Message.query.filter(or_(Message.author_id.like(current_user.id),Message.sendto_id.like(current_user.id))).order_by(Message.timestamp.desc()).all()
+    asc_messgs = Message.query.filter(or_(Message.author_id.like(current_user.id),Message.sendto_id.like(current_user.id))).order_by(Message.timestamp.asc()).all()
+
+    form = MessageForm()
+    if form.submit.data and form.validate_on_submit():
+        comment = Message(body=form.body.data,author=current_user._get_current_object(),sendto=contector)
+        db.session.add(comment)
+        db.session.commit()
+        return redirect(url_for('.se_message', id=contector.id))
+    return render_template('se_message.html',form=form,messageds=messageds,messages=messages,contector=contector,User=User,messgs=messgs,asc_messgs=asc_messgs)
+
+@main.route('/message/<int:id>', methods=['GET', 'POST'])
+@login_required
+def message(id):
+    user = User.query.get_or_404(id)
+    if user != current_user:
+        abort(403)
+    messgs = Message.query.filter(or_(Message.author_id.like(current_user.id),Message.sendto_id.like(current_user.id))).order_by(Message.timestamp.desc()).all()
+    contectors = []
+    for i in messgs:
+        if i.author_id == current_user.id:
+            if i.sendto.id not in contectors:
+                contectors.append(i.sendto_id)
+        else:
+            if i.author.id not in contectors:
+                contectors.append(i.author_id)
+    return render_template('message.html',contectors=contectors,User=User,messgs=messgs,)
 
