@@ -484,18 +484,21 @@ def se_message(id):
     if contector == current_user:
         flash(u'不能给自己发送私信','danger')
         return redirect(url_for('.index'))
-    messageds = current_user.messageds.order_by(Message.timestamp.desc()).all()
-    messages = current_user.messages.order_by(Message.timestamp.desc()).all()
-    messgs = Message.query.filter(or_(Message.author_id.like(current_user.id),Message.sendto_id.like(current_user.id))).order_by(Message.timestamp.desc()).all()
-    asc_messgs = Message.query.filter(or_(Message.author_id.like(current_user.id),Message.sendto_id.like(current_user.id))).order_by(Message.timestamp.asc()).all()
-
+    l = []
+    messgs = Message.query.filter_by(author_id=current_user.id).order_by(Message.timestamp.desc()).all()+Message.query.filter_by(sendto_id=current_user.id).order_by(Message.timestamp.desc()).all()
+    for i in messgs:
+        l.append(i.id)
+    l.sort()
+    fmessgs = []
+    for i in l:
+        fmessgs.append(Message.query.get(i))
     form = MessageForm()
     if form.submit.data and form.validate_on_submit():
         comment = Message(body=form.body.data,author=current_user._get_current_object(),sendto=contector)
         db.session.add(comment)
         db.session.commit()
         return redirect(url_for('.se_message', id=contector.id))
-    return render_template('se_message.html',form=form,messageds=messageds,messages=messages,contector=contector,User=User,messgs=messgs,asc_messgs=asc_messgs)
+    return render_template('se_message.html',form=form,contector=contector,User=User,fmessgs=fmessgs)
 
 @main.route('/message/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -503,14 +506,21 @@ def message(id):
     user = User.query.get_or_404(id)
     if user != current_user:
         abort(403)
-    messgs = Message.query.filter(or_(Message.author_id.like(current_user.id),Message.sendto_id.like(current_user.id))).order_by(Message.timestamp.desc()).all()
-    contectors = []
+    l = []
+    messgs = Message.query.filter_by(author_id=current_user.id).order_by(Message.timestamp.desc()).all()+Message.query.filter_by(sendto_id=current_user.id).order_by(Message.timestamp.desc()).all()
     for i in messgs:
+        l.append(i.id)
+    l.sort(reverse=True)
+    fmessgs = []
+    for i in l:
+        fmessgs.append(Message.query.get(i))
+    contectors = []
+    for i in fmessgs:
         if i.author_id == current_user.id:
             if i.sendto.id not in contectors:
                 contectors.append(i.sendto_id)
         else:
             if i.author.id not in contectors:
                 contectors.append(i.author_id)
-    return render_template('message.html',contectors=contectors,User=User,messgs=messgs,)
+    return render_template('message.html',contectors=contectors,User=User)
 
