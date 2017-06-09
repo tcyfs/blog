@@ -57,7 +57,7 @@ def upfile(username):
         except:
             flash(u'上传失败，请确认上传文件是图片','warning')
             return render_template('upload.html')
-    return render_template('upload.html')
+    return render_template('upload.html',Message=Message)
 @main.route('/about_web')
 def about_web():
     return render_template('about_web.html')
@@ -115,7 +115,7 @@ def index():
     pagination = query.order_by(Post.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
                                                                      error_out=False)
     posts = pagination.items
-    return render_template('index.html', form1=form1, form2=form2,form3=form3, posts=posts, show_followed=show_followed, pagination=pagination, Category=Category)
+    return render_template('index.html', form1=form1, form2=form2,form3=form3, posts=posts, show_followed=show_followed, pagination=pagination, Category=Category,Message=Message)
 
 
 @main.route('/user/<username>')
@@ -124,7 +124,7 @@ def user(username):
     if user is None:
         abort(404)
     posts = user.posts.order_by(Post.timestamp.desc()).all()
-    return render_template('user.html', user=user, posts=posts)
+    return render_template('user.html', user=user, posts=posts,Message=Message)
 
 
 @main.route('/edit-profile', methods=['GET', 'POST'])
@@ -142,7 +142,7 @@ def edit_profile():
     form.name.data = current_user.name
     form.location.data = current_user.location
     form.about_me.data = current_user.about_me
-    return render_template('edit_profile.html', form=form)
+    return render_template('edit_profile.html', form=form,Message=Message)
 
 
 @main.route('/edit-profile/<int:id>', methods=['GET', 'POST'])
@@ -170,7 +170,7 @@ def edit_profile_admin(id):
     form.name.data = user.name
     form.location.data = user.location
     form.about_me.data = user.about_me
-    return render_template('edit_profile.html', form=form, user=user)
+    return render_template('edit_profile.html', form=form, user=user,Message=Message)
 
 
 @main.route('/post/<int:id>', methods=['GET', 'POST'])
@@ -191,7 +191,7 @@ def post(id):
                                                                           error_out=False)
     comments = pagination.items
 
-    return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination, ReComment=ReComment, Category=Category)
+    return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination, ReComment=ReComment, Category=Category,Message=Message)
 
 @main.route('/recomment/<int:id>', methods=['POST'])
 @login_required
@@ -297,7 +297,7 @@ def edit(id):
         flash(u'文章修改成功!','success')
         return redirect(url_for('.post', id=post.id))
     form.body.data = post.body
-    return render_template('edit_post.html', form=form,id=post.id)
+    return render_template('edit_post.html', form=form,id=post.id,Message=Message)
 
 
 @main.route('/follow/<username>')
@@ -346,7 +346,7 @@ def followers(username):
                for item in pagination.items]
     return render_template('followers.html', user=user, title=u"的关注者",
                            endpoint='.followers', pagination=pagination,
-                           follows=follows)
+                           follows=follows,Message=Message)
 
 
 @main.route('/followed-by/<username>')
@@ -363,7 +363,7 @@ def followed_by(username):
                for item in pagination.items]
     return render_template('followers.html', user=user, title=u"关注的人",
                            endpoint='.followed_by', pagination=pagination,
-                           follows=follows)
+                           follows=follows,Message=Message)
 
 
 @main.route('/all')
@@ -390,7 +390,7 @@ def moderate():
     pagination = Comment.query.order_by(Comment.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
                                                                            error_out=False)
     comments = pagination.items
-    return render_template('moderate.html', comments=comments, pagination=pagination, page=page, ReComment=ReComment)
+    return render_template('moderate.html', comments=comments, pagination=pagination, page=page, ReComment=ReComment,Message=Message)
 
 
 @main.route('/moderate/enable/<int:id>')
@@ -448,7 +448,7 @@ def tag(id):
     pagination = query.order_by(Post.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
                                                                      error_out=False)
     posts = pagination.items
-    return render_template('tag.html',posts=posts,pagination=pagination,tag=tag,Category=Category)
+    return render_template('tag.html',posts=posts,pagination=pagination,tag=tag,Category=Category,Message=Message)
 
 def gen_rnd_filename():
     filename_prefix = datetime.now().strftime('%Y%m%d%H%M%S')
@@ -492,13 +492,25 @@ def se_message(id):
     fmessgs = []
     for i in l:
         fmessgs.append(Message.query.get(i))
+    
+    messageds = Message.query.filter_by(author_id=contector.id,sendto_id=current_user.id).order_by(Message.timestamp.asc()).all()
+
+    #messageds = current_user.messageds.order_by(Message.timestamp.asc()).all()
+    unreadmessages = []
+    for i in messageds:
+        if not i.confirmed:
+            unreadmessages.append(i)
+
+    for i in messageds:
+        i.confirmed = True
+        db.session.add(i)
     form = MessageForm()
     if form.submit.data and form.validate_on_submit():
-        comment = Message(body=form.body.data,author=current_user._get_current_object(),sendto=contector)
-        db.session.add(comment)
+        msg = Message(body=form.body.data,author=current_user._get_current_object(),sendto=contector,confirmed=False)
+        db.session.add(msg)
         db.session.commit()
         return redirect(url_for('.se_message', id=contector.id))
-    return render_template('se_message.html',form=form,contector=contector,User=User,fmessgs=fmessgs)
+    return render_template('se_message.html',form=form,contector=contector,User=User,fmessgs=fmessgs, unreadmessages=unreadmessages,Message=Message)
 
 @main.route('/message/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -522,5 +534,5 @@ def message(id):
         else:
             if i.author.id not in contectors:
                 contectors.append(i.author_id)
-    return render_template('message.html',contectors=contectors,User=User)
+    return render_template('message.html',contectors=contectors,User=User,Message=Message)
 

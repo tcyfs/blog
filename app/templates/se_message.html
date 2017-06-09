@@ -6,7 +6,7 @@
 <li class="contector" style="list-style-type:none;">
 <h1 style="text-align: center;">与{{ contector.username}}的聊天</h1>
 <hr>
-
+{% if unreadmessages==[] %}
 {% for i in fmessgs %}
 {% if i.author_id==contector.id %}
 <div class="post-thumbnail" >
@@ -18,7 +18,11 @@
 {% endif %}
 </a>
 </div>
-<div class="contector-time" style="padding-left: 48px">{{ moment(i.timestamp).format('YYYY年M月D日, h:mm:ss a') }}</div>
+<div class="contector-time" style="padding-left: 48px">{{ moment(i.timestamp).format('YYYY年M月D日, h:mm:ss a') }}
+{% if not i.confirmed %}
+<span class="label label-primary">未读</span>
+{% endif %}
+</div>
 <div class='message-content' style="margin-left: 48px;margin-right: 75%; min-height: 48px;border:1px solid;border-radius: 10px;margin-bottom: 3px;background-color:#f5f5f5">
 
 <div class="post-body" style="overflow-wrap: break-word;margin-left: 10px;margin-top: 5px">
@@ -38,7 +42,9 @@
 {% endif %}
 </a>
 </div>
-<div class="contector-time" style="margin-left: 71%;margin-right: 50px;">{{ moment(i.timestamp).format('YYYY年M月D日, h:mm:ss a') }}</div>
+<div class="contector-time" style="margin-left: 71%;margin-right: 50px;">{{ moment(i.timestamp).format('YYYY年M月D日, h:mm:ss a') }}
+
+</div>
 <div class='message-content' style="margin-left: 75%;margin-right: 50px; min-height: 48px;border:1px solid;border-radius: 10px;margin-bottom: 3px;background-color: rgba(73, 241, 78, 0.9);">
 
 <div class="post-body" style="overflow-wrap: break-word;margin-top: 5px;margin-right: 10px;text-align: right">
@@ -49,6 +55,75 @@
 
 {% endif %}
 {% endfor %}
+<p style="text-align: center;">---------------以上为历史消息---------------</p>
+{% else %}
+{% for i in fmessgs %}
+{% if i.author_id==contector.id %}
+{% if i == unreadmessages[0] %}
+<p style="text-align: center;">---------------以下为未读消息---------------</p>
+<div class="post-thumbnail" >
+<a href="{{ url_for('.user', username=i.author.username) }}">
+{% if i.author.photo %}
+<img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 40px; height: 40px; ">
+{% else %}
+<img class="img-rounded profile-thumbnail" src="{{ i.author.gravatar(size=40)}}">
+{% endif %}
+</a>
+</div>
+<div class="contector-time" style="padding-left: 48px">{{ moment(i.timestamp).format('YYYY年M月D日, h:mm:ss a') }}
+</div>
+<div class='message-content' style="margin-left: 48px;margin-right: 75%; min-height: 48px;border:1px solid;border-radius: 10px;margin-bottom: 3px;background-color:#f5f5f5">
+
+<div class="post-body" style="overflow-wrap: break-word;margin-left: 10px;margin-top: 5px">
+{{i.body}}
+</div>
+</div>
+{% else %}
+<div class="post-thumbnail" >
+<a href="{{ url_for('.user', username=i.author.username) }}">
+{% if i.author.photo %}
+<img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 40px; height: 40px; ">
+{% else %}
+<img class="img-rounded profile-thumbnail" src="{{ i.author.gravatar(size=40)}}">
+{% endif %}
+</a>
+</div>
+<div class="contector-time" style="padding-left: 48px">{{ moment(i.timestamp).format('YYYY年M月D日, h:mm:ss a') }}
+</div>
+<div class='message-content' style="margin-left: 48px;margin-right: 75%; min-height: 48px;border:1px solid;border-radius: 10px;margin-bottom: 3px;background-color:#f5f5f5">
+
+<div class="post-body" style="overflow-wrap: break-word;margin-left: 10px;margin-top: 5px">
+{{i.body}}
+</div>
+</div>
+{% endif %}
+{% endif %}
+{% if i.sendto_id==contector.id %}
+
+<div style="display: block; margin:0;padding: 0; ">
+<div class="post-thumbnail" style="margin-left:87%">
+<a href="{{ url_for('.user', username=i.author.username) }}">
+{% if i.author.photo %}
+<img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 40px; height: 40px; ">
+{% else %}
+<img class="img-rounded profile-thumbnail" src="{{ i.author.gravatar(size=40)}}">
+{% endif %}
+</a>
+</div>
+<div class="contector-time" style="margin-left: 71%;margin-right: 50px;">{{ moment(i.timestamp).format('YYYY年M月D日, h:mm:ss a') }}
+
+</div>
+<div class='message-content' style="margin-left: 75%;margin-right: 50px; min-height: 48px;border:1px solid;border-radius: 10px;margin-bottom: 3px;background-color: rgba(73, 241, 78, 0.9);">
+
+<div class="post-body" style="overflow-wrap: break-word;margin-top: 5px;margin-right: 10px;text-align: right">
+{{i.body}}
+</div>
+</div>
+</div>
+
+{% endif %}
+{% endfor %}
+{% endif %}
 <hr>
 </li>
 
