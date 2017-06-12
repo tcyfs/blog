@@ -1,7 +1,7 @@
 # -*-coding:utf-8-*-
 import os
 import json
-from datetime import datetime
+from datetime import datetime,timedelta
 import random
 import urllib
 from flask import render_template, abort, redirect, flash, url_for, request, current_app, make_response,jsonify
@@ -52,11 +52,11 @@ def upfile(username):
             current_user.photo = file_url
             db.session.add(current_user)
             db.session.commit()
-            return render_template('user.html', user=user, posts=posts)
+            return render_template('user.html', user=user, posts=posts,Message=Message)
             
         except:
             flash(u'上传失败，请确认上传文件是图片','warning')
-            return render_template('upload.html')
+            return render_template('upload.html',Message=Message)
     return render_template('upload.html',Message=Message)
 @main.route('/about_web')
 def about_web():
@@ -494,8 +494,6 @@ def se_message(id):
         fmessgs.append(Message.query.get(i))
     
     messageds = Message.query.filter_by(author_id=contector.id,sendto_id=current_user.id).order_by(Message.timestamp.asc()).all()
-
-    #messageds = current_user.messageds.order_by(Message.timestamp.asc()).all()
     unreadmessages = []
     for i in messageds:
         if not i.confirmed:
@@ -509,7 +507,7 @@ def se_message(id):
         msg = Message(body=form.body.data,author=current_user._get_current_object(),sendto=contector,confirmed=False)
         db.session.add(msg)
         db.session.commit()
-        return redirect(url_for('.se_message', id=contector.id))
+        return redirect(url_for('.se_message', id=contector.id)+"#contectorform")
     return render_template('se_message.html',form=form,contector=contector,User=User,fmessgs=fmessgs, unreadmessages=unreadmessages,Message=Message)
 
 @main.route('/message/<int:id>', methods=['GET', 'POST'])
@@ -536,3 +534,15 @@ def message(id):
                 contectors.append(i.author_id)
     return render_template('message.html',contectors=contectors,User=User,Message=Message)
 
+@main.route('/testmsg/<int:id>')
+def testmsg(id):
+    unread = Message.query.filter_by(sendto_id=current_user.id,author_id=id,confirmed=False).order_by(Message.timestamp.asc()).first()
+    if unread:
+        unread.confirmed = True
+        db.session.add(unread)
+        db.session.commit()
+        msgtime = unread.timestamp+timedelta(hours=8)
+        msgtime = msgtime.strftime('%Y-%m-%d, %H:%M')
+        return jsonify(result=unread.body,t=msgtime)
+    
+    return jsonify()

@@ -8,7 +8,7 @@
 {% endif %}
 {% for contector in contectors %}
 <li class="contector" style="list-style-type:none;">
-<h1><a href="{{ url_for('.se_message',id=contector) }}#contectorform">与{{ User.query.get(contector).username}}的聊天(有{{Message.query.filter_by(author_id=contector,sendto_id=current_user.id,confirmed=False).count()}}未读消息)</a></h1>
+<h1><a href="{{ url_for('.se_message',id=contector) }}#unread{{Message.query.filter_by(sendto_id=current_user.id,author_id=contector,confirmed=False).order_by(Message.timestamp.asc()).first().id}}">与{{ User.query.get(contector).username}}的聊天(有{{Message.query.filter_by(author_id=contector,sendto_id=current_user.id,confirmed=False).count()}}未读消息)</a></h1>
 {% endfor %}
 </li>
 

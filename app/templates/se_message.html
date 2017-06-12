@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 {% block title %}发送私信{% endblock %}
+
 {% block page_content %}
+
 <ul class="messages">
-<li class="contector" style="list-style-type:none;">
+<li id="contectormessages" class="contector" style="list-style-type:none;">
 <h1 style="text-align: center;">与{{ contector.username}}的聊天</h1>
 <hr>
 {% if unreadmessages==[] %}
 {% for i in fmessgs %}
 {% if i.author_id==contector.id %}
-<div class="post-thumbnail" >
+<div class="post-thumbnail" style="margin-top: 23px" >
 <a href="{{ url_for('.user', username=i.author.username) }}">
 {% if i.author.photo %}
 <img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 40px; height: 40px; ">
@@ -18,10 +20,7 @@
 {% endif %}
 </a>
 </div>
-<div class="contector-time" style="padding-left: 48px">{{ moment(i.timestamp).format('YYYY年M月D日, h:mm:ss a') }}
-{% if not i.confirmed %}
-<span class="label label-primary">未读</span>
-{% endif %}
+<div class="contector-time" style="padding-left:48px; display: block;">{{ moment(i.timestamp).format('YYYY-M-D, H:mm ') }}
 </div>
 <div class='message-content' style="margin-left: 48px;margin-right: 75%; min-height: 48px;border:1px solid;border-radius: 10px;margin-bottom: 3px;background-color:#f5f5f5">
 
@@ -33,7 +32,7 @@
 {% if i.sendto_id==contector.id %}
 
 <div style="display: block; margin:0;padding: 0; ">
-<div class="post-thumbnail" style="margin-left:87%">
+<div class="post-thumbnail" style="margin-left:87%;margin-top: 23px">
 <a href="{{ url_for('.user', username=i.author.username) }}">
 {% if i.author.photo %}
 <img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 40px; height: 40px; ">
@@ -42,7 +41,7 @@
 {% endif %}
 </a>
 </div>
-<div class="contector-time" style="margin-left: 71%;margin-right: 50px;">{{ moment(i.timestamp).format('YYYY年M月D日, h:mm:ss a') }}
+<div class="contector-time" style="margin-left: 80%;margin-right:">{{ moment(i.timestamp).format('YYYY-M-D, H:mm') }}
 
 </div>
 <div class='message-content' style="margin-left: 75%;margin-right: 50px; min-height: 48px;border:1px solid;border-radius: 10px;margin-bottom: 3px;background-color: rgba(73, 241, 78, 0.9);">
@@ -55,13 +54,14 @@
 
 {% endif %}
 {% endfor %}
-<p style="text-align: center;">---------------以上为历史消息---------------</p>
+<p id="unread" style="text-align: center;">---------------以上为历史消息---------------</p>
 {% else %}
 {% for i in fmessgs %}
 {% if i.author_id==contector.id %}
 {% if i == unreadmessages[0] %}
-<p style="text-align: center;">---------------以下为未读消息---------------</p>
-<div class="post-thumbnail" >
+<p id="unread{{i.id}}" style="text-align: center;">---------------以下为未读消息---------------</p>
+
+<div class="post-thumbnail" style="margin-top:23px">
 <a href="{{ url_for('.user', username=i.author.username) }}">
 {% if i.author.photo %}
 <img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 40px; height: 40px; ">
@@ -70,7 +70,7 @@
 {% endif %}
 </a>
 </div>
-<div class="contector-time" style="padding-left: 48px">{{ moment(i.timestamp).format('YYYY年M月D日, h:mm:ss a') }}
+<div class="contector-time" style="padding-left: 48px">{{ moment(i.timestamp).format('YYYY-M-D, H:mm') }}
 </div>
 <div class='message-content' style="margin-left: 48px;margin-right: 75%; min-height: 48px;border:1px solid;border-radius: 10px;margin-bottom: 3px;background-color:#f5f5f5">
 
@@ -79,7 +79,7 @@
 </div>
 </div>
 {% else %}
-<div class="post-thumbnail" >
+<div class="post-thumbnail" style="margin-top:23px">
 <a href="{{ url_for('.user', username=i.author.username) }}">
 {% if i.author.photo %}
 <img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 40px; height: 40px; ">
@@ -88,7 +88,7 @@
 {% endif %}
 </a>
 </div>
-<div class="contector-time" style="padding-left: 48px">{{ moment(i.timestamp).format('YYYY年M月D日, h:mm:ss a') }}
+<div class="contector-time" style="padding-left: 48px">{{ moment(i.timestamp).format('YYYY-M-D, H:mm') }}
 </div>
 <div class='message-content' style="margin-left: 48px;margin-right: 75%; min-height: 48px;border:1px solid;border-radius: 10px;margin-bottom: 3px;background-color:#f5f5f5">
 
@@ -101,7 +101,7 @@
 {% if i.sendto_id==contector.id %}
 
 <div style="display: block; margin:0;padding: 0; ">
-<div class="post-thumbnail" style="margin-left:87%">
+<div class="post-thumbnail" style="margin-left:87%; margin-top: 23px">
 <a href="{{ url_for('.user', username=i.author.username) }}">
 {% if i.author.photo %}
 <img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 40px; height: 40px; ">
@@ -110,8 +110,7 @@
 {% endif %}
 </a>
 </div>
-<div class="contector-time" style="margin-left: 71%;margin-right: 50px;">{{ moment(i.timestamp).format('YYYY年M月D日, h:mm:ss a') }}
-
+<div class="contector-time" style="margin-left: 71%;margin-right: ">{{ moment(i.timestamp).format('YYYY-M-D, H:mm') }}
 </div>
 <div class='message-content' style="margin-left: 75%;margin-right: 50px; min-height: 48px;border:1px solid;border-radius: 10px;margin-bottom: 3px;background-color: rgba(73, 241, 78, 0.9);">
 
@@ -124,9 +123,9 @@
 {% endif %}
 {% endfor %}
 {% endif %}
-<hr>
-</li>
 
+</li>
+<hr>
 
 </ul>
 <div id="contectorform" class="comment-form" style="padding-bottom:50px">
@@ -136,4 +135,24 @@
     {{ wtf.form_field(form.submit,style="background-color:#ea6d23;float:right;") }}
 </form>
 </div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<script type="text/javascript">
+var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+var reloadmessage = {
+      url:$SCRIPT_ROOT+'/testmsg/'+{{contector.id}},
+      dataType:'json',
+      success :function(data){
+        if (data.result){
+          if ("{{contector.photo}}" != "None"){
+        $('#contectormessages').append("<div class='post-thumbnail' style='margin-top: 23px' ><a href="+"{{url_for('.user', username=contector.username)}}"+"><img class='img-rounded profile-thumbnail' src='{{ contector.photo }}' style='width: 40px; height: 40px;'></a></div><div class='contector-time' style='padding-left:48px; display: block;'>"+data.t+"</div><div class='message-content animated fadeIn' style='margin-left: 48px;margin-right: 75%; min-height: 48px;border:1px solid;border-radius: 10px;margin-bottom: 3px;background-color:#f5f5f5'><div class='post-body' style='overflow-wrap: break-word;margin-left: 10px;margin-top: 5px'>"+data.result+"</div></div>");
+      } else{
+        $('#contectormessages').append("<div class='post-thumbnail' style='margin-top: 23px' ><a href="+"{{url_for('.user', username=contector.username)}}"+"><img class='img-rounded profile-thumbnail' src='{{ contector.gravatar(size=40)}}'></a></div><div class='contector-time' style='padding-left:48px; display: block;'>"+data.t+"</div><div class='message-content animated fadeIn' style='margin-left: 48px;margin-right: 75%; min-height: 48px;border:1px solid;border-radius: 10px;margin-bottom: 3px;background-color:#f5f5f5'><div class='post-body' style='overflow-wrap: break-word;margin-left: 10px;margin-top: 5px'>"+data.result+"</div></div>");
+      }
+      };
+    }
+      };
+window.setInterval(function(){$.ajax(reloadmessage)},1000);
+</script>
 {% endblock %}

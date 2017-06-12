@@ -57,8 +57,9 @@
 {% else %}
 <h3>发表评论，请先<a href="{{ url_for('auth.login' )}}">登录</a></h3>
 {% endif %}
-
+{% block comments %}
 {% include '_comments.html' %}
+{% endblock %}
 
 {% if pagination %}
 <div class="pagination">
