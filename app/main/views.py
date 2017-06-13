@@ -477,7 +477,7 @@ def ckupload():
     return response
 
 
-@main.route('/se_message/<int:id>', methods=['GET', 'POST'])
+@main.route('/se_message/<int:id>', methods=['GET'])
 @login_required
 def se_message(id):
     contector = User.query.get_or_404(id)
@@ -502,13 +502,9 @@ def se_message(id):
     for i in messageds:
         i.confirmed = True
         db.session.add(i)
-    form = MessageForm()
-    if form.submit.data and form.validate_on_submit():
-        msg = Message(body=form.body.data,author=current_user._get_current_object(),sendto=contector,confirmed=False)
-        db.session.add(msg)
-        db.session.commit()
-        return redirect(url_for('.se_message', id=contector.id)+"#contectorform")
-    return render_template('se_message.html',form=form,contector=contector,User=User,fmessgs=fmessgs, unreadmessages=unreadmessages,Message=Message)
+
+
+    return render_template('se_message.html',contector=contector,User=User,fmessgs=fmessgs, unreadmessages=unreadmessages,Message=Message)
 
 @main.route('/message/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -546,3 +542,17 @@ def testmsg(id):
         return jsonify(result=unread.body,t=msgtime)
     
     return jsonify()
+
+@main.route('/remsg/<int:id>', methods=['POST'])
+@login_required
+def remsg(id):
+    data = json.loads(request.form.get('data'))
+    a = data['a']
+    if a.strip() == '':
+        return jsonify()
+    msg = Message(body=a,author=current_user._get_current_object(),sendto=User.query.get(id),confirmed=False)
+    db.session.add(msg)
+    db.session.commit()
+    msgtime = msg.timestamp+timedelta(hours=8)
+    msgtime = msgtime.strftime('%Y-%m-%d, %H:%M')
+    return jsonify(result=a,t=msgtime)
