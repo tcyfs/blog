@@ -14,6 +14,11 @@ class Config(object):
     FLASKY_COMMENTS_PER_PAGE = 10
     SSL_DISABLE = False
     UPLOADED_PHOTOS_DEST = os.getcwd()+'/app/static/userspic'
+    MSEARCH_INDEX_NAME = 'whoosh_index'
+    # simple,whoosh
+    MSEARCH_BACKEND = 'whoosh'
+    # auto create or update index
+    MSEARCH_ENABLE = True
 
 
     @staticmethod

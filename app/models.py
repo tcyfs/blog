@@ -1,4 +1,5 @@
 # -*-coding:utf-8-*-
+import sys
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -8,6 +9,8 @@ from flask import current_app, request
 from flask_login import UserMixin, AnonymousUserMixin
 from . import db, login_manager
 import hashlib
+#from jieba.analyse import ChineseAnalyzer
+
 
 
 class Permission(object):
@@ -250,6 +253,8 @@ def load_user(user_id):
 
 class Post(db.Model):
     __tablename__ = 'posts'
+    __searchable__ = ['body']
+    #__analyzer__ = ChineseAnalyzer()  
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.Text)
     body_html = db.Column(db.Text)
@@ -282,6 +287,7 @@ class Post(db.Model):
         target.body_html = bleach.linkify(bleach.clean(markdown(value, output_format='html'), tags=allowed_tags,
                                                        attributes=attrs,styles=styles, strip=True))
 db.event.listen(Post.body, 'set', Post.on_changed_body)
+
 
 class Message(db.Model):
     __tablename__ = 'messages'
@@ -337,6 +343,7 @@ registrations = db.Table('registrations',
                         )
 class Category(db.Model):
     __tablename__ = 'categorys'
+    __searchable__ = ['name']
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
     posts = db.relationship('Post',secondary=registrations,backref=db.backref('categorys', lazy='dynamic'),lazy='dynamic')
@@ -351,3 +358,4 @@ class Category(db.Model):
                 postcategory=Category(name=category)
                 db.session.add(postcategory)
             db.session.commit()
+

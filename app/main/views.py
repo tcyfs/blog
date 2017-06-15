@@ -5,7 +5,7 @@ from datetime import datetime,timedelta
 import random
 import urllib
 from flask import render_template, abort, redirect, flash, url_for, request, current_app, make_response,jsonify
-from .. import photos
+from .. import photos, search
 from werkzeug import secure_filename
 from flask_login import login_required, current_user, login_user
 from . import main
@@ -556,3 +556,19 @@ def remsg(id):
     msgtime = msg.timestamp+timedelta(hours=8)
     msgtime = msgtime.strftime('%Y-%m-%d, %H:%M')
     return jsonify(result=a,t=msgtime)
+
+@main.route('/search', methods=['GET','POST'])
+def cz():
+    data = json.loads(request.form.get('data'))
+    a = data['a']
+    if a.strip() == '':
+        return jsonify()
+
+    return jsonify(result=a)
+
+@main.route('/seek/<kwd>')
+def seek(kwd):
+    results = Post.query.msearch(kwd,fields=['body'],limit=20).order_by(Post.timestamp.desc()).all()
+    return render_template('search_result.html',posts=results,Category=Category,Message=Message)
+
+    
