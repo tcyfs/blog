@@ -9,7 +9,8 @@ from flask import current_app, request
 from flask_login import UserMixin, AnonymousUserMixin
 from . import db, login_manager
 import hashlib
-#from jieba.analyse import ChineseAnalyzer
+import flask_whooshalchemyplus as whooshalchemy
+from jieba.analyse import ChineseAnalyzer
 
 
 
@@ -254,7 +255,7 @@ def load_user(user_id):
 class Post(db.Model):
     __tablename__ = 'posts'
     __searchable__ = ['body']
-    #__analyzer__ = ChineseAnalyzer()  
+    __analyzer__ = ChineseAnalyzer()  
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.Text)
     body_html = db.Column(db.Text)

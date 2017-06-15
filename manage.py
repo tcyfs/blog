@@ -4,10 +4,12 @@ from app import create_app, db
 from app.models import User, Role, Post, Permission, Follow, Category, ReComment
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
+import flask_whooshalchemyplus
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
 migrate = Migrate(app, db)
+flask_whooshalchemyplus.init_app(app)
 
 
 def make_shell_context():

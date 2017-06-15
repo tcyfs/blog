@@ -7,7 +7,6 @@ from config import config
 from flask_login import LoginManager
 from flask_pagedown import PageDown
 from flask_uploads import UploadSet, configure_uploads, IMAGES
-from flask_msearch import Search
 from jieba.analyse import ChineseAnalyzer
 
 bootstrap = Bootstrap()
@@ -16,7 +15,6 @@ moment = Moment()
 db = SQLAlchemy()
 login_manager = LoginManager()
 pagedown = PageDown()
-search = Search(analyzer=ChineseAnalyzer())
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
 photos = UploadSet('photos', IMAGES)
@@ -36,8 +34,7 @@ def create_app(config_name):
     db.init_app(app)
     pagedown.init_app(app)
     login_manager.init_app(app)
-    search.init_app(app)
-    
+
     configure_uploads(app, photos)
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
