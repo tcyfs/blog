@@ -171,7 +171,7 @@ window.setInterval(function(){$.ajax(reloadmessage)},1000);
                         data: data,
                         success:function(data){
                           $('input[name="body"]').val("");
-                          $('#body').focus().select();
+                          $('#body+').focus().select();
                           if (data.result){
                           if("{{current_user.photo}}" != "None"){
                             
