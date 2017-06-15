@@ -567,7 +567,12 @@ def cz():
 
 @main.route('/seek/<kwd>')
 def seek(kwd):
-    results = Post.query.whoosh_search(kwd).order_by(Post.timestamp.desc()).all()
-    return render_template('search_result.html',posts=results,Category=Category,Message=Message)
+    results = Post.query.whoosh_search(kwd)
+    page = request.args.get('page', 1, type=int)
+    pagination = results.order_by(Post.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+                                                                     error_out=False)
+    posts = pagination.items
+    return render_template('seek.html',posts=posts,pagination=pagination,Category=Category,Message=Message,kwd=kwd)
+
 
     

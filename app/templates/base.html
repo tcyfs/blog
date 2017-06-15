@@ -32,14 +32,15 @@
                 <li><a href="{{ url_for('main.user', username=current_user.username) }}" class="hvr-wobble-skew" style="color: white"><span class="glyphicon glyphicon-user"></span>&nbsp;个人信息</a></li>
                 <li><a href="{{ url_for('main.message', id=current_user.id) }}" class="hvr-wobble-skew" style="color: white"><span class="glyphicon glyphicon-envelope" ></span>&nbsp;私信<span class="label label-primary">{{Message.query.filter_by(sendto_id=current_user.id,confirmed=False).count()}}</span></a></li>
                 {% endif %}
-            <form class="navbar-form navbar-left" role="search">
+            <li class="navbar-form navbar-left">
                 <div class="input-group">
-                    <input id="search" type="text" class="form-control" name="search" placeholder="搜索你感兴趣的内容...">
+                    <input id="searchform" type="text" class="form-control" name="search" placeholder="搜索文章...">
                     <span class="input-group-btn">
                     <button id="searchbutton" class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>
                     </span>
-                    </div>
-            </form>
+                </div>
+            </li>
+
 
             </ul>
             <ul class="nav navbar-nav navbar-right">
@@ -118,7 +119,7 @@ $(document).ready(function(){
 </script>
 <script type="text/javascript">
 var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-                $("#searchbutton").click(function(){
+                    $("#searchbutton").click(function(){
                     var a=$('input[name="search"]').val();
                     var data={
                         data: JSON.stringify({
@@ -140,7 +141,31 @@ var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
                         },
                       })
                     })
+                    $('input[type=text]').bind('keydown', function(e) {
+                  if (e.keyCode == 13) {
+                    var a=$('input[name="search"]').val();
+                    var data={
+                        data: JSON.stringify({
+                            'a': a
+                        }),
+                    }
+                    $.ajax({
+                        url: $SCRIPT_ROOT + '/search',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        success:function(data){
+                            $('input[name="search"]').val("");
+                            if (data.result){
+                                window.location.href=$SCRIPT_ROOT+"/seek/"+data.result;
+                            }
+                            
 
+                        },
+                      })
+                    
+      }
+    });
 </script>
 
 {% endblock %}

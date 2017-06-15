@@ -9,5 +9,9 @@
 <h1>没有找到相关内容。</h1>
 {% else %}
 {% include '_posts.html' %}
+
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, '.seek',kwd=kwd)}}
+</div>
 {% endif %}
 {% endblock %}
