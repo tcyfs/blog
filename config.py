@@ -14,7 +14,10 @@ class Config(object):
     FLASKY_COMMENTS_PER_PAGE = 10
     SSL_DISABLE = False
     UPLOADED_PHOTOS_DEST = os.getcwd()+'/app/static/userspic'
-    WHOOSH_BASE = os.path.join(basedir, 'search.db')
+    #WHOOSH_BASE = os.path.join(basedir, 'search.db')
+    WHOOSH_BASE = 'search'
+    MAX_SEARCH_RESULTS = 50
+    PROPAGATE_EXCEPTIONS = True
 
 
     @staticmethod
