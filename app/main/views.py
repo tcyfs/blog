@@ -3,7 +3,7 @@ import os
 import json
 from datetime import datetime,timedelta
 import random
-import urllib
+# import urllib
 from flask import render_template, abort, redirect, flash, url_for, request, current_app, make_response,jsonify
 from werkzeug import secure_filename
 from flask_login import login_required, current_user, login_user
@@ -17,10 +17,10 @@ from ..decorators import admin_required, permission_required
 from qiniu import Auth, put_file, etag, urlsafe_base64_encode,put_data
 import qiniu.config
 import time
-from sqlalchemy.sql import or_
+
 
 class UploadToQiniu():
-    def __init__(self, file,domian_name='http://oqytm3mqj.bkt.clouddn.com', bucket_name='flaskblog',  expire=3600):
+    def __init__(self, file, domian_name='http://oqytm3mqj.bkt.clouddn.com', bucket_name='flaskblog',  expire=3600):
         self.access_key = 'TvQoGbSnVvStgs6brjwPzCS3nADzEQ_kjSzHGotm'
         self.secret_key = 'Q--6LAxGsiySHpNxcxBiGh1Ud79-0LvzT3jPpvUu'
         self.bucket_name = bucket_name
@@ -36,6 +36,8 @@ class UploadToQiniu():
         k = time_ + '_' + str(user.id) + '.' + ext 
         token = q.upload_token(self.bucket_name, k, self.expire)
         return put_data(token, k, self.file.read())
+
+
 @main.route('/upfile/<username>',methods = ['GET','POST'])
 def upfile(username):
     user = User.query.filter_by(username=username).first()
@@ -57,9 +59,13 @@ def upfile(username):
             flash(u'上传失败，请确认上传文件是图片','warning')
             return render_template('upload.html',Message=Message)
     return render_template('upload.html',Message=Message)
+
+
 @main.route('/about_web')
 def about_web():
     return render_template('about_web.html')
+
+
 @main.route('/', methods=['GET', 'POST'])
 def index():
     for i in Category.query.all():
@@ -206,7 +212,8 @@ def recomment(id):
     db.session.add(recomment)
     db.session.commit()
     return jsonify(result=a)
-    #return redirect(url_for('.post', id=comment.post_id))
+    # return redirect(url_for('.post', id=comment.post_id))
+
 
 @main.route('/reply/<int:id>', methods=['POST'])
 @login_required
@@ -221,8 +228,8 @@ def reply(id):
     reply = ReComment(body=a, comment=comment,post=post,author=current_user._get_current_object(),reply_id=recomment.id,reply_type="reply")
     db.session.add(reply)
     db.session.commit()
-    
     return jsonify(result=a)
+
 
 @main.route('/delete_post/<int:id>', methods=['GET','POST'])
 @login_required
@@ -234,6 +241,7 @@ def delete_post(id):
     db.session.commit()
     flash(u'文章已删除', 'danger')
     return redirect(url_for('main.index'))
+
 
 @main.route('/delete_recomment/<int:id>', methods=['GET','POST'])
 @login_required
@@ -254,6 +262,7 @@ def delete_recomment(id):
         flash(u'此评论文章不存在', 'danger')
         return redirect(url_for('main.index'))
 
+
 @main.route('/delete_comment/<int:id>', methods=['GET','POST'])
 @login_required
 def delete_comment(id):
@@ -266,7 +275,6 @@ def delete_comment(id):
     except:
         flash(u'此评论文章不存在', 'danger')
         return redirect(url_for('main.index'))
-
 
 
 @main.route('/edit/<int:id>', methods=['GET', 'POST'])
@@ -449,9 +457,12 @@ def tag(id):
     posts = pagination.items
     return render_template('tag.html',posts=posts,pagination=pagination,tag=tag,Category=Category,Message=Message)
 
+
 def gen_rnd_filename():
     filename_prefix = datetime.now().strftime('%Y%m%d%H%M%S')
     return '%s%s' % (filename_prefix, str(random.randrange(1000, 10000)))
+
+
 @main.route('/ckupload/', methods=['POST', 'OPTIONS'])
 def ckupload():
     """CKEditor file upload"""
@@ -505,6 +516,7 @@ def se_message(id):
 
     return render_template('se_message.html',contector=contector,User=User,fmessgs=fmessgs, unreadmessages=unreadmessages,Message=Message)
 
+
 @main.route('/message/<int:id>', methods=['GET', 'POST'])
 @login_required
 def message(id):
@@ -529,6 +541,7 @@ def message(id):
                 contectors.append(i.author_id)
     return render_template('message.html',contectors=contectors,User=User,Message=Message)
 
+
 @main.route('/testmsg/<int:id>')
 def testmsg(id):
     unread = Message.query.filter_by(sendto_id=current_user.id,author_id=id,confirmed=False).order_by(Message.timestamp.asc()).first()
@@ -538,9 +551,10 @@ def testmsg(id):
         db.session.commit()
         msgtime = unread.timestamp+timedelta(hours=8)
         msgtime = msgtime.strftime('%Y-%m-%d, %H:%M')
-        return jsonify(result=unread.body,t=msgtime)
+        return jsonify(result=unread.body, t=msgtime,msgid=unread.id)
     
     return jsonify()
+
 
 @main.route('/remsg/<int:id>', methods=['POST'])
 @login_required
@@ -549,12 +563,13 @@ def remsg(id):
     a = data['a']
     if a.strip() == '':
         return jsonify()
-    msg = Message(body=a,author=current_user._get_current_object(),sendto=User.query.get(id),confirmed=False)
+    msg = Message(body=a, author=current_user._get_current_object(), sendto=User.query.get(id), confirmed=False)
     db.session.add(msg)
     db.session.commit()
     msgtime = msg.timestamp+timedelta(hours=8)
     msgtime = msgtime.strftime('%Y-%m-%d, %H:%M')
-    return jsonify(result=a,t=msgtime)
+    return jsonify(result=a,t=msgtime,msgid=msg.id)
+
 
 @main.route('/search', methods=['GET','POST'])
 def cz():
@@ -565,6 +580,7 @@ def cz():
 
     return jsonify(result=a)
 
+
 @main.route('/seek/<kwd>')
 def seek(kwd):
     results = Post.query.whoosh_search(kwd)
@@ -572,7 +588,22 @@ def seek(kwd):
     pagination = results.order_by(Post.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
                                                                      error_out=False)
     posts = pagination.items
-    return render_template('seek.html',posts=posts,pagination=pagination,Category=Category,Message=Message,kwd=kwd)
+    return render_template('seek.html', posts=posts, pagination=pagination, Category=Category, Message=Message, kwd=kwd)
 
 
-    
+@main.route('/delete_message/<int:id>', methods=["GET", "POST"])
+@login_required
+def delte_message(id):
+    message = Message.query.get_or_404(id)
+    if message.author_delete and message.sendto_delete:
+        db.session.delete(message)
+        db.session.commit()
+        return jsonify(result="delete")
+    if message.author == current_user:
+        message.author_delete = True
+    if message.sendto == current_user:
+        message.sendto_delete = True
+    db.session.add(message)
+    db.session.commit()
+    return jsonify(rusult="true")
+

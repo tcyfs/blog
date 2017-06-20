@@ -297,7 +297,10 @@ class Message(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     sendto_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    confirmed = db.Column(db.Boolean,default=False)
+    confirmed = db.Column(db.Boolean, default=False)
+    author_delete = db.Column(db.Boolean, default=False)
+    sendto_delete = db.Column(db.Boolean, default=False)
+
 
 class Comment(db.Model):
     __tablename__ = 'comments'

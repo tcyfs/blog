@@ -25,6 +25,7 @@ def test():
     tests = unittest.TestLoader().discover('tests')
     unittest.TextTestRunner(verbosity=2).run(tests)
 
+
 @manager.command
 def profile(length=25, profile_dir=None):
     """Start the application under the code profiler."""
@@ -32,7 +33,8 @@ def profile(length=25, profile_dir=None):
     app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[length],
                                       profile_dir=profile_dir)
     app.run()
-    
+
+
 @manager.command
 def deploy():
     """Run deployment tasks."""
