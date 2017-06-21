@@ -294,12 +294,22 @@ class Message(db.Model):
     __tablename__ = 'messages'
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.Text)
+    body_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     sendto_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     confirmed = db.Column(db.Boolean, default=False)
     author_delete = db.Column(db.Boolean, default=False)
     sendto_delete = db.Column(db.Boolean, default=False)
+
+    @staticmethod
+    def on_changed_body(target, value, oldvalue, initiator):
+        allowed_tags = ['a', 'abbr', 'b', 'code', 'em', 'i', 'strong','img']
+        attrs={'*': ['class', 'style'],'img':['src', 'alt'],'a':'href','embed':['src','width','height','type']}
+        styles = ['height', 'width'] 
+        target.body_html = bleach.linkify(bleach.clean(markdown(value, output_format='html'), tags=allowed_tags,
+                                                       attributes=attrs,styles=styles,strip=True))
+db.event.listen(Message.body, 'set', Message.on_changed_body)
 
 
 class Comment(db.Model):

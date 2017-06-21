@@ -4,16 +4,21 @@
 {% block head %}
 {{ super() }}
 {% endblock %}
-
 {% block page_content %}
+<div class="row">
+        <div class="col-md-3">
+
+        </div>
+         <div class="col-md-9">
 
 <ul class="messages">
-<li id="contectormessages" class="contector" style="list-style-type:none;">
+<li id="contectormessages" class="contector" style="list-style-type:none; ">
 <h1 style="text-align: center;">与{{ contector.username}}的聊天</h1>
 <hr>
+<div id="chatcontent" class="content1 chat-block" tabindex="0" style="width: 100%;max-height: 500px" >
 {% if unreadmessages==[] %}
-{% for i in fmessgs %}
 
+{% for i in fmessgs %}
 {% if i.author_id==contector.id %}
     {% if not i.sendto_delete %}
     <script type="text/javascript">
@@ -40,30 +45,30 @@ var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 
 </script>
 <div id="{{i.id}}">
-<div class="post-thumbnail" style="margin-top: 23px" >
-<a href="{{ url_for('.user', username=i.author.username) }}">
+            <div class="jimi_lists clearfix">
+                <div class="header_img jimi3 fl"><a href="{{ url_for('.user', username=i.author.username) }}">
 {% if i.author.photo %}
-<img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 40px; height: 40px; ">
+<img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 50px; height: 50px; ">
 {% else %}
-<img class="img-rounded profile-thumbnail" src="{{ i.author.gravatar(size=40)}}">
+<img class="img-rounded profile-thumbnail" src="{{ i.author.gravatar(size=50)}}">
 {% endif %}
-</a>
-</div>
-<div class="contector-time" style="padding-left:48px; display: block;">{{ moment(i.timestamp).format('YYYY-M-D, H:mm ') }}
-</div>
-<div class='message-content' style="margin-left: 48px;margin-right: 75%; min-height: 48px;border:1px;border-radius: 10px;margin-bottom: 3px;background-color:#f5f5f5">
+</a></div>
+                <div class="bkbubble right">
+                     <p style="overflow-wrap: break-word;max-width: 400px;padding-right: 50px;background-color: #ddd ">
+                     {% if i.body_html %}
+                     {{ i.body_html | safe }}
+                     {% else %}
+                     {{ i.body }}
+                     {% endif %}
+                     <button id="delete{{i.id}}" class="glyphicon glyphicon-trash" style="position: relative;float:right;margin-right: -40px;
+                    background-color: #ddd;border: 0;color:#ed430c"></button>
+                    </p>
+                </div>
 
-<div class="post-body" style="overflow-wrap: break-word;margin-left: 10px;margin-top: 5px">
-{{i.body}}
-</div>
-<div class="input-group-btn">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float: right;background-color: #f5f5f5;border: 0"><span class="glyphicon glyphicon-chevron-down"></span></button>
-        <ul class="dropdown-menu" style="left: ;right: 0px;min-width: 20px">
-          <li><button id="delete{{i.id}}" style="float: right;background-color: white;border: 0;color: #f3630b"><span class="glyphicon glyphicon-trash"></span>&nbsp;删除</button></li>
-        </ul>
-      </div>
-</div>
-</div>
+            </div>
+            </div>
+           
+
     {% endif %}
 {% endif %}
 {% if i.sendto_id==contector.id %}
@@ -91,37 +96,27 @@ var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
                 })
 
 </script>
-<div id="{{i.id}}" style="display: block; margin:0;padding: 0; ">
-<div class="post-thumbnail" style="margin-left:87%;margin-top: 23px">
-<a href="{{ url_for('.user', username=i.author.username) }}">
+<div id="{{i.id}}">
+<div class="customer_lists clearfix" >
+                <div class="header_img jimi3 fl"><a href="{{ url_for('.user', username=i.author.username) }}">
 {% if i.author.photo %}
-<img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 40px; height: 40px; ">
+<img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 50px; height: 50px; ">
 {% else %}
-<img class="img-rounded profile-thumbnail" src="{{ i.author.gravatar(size=40)}}">
+<img class="img-rounded profile-thumbnail" src="{{ i.author.gravatar(size=50)}}">
 {% endif %}
-</a>
-</div>
-<div class="contector-time" style="margin-left: 80%;margin-right:">{{ moment(i.timestamp).format('YYYY-M-D, H:mm') }}
+</a></div>
 
-</div>
+                <div class="bkbubble left">
+                    <div style=""><p style="max-width: 400px;overflow-wrap: break-word;padding-right: 50px;background-color: #09c54c">{% if i.body_html%}
+                    {{i.body_html | safe}}{% else %}{{i.body}}{% endif %}<button id="delete{{i.id}}" class="glyphicon glyphicon-trash" style="position: absolute;margin-top: 20px;margin-left: 20px;
+                    background-color: #09c54c;border: 0;color:#ed430c"></button></p>
 
+                    
+                    </div>
+                </div>
+                </div>
+                </div>
 
-      
-<div class='message-content' style="margin-left: 75%;margin-right: 50px; min-height: 48px;border:1px;border-radius: 10px;margin-bottom: 3px;background-color: rgba(73, 241, 78, 0.9);">
-
-<div class="post-body" style="overflow-wrap: break-word;margin-top: 5px;margin-left: 10px;text-align:">
-{{i.body}}
-</div>
-<div class="input-group-btn">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float: right;background-color: rgba(73, 241, 78, 0.9);border: 0"><span class="glyphicon glyphicon-chevron-down"></span></button>
-        <ul class="dropdown-menu">
-          <li><button id="delete{{i.id}}" style="float: right;background-color: white;border: 0;color: #f3630b"><span class="glyphicon glyphicon-trash"></span>&nbsp;删除</button></li>
-        </ul>
-      </div>
-  </div>
-
-
-</div>
 {% endif %}
 {% endif %}
 {% endfor %}
@@ -155,104 +150,97 @@ var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 {% if i == unreadmessages[0] %}
 <p id="unread{{i.id}}" style="text-align: center;">---------------以下为未读消息---------------</p>
 <div id="{{i.id}}">
-<div class="post-thumbnail" style="margin-top:23px">
-<a href="{{ url_for('.user', username=i.author.username) }}">
+            <div class="jimi_lists clearfix">
+                <div class="header_img jimi3 fl"><a href="{{ url_for('.user', username=i.author.username) }}">
 {% if i.author.photo %}
-<img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 40px; height: 40px; ">
+<img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 50px; height: 50px; ">
 {% else %}
-<img class="img-rounded profile-thumbnail" src="{{ i.author.gravatar(size=40)}}">
+<img class="img-rounded profile-thumbnail" src="{{ i.author.gravatar(size=50)}}">
 {% endif %}
-</a>
-</div>
-<div class="contector-time" style="padding-left: 48px">{{ moment(i.timestamp).format('YYYY-M-D, H:mm') }}
-</div>
-<div class='message-content' style="margin-left: 48px;margin-right: 75%; min-height: 48px;border:1px;border-radius: 10px;margin-bottom: 3px;background-color:#f5f5f5">
+</a></div>
+                <div class="bkbubble right">
+                     <p style="overflow-wrap: break-word;max-width: 400px;padding-right: 50px;background-color: #ddd ">
+                     {% if i.body_html%}
+                    {{i.body_html | safe}}{% else %}{{i.body}}{% endif %}<button id="delete{{i.id}}" class="glyphicon glyphicon-trash" style="position: relative;float:right;margin-right: -40px;
+                    background-color: #ddd;border: 0;color:#ed430c"></button>
+                    </p>
+                </div>
 
-<div class="post-body" style="overflow-wrap: break-word;margin-left: 10px;margin-top: 5px">
-
-{{i.body}}
-</div>
-<div class="input-group-btn">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float: right;background-color: #f5f5f5;border: 0"><span class="glyphicon glyphicon-chevron-down"></span></button>
-        <ul class="dropdown-menu">
-          <li><button id="delete{{i.id}}" style="float: right;background-color: white;border: 0;color: #f3630b"><span class="glyphicon glyphicon-trash"></span>&nbsp;删除</button></li>
-        </ul>
-      </div>
-
-</div>
-</div>
+            </div>
+            </div>
 {% else %}
     {% if not i.sendto_delete %}
 <div id="{{i.id}}">
-<div class="post-thumbnail" style="margin-top:23px">
-<a href="{{ url_for('.user', username=i.author.username) }}">
+            <div class="jimi_lists clearfix">
+                <div class="header_img jimi3 fl"><a href="{{ url_for('.user', username=i.author.username) }}">
 {% if i.author.photo %}
-<img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 40px; height: 40px; ">
+<img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 50px; height: 50px; ">
 {% else %}
-<img class="img-rounded profile-thumbnail" src="{{ i.author.gravatar(size=40)}}">
+<img class="img-rounded profile-thumbnail" src="{{ i.author.gravatar(size=50)}}">
 {% endif %}
-</a>
-</div>
-<div class="contector-time" style="padding-left: 48px">{{ moment(i.timestamp).format('YYYY-M-D, H:mm') }}
-</div>
-<div class='message-content' style="margin-left: 48px;margin-right: 75%; min-height: 48px;border:1px;border-radius: 10px;margin-bottom: 3px;background-color:#f5f5f5">
+</a></div>
+                <div class="bkbubble right">
+                     <p style="overflow-wrap: break-word;max-width: 400px;padding-right: 50px;background-color: #ddd ">
+                     {% if i.body_html%}
+                    {{i.body_html | safe}}{% else %}{{i.body}}{% endif %}<button id="delete{{i.id}}" class="glyphicon glyphicon-trash" style="position: relative;float:right;margin-right: -40px;
+                    background-color: #ddd;border: 0;color:#ed430c"></button>
+                    </p>
+                </div>
 
-<div class="post-body" style="overflow-wrap: break-word;margin-left: 10px;margin-top: 5px">
-{{i.body}}
-</div>
-<div class="input-group-btn">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float: right;background-color:#f5f5f5;border: 0"><span class="glyphicon glyphicon-chevron-down"></span></button>
-        <ul class="dropdown-menu">
-          <li><button id="delete{{i.id}}" style="float: right;background-color: white;border: 0;color: #f3630b"><span class="glyphicon glyphicon-trash"></span>&nbsp;删除</button></li>
-        </ul>
-      </div>
-
-</div>
-</div>
+            </div>
+            </div>
     {% endif %}
 {% endif %}
 {% endif %}
 {% if i.sendto_id==contector.id %}
 {% if not i.author_delete %}
-<div id="{{i.id}}" style="display: block; margin:0;padding: 0; ">
-<div class="post-thumbnail" style="margin-left:87%; margin-top: 23px">
-<a href="{{ url_for('.user', username=i.author.username) }}">
+<div id="{{i.id}}">
+<div class="customer_lists clearfix" >
+                <div class="header_img jimi3 fl"><a href="{{ url_for('.user', username=i.author.username) }}">
 {% if i.author.photo %}
-<img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 40px; height: 40px; ">
+<img class="img-rounded profile-thumbnail" src="{{ i.author.photo }}" style="width: 50px; height: 50px; ">
 {% else %}
-<img class="img-rounded profile-thumbnail" src="{{ i.author.gravatar(size=40)}}">
+<img class="img-rounded profile-thumbnail" src="{{ i.author.gravatar(size=50)}}">
 {% endif %}
-</a>
-</div>
-<div class="contector-time" style="margin-left: 71%;margin-right: ">{{ moment(i.timestamp).format('YYYY-M-D, H:mm') }}
-</div>
-<div class='message-content' style="margin-left: 75%;margin-right: 50px; min-height: 48px;border:1px;border-radius: 10px;margin-bottom: 3px;background-color: rgba(73, 241, 78, 0.9);">
+</a></div>
+                <div class="bkbubble left">
+                    <div style=""><p style="max-width: 400px;overflow-wrap: break-word;padding-right: 50px;background-color: #09c54c">{% if i.body_html%}
+                    {{i.body_html | safe}}{% else %}{{i.body}}{% endif %}<button id="delete{{i.id}}" class="glyphicon glyphicon-trash" style="position: absolute;margin-top: 20px;margin-left: 20px;
+                    background-color: #09c54c;border: 0;color:#ed430c"></button></p>
 
-<div class="post-body" style="overflow-wrap: break-word;margin-top: 5px;margin-left: 10px;text-align:">
-{{i.body}}
-</div>
-<div class="input-group-btn">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="float: right;background-color: rgba(73, 241, 78, 0.9);border: 0"><span class="glyphicon glyphicon-chevron-down"></span></button>
-        <ul class="dropdown-menu">
-          <li><button id="delete{{i.id}}" style="float: right;background-color: white;border: 0;color: #f3630b"><span class="glyphicon glyphicon-trash"></span>&nbsp;删除</button></li>
-        </ul>
-      </div>
-</div>
-</div>
+                    
+                    </div>
+                </div>
+                </div>
+                </div>
+                
     {% endif %}
 {% endif %}
 {% endfor %}
 {% endif %}
-
+</div>
 </li>
 <hr>
-
 </ul>
 <div id="contectorform" class="comment-form" style="padding-bottom:50px">
-<p>
-  <input id="body" type="text" name="body" style="width: 98%;height: 27px;border:1px solid #da7f21"></input>
-</p>
-<button id="submit" style="margin-left: 90%;background-color: #c76d10;color: white;width: 70px;border:1px solid;">回复</button>
+
+  <textarea id="body" rows="4" name="body" style="width: 98%;border:1px solid #da7f21;resize:none"></textarea>
+  <script type="text/javascript">CKEDITOR.replace( 'body',{
+             toolbar :
+             [
+                //加粗     斜体，     
+                ['Bold','Italic'],
+                //图片       表情       
+                ['Image','Smiley','SpecialChar','PageBreak'],
+             ],
+             resize_enabled:false,
+             height : 100,
+             removePlugins :'elementspath'
+        }
+    );</script>
+ 
+<button id="submit" style="margin-left: 89%;background-color: #c76d10;color: white;width: 70px;border:1px solid;margin-top: 10px">发送</button>
+</div>
 </div>
 {% endblock %}
 {% block scripts %}
@@ -268,7 +256,7 @@ var reloadmessage = {
           
 
         if ("{{contector.photo}}" != "None"){
-        $('#contectormessages').append("<div id='"+data1.msgid+"'> <div class='post-thumbnail' style='margin-top: 23px' ><a href="+"{{url_for('.user', username=contector.username)}}"+"><img class='img-rounded profile-thumbnail' src='{{ contector.photo }}' style='width: 40px; height: 40px;'></a></div><div class='contector-time' style='padding-left:48px; display: block;'>"+data1.t+"</div><div class='message-content animated fadeIn' style='margin-left: 48px;margin-right: 75%; min-height: 48px;border:1px;border-radius: 10px;margin-bottom: 3px;background-color:#f5f5f5'><div class='post-body' style='overflow-wrap: break-word;margin-left: 10px;margin-top: 5px'>"+data1.result+"</div><div class='input-group-btn'><button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' style='float: right;background-color:#f5f5f5;border: 0'><span class='glyphicon glyphicon-chevron-down'></span></button><ul class='dropdown-menu'><li><button id='delete"+data1.msgid+"' style='float: right;background-color: white;border: 0;color: #f3630b'><span class='glyphicon glyphicon-trash'></span>&nbsp;删除</button></li></ul></div></div></div>");
+        $('#chatcontent').append("<div id='"+data1.msgid+"'><div class='jimi_lists clearfix'><div class='header_img jimi3 fl'><a href='{{ url_for('.user', username=contector.username) }}'><img class='img-rounded profile-thumbnail' src='{{ contector.photo }}' style='width: 50px; height: 50px; '></a></div><div class='bkbubble right'><p style='overflow-wrap: break-word;max-width: 400px;padding-right: 50px;background-color: #ddd '>"+data1.result+"<button id='delete"+data1.msgid+"' class='glyphicon glyphicon-trash' style='position: relative;float:right;margin-right: -40px;background-color: #ddd;border: 0;color:#ed430c'></button></p></div></div></div>");
         $("#delete"+data1.msgid).click(function(){
                     var data={
                         data: JSON.stringify({
@@ -287,7 +275,8 @@ var reloadmessage = {
                       })
                     });
       } else{
-        $('#contectormessages').append("<div id='"+data1.msgid+"'><div class='post-thumbnail' style='margin-top: 23px' ><a href="+"{{url_for('.user', username=contector.username)}}"+"><img class='img-rounded profile-thumbnail' src='{{ contector.gravatar(size=40)}}'></a></div><div class='contector-time' style='padding-left:48px; display: block;'>"+data1.t+"</div><div class='message-content animated fadeIn' style='margin-left: 48px;margin-right: 75%; min-height: 48px;border:1px;border-radius: 10px;margin-bottom: 3px;background-color:#f5f5f5'><div class='post-body' style='overflow-wrap: break-word;margin-left: 10px;margin-top: 5px'>"+data1.result+"</div><div class='input-group-btn'><button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' style='float: right;background-color:#f5f5f5;border: 0'><span class='glyphicon glyphicon-chevron-down'></span></button><ul class='dropdown-menu'><li><button id='delete"+data1.msgid+"' style='float: right;background-color: white;border: 0;color: #f3630b'><span class='glyphicon glyphicon-trash'></span>&nbsp;删除</button></li></ul></div></div></div>");
+        $('#chatcontent').append("<div id='"+data1.msgid+"'><div class='jimi_lists clearfix'><div class='header_img jimi3 fl'><a href='{{ url_for('.user', username=contector.username) }}'><img class='img-rounded profile-thumbnail' src='{{ contector.gravatar(size=50) }}' style='width: 50px; height: 50px; '></a></div><div class='bkbubble right'><p style='overflow-wrap: break-word;max-width: 400px;padding-right: 50px;background-color: #ddd '>"+data1.result+"<button id='delete"+data1.msgid+"' class='glyphicon glyphicon-trash' style='position: relative;float:right;margin-right: -40px;background-color: #ddd;border: 0;color:#ed430c'></button></p></div></div></div>");
+       
          $("#delete"+data1.msgid).click(function(){
                     var data={
                         data: JSON.stringify({
@@ -306,6 +295,7 @@ var reloadmessage = {
                       })
                     });
       }
+      window.location.hash = "#"+data1.msgid;
       };
     }
       };
@@ -313,12 +303,15 @@ window.setInterval(function(){$.ajax(reloadmessage)},1000);
 </script>
 <script type="text/javascript">
  var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
             $(function(){
-                $("#submit").click(function(){
-                    var a=$('input[name="body"]').val();
+                $("#submit").click(function(){ 
+                    var b=CKEDITOR.instances.body.getData()  
+                    var a=$('textarea[name="body"]').val();
                     var data={
                         data: JSON.stringify({
-                            'a': a
+                            'a': a,
+                            'b': b
                         }),
                     }
                     $.ajax({
@@ -327,11 +320,11 @@ window.setInterval(function(){$.ajax(reloadmessage)},1000);
                         dataType: 'json',
                         data: data,
                         success:function(data1){
-                          $('input[name="body"]').val("")
+                          CKEDITOR.instances.body.setData("")
                           if (data1.result){
                           if("{{current_user.photo}}" != "None"){
+                            $('#chatcontent').append("<div id='"+data1.msgid+"'><div class='customer_lists clearfix'><div class='header_img jimi3 fl'><a href='{{ url_for('.user', username=current_user.username) }}'><img class='img-rounded profile-thumbnail' src='{{ current_user.photo }}' style='width: 50px; height: 50px; '></a></div><div class='bkbubble left'><div style=''><p style='max-width: 400px;overflow-wrap: break-word;padding-right: 50px;background-color: #09c54c'>"+data1.result+"<button id='delete"+data1.msgid+"' class='glyphicon glyphicon-trash' style='position: absolute;margin-top: 20px;margin-left: 20px;background-color: #09c54c;border: 0;color:#ed430c'></button></p></div></div></div></div>")
                             
-                            $('#contectormessages').append("<div id='"+data1.msgid+"' style='display: block; margin:0;padding: 0;'><div class='post-thumbnail' style='margin-left:87%;margin-top: 23px' ><a href="+"{{url_for('.user', username=current_user.username)}}"+"><img class='img-rounded profile-thumbnail' src='{{ current_user.photo }}' style='width: 40px; height: 40px;'></a></div><div class='contector-time' style='margin-left: 80%'>"+data1.t+"</div><div class='message-content animated fadeIn' style='margin-left: 75%;margin-right: 50px; min-height: 48px;border:1px;border-radius: 10px;margin-bottom: 3px;background-color: rgba(73, 241, 78, 0.9);'><div class='post-body' style='overflow-wrap: break-word;margin-top: 5px;margin-left: 10px;text-align:'>"+data1.result+"</div><div class='input-group-btn'><button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' style='float: right;background-color: rgba(73, 241, 78, 0.9);border: 0'><span class='glyphicon glyphicon-chevron-down'></span></button><ul class='dropdown-menu'><li><button id='delete"+data1.msgid+"' style='float: right;background-color: white;border: 0;color: #f3630b'><span class='glyphicon glyphicon-trash'></span>&nbsp;删除</button></li></ul></div></div></div>");
                             $("#delete"+data1.msgid).click(function(){
                     var data={
                         data: JSON.stringify({
@@ -350,7 +343,8 @@ window.setInterval(function(){$.ajax(reloadmessage)},1000);
                       })
                     });
                           } else{
-                            $('#contectormessages').append("<div id='"+data1.msgid+"' style='display: block; margin:0;padding: 0;'><div class='post-thumbnail' style='margin-left:87%;margin-top: 23px' ><a href="+"{{url_for('.user', username=current_user.username)}}"+"><img class='img-rounded profile-thumbnail' src='{{ current_user.gravatar(size=40)}}'></a></div><div class='contector-time' style='margin-left: 80%'>"+data1.t+"</div><div class='message-content animated fadeIn' style='margin-left: 75%;margin-right: 50px; min-height: 48px;border:1px;border-radius: 10px;margin-bottom: 3px;background-color: rgba(73, 241, 78, 0.9);'><div class='post-body' style='overflow-wrap: break-word;margin-top: 5px;margin-left: 10px;text-align:'>"+data1.result+"</div><div class='input-group-btn'><button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false' style='float: right;background-color: rgba(73, 241, 78, 0.9);border: 0'><span class='glyphicon glyphicon-chevron-down'></span></button><ul class='dropdown-menu'><li><button id='delete"+data1.msgid+"' style='float: right;background-color: white;border: 0;color: #f3630b'><span class='glyphicon glyphicon-trash'></span>&nbsp;删除</button></li></ul></div></div></div>");
+                            $('#chatcontent').append("<div id='"+data1.msgid+"'><div class='customer_lists clearfix'><div class='header_img jimi3 fl'><a href='{{ url_for('.user', username=current_user.username) }}'><img class='img-rounded profile-thumbnail' src='{{ current_user.gravatar(size=50) }}' style='width: 50px; height: 50px; '></a></div><div class='bkbubble left'><div style=''><p style='max-width: 400px;overflow-wrap: break-word;padding-right: 50px;background-color: #09c54c'>"+data1.result+"<button id='delete"+data1.msgid+"' class='glyphicon glyphicon-trash' style='position: absolute;margin-top: 20px;margin-left: 20px;background-color: #09c54c;border: 0;color:#ed430c'></button></p></div></div></div></div>")
+                            
                             $("#delete"+data1.msgid).click(function(){
                     var data={
                         data: JSON.stringify({
@@ -369,6 +363,7 @@ window.setInterval(function(){$.ajax(reloadmessage)},1000);
                       })
                     });
                           }
+                          window.location.hash = "#"+data1.msgid;
                         }
 
                         },
@@ -376,5 +371,6 @@ window.setInterval(function(){$.ajax(reloadmessage)},1000);
                     })
                 })
 </script>
+
 
 {% endblock %}

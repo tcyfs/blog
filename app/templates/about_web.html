@@ -6,6 +6,7 @@
 <link rel="shortcut icon" href="{{ url_for('static', filename='cat.ico') }}" type="image/x-icon">
 <link rel="icon" href="{{ url_for('static', filename='cat.ico') }}" type="image/x-icon">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='hover.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jd.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
 {% endblock %}
 {% block navbar %}
@@ -95,4 +96,29 @@
     <span class="sr-only">Next</span>
   </a>
 </div>
+<div class="testchat" style="position: absolute;margin-top: 25px;margin-left: auto;margin-right: auto;left: 130px;left: 188px;
+    height: 679px;
+    right: auto;
+    top: 0px;">
+       
+        <div id="chatcontent" class="content chat-block" tabindex="0" >
+
+
+            <div class="jimi_lists clearfix">
+                <div class="header_img jimi3 fl"></div>
+                <div class="bkbubble right">
+                     <p>换个气泡如何</p>
+                </div>
+            </div>
+            <div class="customer_lists clearfix">
+                <div class="header_img jimi3" style="background: url(img/mine.jpg) no-repeat center;">
+                    <div class="header_img_hover"></div>
+                </div>
+                <div class="bkbubble left">
+                    <p>这个不错</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
 {% endblock %}

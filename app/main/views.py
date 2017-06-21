@@ -487,10 +487,11 @@ def ckupload():
     return response
 
 
-@main.route('/se_message/<int:id>', methods=['GET'])
+@main.route('/se_message/<int:id>', methods=['POST','GET'])
 @login_required
 def se_message(id):
     contector = User.query.get_or_404(id)
+    form1 = PostForm()
     if contector == current_user:
         flash(u'不能给自己发送私信','danger')
         return redirect(url_for('.index'))
@@ -513,8 +514,7 @@ def se_message(id):
         i.confirmed = True
         db.session.add(i)
 
-
-    return render_template('se_message.html',contector=contector,User=User,fmessgs=fmessgs, unreadmessages=unreadmessages,Message=Message)
+    return render_template('se_message.html',form1=form1,contector=contector,User=User,fmessgs=fmessgs, unreadmessages=unreadmessages,Message=Message)
 
 
 @main.route('/message/<int:id>', methods=['GET', 'POST'])
@@ -551,7 +551,7 @@ def testmsg(id):
         db.session.commit()
         msgtime = unread.timestamp+timedelta(hours=8)
         msgtime = msgtime.strftime('%Y-%m-%d, %H:%M')
-        return jsonify(result=unread.body, t=msgtime,msgid=unread.id)
+        return jsonify(result=unread.body_html, t=msgtime,msgid=unread.id)
     
     return jsonify()
 
@@ -561,14 +561,15 @@ def testmsg(id):
 def remsg(id):
     data = json.loads(request.form.get('data'))
     a = data['a']
-    if a.strip() == '':
+    b= data['b']
+    if b.strip() == '':
         return jsonify()
-    msg = Message(body=a, author=current_user._get_current_object(), sendto=User.query.get(id), confirmed=False)
+    msg = Message(body=b, author=current_user._get_current_object(), sendto=User.query.get(id), confirmed=False)
     db.session.add(msg)
     db.session.commit()
     msgtime = msg.timestamp+timedelta(hours=8)
     msgtime = msgtime.strftime('%Y-%m-%d, %H:%M')
-    return jsonify(result=a,t=msgtime,msgid=msg.id)
+    return jsonify(result=msg.body_html,t=msgtime,msgid=msg.id)
 
 
 @main.route('/search', methods=['GET','POST'])
@@ -606,4 +607,7 @@ def delte_message(id):
     db.session.add(message)
     db.session.commit()
     return jsonify(rusult="true")
+
+
+
 
