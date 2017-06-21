@@ -491,7 +491,6 @@ def ckupload():
 @login_required
 def se_message(id):
     contector = User.query.get_or_404(id)
-    form1 = PostForm()
     if contector == current_user:
         flash(u'不能给自己发送私信','danger')
         return redirect(url_for('.index'))
@@ -514,7 +513,16 @@ def se_message(id):
         i.confirmed = True
         db.session.add(i)
 
-    return render_template('se_message.html',form1=form1,contector=contector,User=User,fmessgs=fmessgs, unreadmessages=unreadmessages,Message=Message)
+    contectors = []
+    for i in fmessgs:
+        if i.author_id == current_user.id:
+            if i.sendto.id not in contectors:
+                contectors.append(i.sendto_id)
+        else:
+            if i.author.id not in contectors:
+                contectors.append(i.author_id)
+
+    return render_template('se_message.html',contector=contector,User=User,fmessgs=fmessgs, unreadmessages=unreadmessages,Message=Message,contectors=contectors)
 
 
 @main.route('/message/<int:id>', methods=['GET', 'POST'])
