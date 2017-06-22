@@ -522,7 +522,7 @@ def se_message(id):
             if i.author.id not in contectors:
                 contectors.append(i.author_id)
 
-    return render_template('se_message.html',contector=contector,User=User,fmessgs=fmessgs, unreadmessages=unreadmessages,Message=Message,contectors=contectors)
+    return render_template('se_message.html',Category=Category,contector=contector,User=User,fmessgs=fmessgs, unreadmessages=unreadmessages,Message=Message,contectors=contectors)
 
 
 @main.route('/message/<int:id>', methods=['GET', 'POST'])
@@ -604,18 +604,16 @@ def seek(kwd):
 @login_required
 def delte_message(id):
     message = Message.query.get_or_404(id)
-    if message.author_delete and message.sendto_delete:
-        db.session.delete(message)
-        db.session.commit()
-        return jsonify(result="delete")
     if message.author == current_user:
         message.author_delete = True
     if message.sendto == current_user:
         message.sendto_delete = True
     db.session.add(message)
     db.session.commit()
+    if message.author_delete and message.sendto_delete:
+        db.session.delete(message)
+        db.session.commit()
     return jsonify(rusult="true")
-
 
 
 

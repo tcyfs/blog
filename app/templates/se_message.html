@@ -5,7 +5,7 @@
 {{ super() }}
 {% endblock %}
 {% block page_content %}
-<div class="row">
+
         <div class="col-md-3">
         <ul class="messagecontector" style="margin-top: 100px;font-size: 20px">
 {% if contectors==[] %}
@@ -257,6 +257,42 @@ var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 </div>
 </div>
 {% endblock %}
+{% block right_side %}
+
+
+<div class="widget" style="margin-top: 10px">
+    <h4 class="title">
+    文章标签
+    <br>
+    </h4>
+    {% for i in Category.query.all() %}
+    <div><a href="{{url_for('.tag', id=i.id)}}" style="line-height: 1.8;color:#2098d1; font-weight: bolder;">{{i.name}}</a><span class="label label-default" style="float:right;">{{i.posts.count()}}</span></div>
+    {% endfor %}
+</div>
+<div class="widget">
+    <h4 class="title">
+    关于网站的信息
+    <br>
+    </h4>
+    <a href="#">关于本站</a>
+</div>
+
+<div class="widget">
+    <h4 class="title">
+    联系我
+    <br>
+    </h4>
+    <p>邮箱:<a href="mailto:tcyfs@sina.com">tcyfs@sina.com</a><p>
+    <p>github:<a href="https://github.com/tcyfs">tcyfs</a></p>
+
+</div>
+
+ 
+
+
+
+
+{% endblock %}
 {% block scripts %}
 {{ super() }}
 
@@ -270,7 +306,7 @@ var reloadmessage = {
           
 
         if ("{{contector.photo}}" != "None"){
-        $('#chatcontent').append("<div id='"+data1.msgid+"'><div class='jimi_lists clearfix'><div class='header_img jimi3 fl'><a href='{{ url_for('.user', username=contector.username) }}'><img class='img-rounded profile-thumbnail' src='{{ contector.photo }}' style='width: 50px; height: 50px; '></a></div><div class='bkbubble right'><p style='overflow-wrap: break-word;max-width: 400px;padding-right: 50px;background-color: #ddd '>"+data1.result+"<button id='delete"+data1.msgid+"' class='glyphicon glyphicon-trash' style='position: relative;float:right;margin-right: -40px;background-color: #ddd;border: 0;color:#ed430c'></button></p></div></div></div>");
+        $('#chatcontent').append("<div id='"+data1.msgid+"'><div class='jimi_lists clearfix'><div class='header_img jimi3 fl' style='margin-left:5px'><a href='{{ url_for('.user', username=contector.username) }}'><img class='img-rounded profile-thumbnail' src='{{ contector.photo }}' style='width: 50px; height: 50px; '></a></div><div class='bkbubble right'><p style='overflow-wrap: break-word;max-width: 400px;padding-right: 50px;background-color: #ddd '>"+data1.result+"<button id='delete"+data1.msgid+"' class='glyphicon glyphicon-trash' style='position: relative;float:right;margin-right: -40px;background-color: #ddd;border: 0;color:#ed430c'></button></p></div></div></div>");
         $("#delete"+data1.msgid).click(function(){
                     var data={
                         data: JSON.stringify({
@@ -289,7 +325,7 @@ var reloadmessage = {
                       })
                     });
       } else{
-        $('#chatcontent').append("<div id='"+data1.msgid+"'><div class='jimi_lists clearfix'><div class='header_img jimi3 fl'><a href='{{ url_for('.user', username=contector.username) }}'><img class='img-rounded profile-thumbnail' src='{{ contector.gravatar(size=50) }}' style='width: 50px; height: 50px; '></a></div><div class='bkbubble right'><p style='overflow-wrap: break-word;max-width: 400px;padding-right: 50px;background-color: #ddd '>"+data1.result+"<button id='delete"+data1.msgid+"' class='glyphicon glyphicon-trash' style='position: relative;float:right;margin-right: -40px;background-color: #ddd;border: 0;color:#ed430c'></button></p></div></div></div>");
+        $('#chatcontent').append("<div id='"+data1.msgid+"'><div class='jimi_lists clearfix'><div class='header_img jimi3 fl' style='margin-left:5px'><a href='{{ url_for('.user', username=contector.username) }}'><img class='img-rounded profile-thumbnail' src='{{ contector.gravatar(size=50) }}' style='width: 50px; height: 50px; '></a></div><div class='bkbubble right'><p style='overflow-wrap: break-word;max-width: 400px;padding-right: 50px;background-color: #ddd '>"+data1.result+"<button id='delete"+data1.msgid+"' class='glyphicon glyphicon-trash' style='position: relative;float:right;margin-right: -40px;background-color: #ddd;border: 0;color:#ed430c'></button></p></div></div></div>");
        
          $("#delete"+data1.msgid).click(function(){
                     var data={
@@ -337,7 +373,7 @@ window.setInterval(function(){$.ajax(reloadmessage)},1000);
                           CKEDITOR.instances.body.setData("")
                           if (data1.result){
                           if("{{current_user.photo}}" != "None"){
-                            $('#chatcontent').append("<div id='"+data1.msgid+"'><div class='customer_lists clearfix'><div class='header_img jimi3 fl'><a href='{{ url_for('.user', username=current_user.username) }}'><img class='img-rounded profile-thumbnail' src='{{ current_user.photo }}' style='width: 50px; height: 50px; '></a></div><div class='bkbubble left'><div style=''><p style='max-width: 400px;overflow-wrap: break-word;padding-right: 50px;background-color: #09c54c'>"+data1.result+"<button id='delete"+data1.msgid+"' class='glyphicon glyphicon-trash' style='position: absolute;margin-top: 20px;margin-left: 20px;background-color: #09c54c;border: 0;color:#ed430c'></button></p></div></div></div></div>")
+                            $('#chatcontent').append("<div id='"+data1.msgid+"'><div class='customer_lists clearfix'><div class='header_img jimi3 fl' style='right: 1px'><a href='{{ url_for('.user', username=current_user.username) }}'><img class='img-rounded profile-thumbnail' src='{{ current_user.photo }}' style='width: 50px; height: 50px; '></a></div><div class='bkbubble left'><div style=''><p style='max-width: 400px;overflow-wrap: break-word;padding-right: 50px;background-color: #09c54c'>"+data1.result+"<button id='delete"+data1.msgid+"' class='glyphicon glyphicon-trash' style='position: absolute;margin-top: 20px;margin-left: 20px;background-color: #09c54c;border: 0;color:#ed430c'></button></p></div></div></div></div>")
                             
                             $("#delete"+data1.msgid).click(function(){
                     var data={
@@ -357,7 +393,7 @@ window.setInterval(function(){$.ajax(reloadmessage)},1000);
                       })
                     });
                           } else{
-                            $('#chatcontent').append("<div id='"+data1.msgid+"'><div class='customer_lists clearfix'><div class='header_img jimi3 fl'><a href='{{ url_for('.user', username=current_user.username) }}'><img class='img-rounded profile-thumbnail' src='{{ current_user.gravatar(size=50) }}' style='width: 50px; height: 50px; '></a></div><div class='bkbubble left'><div style=''><p style='max-width: 400px;overflow-wrap: break-word;padding-right: 50px;background-color: #09c54c'>"+data1.result+"<button id='delete"+data1.msgid+"' class='glyphicon glyphicon-trash' style='position: absolute;margin-top: 20px;margin-left: 20px;background-color: #09c54c;border: 0;color:#ed430c'></button></p></div></div></div></div>")
+                            $('#chatcontent').append("<div id='"+data1.msgid+"'><div class='customer_lists clearfix'><div class='header_img jimi3 fl' style='right: 1px'><a href='{{ url_for('.user', username=current_user.username) }}'><img class='img-rounded profile-thumbnail' src='{{ current_user.gravatar(size=50) }}' style='width: 50px; height: 50px; '></a></div><div class='bkbubble left'><div style=''><p style='max-width: 400px;overflow-wrap: break-word;padding-right: 50px;background-color: #09c54c'>"+data1.result+"<button id='delete"+data1.msgid+"' class='glyphicon glyphicon-trash' style='position: absolute;margin-top: 20px;margin-left: 20px;background-color: #09c54c;border: 0;color:#ed430c'></button></p></div></div></div></div>")
                             
                             $("#delete"+data1.msgid).click(function(){
                     var data={
