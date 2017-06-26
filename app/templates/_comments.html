@@ -47,7 +47,7 @@
                 $(document).ready(function(){
                 $("#recomment{{ comment.id }}").click(function(){
                 $("#rawcomment{{ comment.id }}").toggle();
-                $('#b{{comment.id}}').focus().select();
+                CKEDITOR.instances.b{{comment.id}}.focus()
                 
                 });
                 });
@@ -72,7 +72,7 @@
             var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
             $(function(){
                 $("#calculate{{ comment.id }}").click(function(){
-                    var a=$('textarea[name="a{{comment.id}}"]').val();
+                    var a=CKEDITOR.instances.b{{comment.id}}.getData();
                     var data={
                         data: JSON.stringify({
                             'a': a
@@ -84,7 +84,7 @@
                         dataType: 'json',
                         data: data,
                         success:function(data){
-                            $('textarea[name="a{{comment.id}}"]').val("");
+                            CKEDITOR.instances.b{{comment.id}}.setData("")
                             $("#rawcomment{{ comment.id }}").toggle();
                             
                             $.ajax({
@@ -108,8 +108,22 @@
 
 
 
-<p>
-  <textarea id="b{{comment.id}}" style="width: 98%;border-width: 1px; border-style:solid;border-color:#e4dcdc;overflow-wrap: break-word;overflow: hidden;resize:none; height: 24px " onfocus="window.activeobj=this;this.clock=setInterval(function(){activeobj.style.height=activeobj.scrollHeight+'px';},200);" onblur="clearInterval(this.clock);" name="a{{comment.id}}"></textarea>
+<p style="padding-top: 20px">
+  <textarea id="b{{comment.id}}" style="width: 98%;border-width: 1px; border-style:solid;border-color:#e4dcdc;overflow-wrap: break-word;overflow: hidden;resize:none; height: 24px " name="a{{comment.id}}"></textarea>
+      <script type="text/javascript">CKEDITOR.replace( 'a{{comment.id}}',{
+             toolbar :
+             [
+                //加粗     斜体，     
+                ['Bold','Italic'],
+                //图片       表情       
+                ['Image','Smiley','SpecialChar','PageBreak'],
+             ],
+             resize_enabled:false,
+             height : 50,
+             removePlugins :'elementspath'
+        }
+    );</script>
+  
 </p>
 <button id="calculate{{ comment.id }}">回复</button>
 </div>

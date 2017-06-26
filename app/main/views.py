@@ -4,7 +4,7 @@ import json
 from datetime import datetime,timedelta
 import random
 # import urllib
-from flask import render_template, abort, redirect, flash, url_for, request, current_app, make_response,jsonify
+from flask import render_template, abort, redirect, flash, url_for, request, current_app, make_response,jsonify,Response
 from werkzeug import secure_filename
 from flask_login import login_required, current_user, login_user
 from . import main
@@ -205,6 +205,7 @@ def recomment(id):
     post = Post.query.get_or_404(comment.post_id)
     data = json.loads(request.form.get('data'))
     a = data['a']
+    print a
     if a.strip() == '':
         return 'input nothing'
     recomment = ReComment(body=a, post=post,comment=comment,author=current_user._get_current_object(),reply_id=comment.id)
@@ -568,7 +569,6 @@ def testmsg(id):
 @login_required
 def remsg(id):
     data = json.loads(request.form.get('data'))
-    a = data['a']
     b= data['b']
     if b.strip() == '':
         return jsonify()
@@ -615,5 +615,15 @@ def delte_message(id):
         db.session.commit()
     return jsonify(rusult="true")
 
-
+def stream():
+    if current_user.is_authenticated():
+        a = Message.query.filter_by(sendto_id=current_user.id,confirmed=False).count()
+        return "data: "+str(a)+'\n\n'
+@main.route("/events")
+@login_required
+def streamSessionEvents():
+    return Response(
+        stream(),
+        mimetype="text/event-stream"
+    )
 

@@ -303,7 +303,7 @@ var reloadmessage = {
       dataType:'json',
       success :function(data1){
         if (data1.result){
-          
+
 
         if ("{{contector.photo}}" != "None"){
         $('#chatcontent').append("<div id='"+data1.msgid+"'><div class='jimi_lists clearfix'><div class='header_img jimi3 fl' style='margin-left:5px'><a href='{{ url_for('.user', username=contector.username) }}'><img class='img-rounded profile-thumbnail' src='{{ contector.photo }}' style='width: 50px; height: 50px; '></a></div><div class='bkbubble right'><p style='overflow-wrap: break-word;max-width: 400px;padding-right: 50px;background-color: #ddd '>"+data1.result+"<button id='delete"+data1.msgid+"' class='glyphicon glyphicon-trash' style='position: relative;float:right;margin-right: -40px;background-color: #ddd;border: 0;color:#ed430c'></button></p></div></div></div>");
@@ -356,11 +356,9 @@ window.setInterval(function(){$.ajax(reloadmessage)},1000);
 
             $(function(){
                 $("#submit").click(function(){ 
-                    var b=CKEDITOR.instances.body.getData()  
-                    var a=$('textarea[name="body"]').val();
+                    var b=CKEDITOR.instances.body.getData()                      
                     var data={
                         data: JSON.stringify({
-                            'a': a,
                             'b': b
                         }),
                     }

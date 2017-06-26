@@ -5,7 +5,7 @@
 {% block head %}
 {{ super() }}
 <link rel="shortcut icon" href="{{ url_for('static', filename='cat.ico') }}" type="image/x-icon">
-<link rel="icon" href="{{ url_for('static', filename='cat.ico') }}" type="image/x-icon">
+<link id="webphoto" rel="icon" href="{{ url_for('static', filename='cat.ico') }}" type="image/x-icon">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='v1003.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='hover.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jd17.css') }}">
@@ -34,7 +34,7 @@
 
                 {% if current_user.is_authenticated() %}
                 <li><a href="{{ url_for('main.user', username=current_user.username) }}" class="hvr-wobble-skew" style="color: white"><span class="glyphicon glyphicon-user"></span>&nbsp;个人信息</a></li>
-                <li><a href="{{ url_for('main.message', id=current_user.id) }}" class="hvr-wobble-skew" style="color: white"><span class="glyphicon glyphicon-envelope" ></span>&nbsp;私信<span class="label label-primary">{{Message.query.filter_by(sendto_id=current_user.id,confirmed=False).count()}}</span></a></li>
+               
                 {% endif %}
             <li class="navbar-form navbar-left">
                 <div class="input-group">
@@ -53,6 +53,15 @@
                 <li><a href="{{ url_for('main.moderate')}}" class="hvr-wobble-skew" style="color: white"><span class="glyphicon glyphicon-comment" ></span>&nbsp;评论管理</a> </li>
                 {% endif %}
                 {% if current_user.is_authenticated() %}
+                <li class="dropdown">
+                    <a id="blink{{ current_user.id }}" href="#" class="dropdown-toggle hvr-wobble-skew" data-toggle="dropdown" style="color: white"><span class="glyphicon glyphicon-envelope"></span>&nbsp;消息<b class="caret"></b> </a>
+                    <ul class="dropdown-menu" style="background-color: #045bb2">
+                    <li><a id="pm{{ current_user.id }}" href="{{ url_for('main.message', id=current_user.id) }}" style="color: white">私信</a></li>
+                    <li><a id="getcomment{{ current_user.id }}" href="#" style="color: white;">评论</a></li>
+                    <li><a id="thumbs-up{{ current_user.id }}" href="#" style="color: white;">赞</a></li>
+                    </ul>
+                </li>
+
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle hvr-wobble-skew" data-toggle="dropdown" style="color: white"><span class="glyphicon glyphicon-cog"></span>&nbsp;账户<b class="caret"></b> </a>
                     <ul class="dropdown-menu" style="background-color: #045bb2">
@@ -173,5 +182,26 @@ var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
       }
     });
 </script>
+<script>
+if(typeof(EventSource)!=="undefined")
+  {
+  var source=new EventSource("/events");
+  source.onmessage=function(event)
+    {
+    if (event.data != '0'){
+    $('#blink{{ current_user.id }}').html("<a href='#' class='dropdown-toggle hvr-wobble-skew' data-toggle='dropdown' style='color: #f76c06'><span class='glyphicon glyphicon-envelope'></span>&nbsp;有新的消息<b class='caret'></b> </a>");
+    $('#pm{{ current_user.id }}').text("私信【你有"+event.data+"条新消息】")
+    
+    }
+
+    };
+  }
+else
+  {
+  $("#resulttest").innerHTML="抱歉，您的浏览器不支持 server-sent 事件 ...";
+  }
+</script>
+
+
 
 {% endblock %}

@@ -51,7 +51,7 @@ class PostForm(Form):
             raise ValidationError(u'列表中存在相似标签，你可以直接选择')
 
 class CommentForm(Form):
-    body = StringField('', validators=[DataRequired()], render_kw={'placeholder': u'写下你的评论'})
+    body = TextAreaField('', validators=[DataRequired()], render_kw={'placeholder': u'写下你的评论'})
     submit = SubmitField(u'提交')
 
 

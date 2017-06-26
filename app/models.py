@@ -319,15 +319,18 @@ class Comment(db.Model):
     body_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     disabled = db.Column(db.Boolean)
+    confirmed = db.Column(db.Boolean, default=False)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
     recomments = db.relationship('ReComment', backref='comment', lazy='dynamic')
 
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
-        allowed_tags = ['a', 'abbr', 'b', 'code', 'em', 'i', 'strong']
+        allowed_tags = ['a', 'abbr', 'b', 'code', 'em', 'i', 'strong','img']
+        attrs={'*': ['class', 'style'],'img':['src', 'alt'],'a':'href','embed':['src','width','height','type']}
+        styles = ['height', 'width'] 
         target.body_html = bleach.linkify(bleach.clean(markdown(value, output_format='html'), tags=allowed_tags,
-                                                       strip=True))
+                                                       attributes=attrs,styles=styles,strip=True))
 db.event.listen(Comment.body, 'set', Comment.on_changed_body)
 
 class ReComment(db.Model):
@@ -345,9 +348,11 @@ class ReComment(db.Model):
 
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
-        allowed_tags = ['a', 'abbr', 'b', 'code', 'em', 'i', 'strong']
+        allowed_tags = ['a', 'abbr', 'b', 'code', 'em', 'i', 'strong','img']
+        attrs={'*': ['class', 'style'],'img':['src', 'alt'],'a':'href','embed':['src','width','height','type']}
+        styles = ['height', 'width']
         target.body_html = bleach.linkify(bleach.clean(markdown(value, output_format='html'), tags=allowed_tags,
-                                                       strip=True))
+                                                       attributes=attrs,styles=styles,strip=True))
 db.event.listen(ReComment.body, 'set', ReComment.on_changed_body)
 
 

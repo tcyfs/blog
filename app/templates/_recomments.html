@@ -60,7 +60,7 @@
                 $(document).ready(function(){
                 $("#reply{{ recomment.id }}").click(function(){
                 $("#rawreply{{ recomment.id }}").toggle();
-                $('#rec{{recomment.id}}').focus().select();
+                CKEDITOR.instances.rec{{recomment.id}}.focus()
                 });
                 });
             </script>
@@ -83,7 +83,7 @@
              var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
             $(function(){
                 $("#tj{{ recomment.id }}").click(function(){
-                    var a=$('textarea[name="r{{recomment.id}}"]').val();
+                    var a=CKEDITOR.instances.rec{{recomment.id}}.getData();;
                     var data={
                         data: JSON.stringify({
                             'a': a
@@ -95,7 +95,7 @@
                         dataType: 'json',
                         data: data,
                         success:function(data){
-                            $('textarea[name="r{{recomment.id}}"]').val("");
+                            CKEDITOR.instances.rec{{recomment.id}}.setData("")
                             $("#rawreply{{ recomment.id }}").toggle();
 
                             $.ajax({
@@ -117,8 +117,21 @@
             })
             </script>
 
-            <p>
-            <textarea id="rec{{recomment.id}}" style="width: 98%;border-width: 1px; border-style:solid;border-color:#e4dcdc;overflow-wrap: break-word;overflow: hidden;resize:none; height: 24px " name="r{{ recomment.id }}" onfocus="window.activeobj=this;this.clock=setInterval(function(){activeobj.style.height=activeobj.scrollHeight+'px';},200);" onblur="clearInterval(this.clock);"></textarea>
+            <p style="padding-top: 20px">
+            <textarea id="rec{{recomment.id}}" style="width: 98%;border-width: 1px; border-style:solid;border-color:#e4dcdc;overflow-wrap: break-word;overflow: hidden;resize:none; height: 24px " name="r{{ recomment.id }}" ></textarea>
+            <script type="text/javascript">CKEDITOR.replace( 'rec{{recomment.id}}',{
+             toolbar :
+             [
+                //加粗     斜体，     
+                ['Bold','Italic'],
+                //图片       表情       
+                ['Image','Smiley','SpecialChar','PageBreak'],
+             ],
+             resize_enabled:false,
+             height : 50,
+             removePlugins :'elementspath'
+        }
+    );</script>
             </p>
             <button id="tj{{ recomment.id }}">回复</button>
             </div>

@@ -52,7 +52,24 @@
 <h4 id="comments">评论</h4>
 {% if current_user.can(Permission.COMMENT) %}
 <div class="comment-form">
-    {{ wtf.quick_form(form) }}
+    <form class="form" method="POST">
+    {{ form.hidden_tag() }}
+    {{ wtf.form_field(form.body) }}
+    <script type="text/javascript">CKEDITOR.replace( 'body',{
+             toolbar :
+             [
+                //加粗     斜体，     
+                ['Bold','Italic'],
+                //图片       表情       
+                ['Image','Smiley','SpecialChar','PageBreak'],
+             ],
+             resize_enabled:false,
+             height : 100,
+             removePlugins :'elementspath'
+        }
+    );</script>
+    {{ wtf.form_field(form.submit,style="background-color:#3cc0bb;") }}
+</form>
 </div>
 {% else %}
 <h3>发表评论，请先<a href="{{ url_for('auth.login' )}}">登录</a></h3>
