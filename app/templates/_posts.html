@@ -42,9 +42,24 @@
                 <a href="{{ url_for('.post', id=post.id)}}#comments">
                     <span class="label label-primary">{{post.comments.count()+post.recomments.count()}}评论</span>
                 </a>
-                <a href="#">
-                    <span class="glyphicon glyphicon-thumbs-up"></span>
+                {% if current_user.is_authenticated() %}
+                <a href="{{ url_for('.thumbs_up', id=post.id)}}">
+                {% if Upvote.query.filter_by(author=current_user,post=post).first() %}
+                    <span class="label label-default" style="background: #c3ac83"><span class="glyphicon glyphicon-thumbs-up" style="color:red">{{post.upvotes.count()}}</span></span>
+                {% else %}
+                    <span class="label label-default"><span class="glyphicon glyphicon-thumbs-up" style="">{{post.upvotes.count()}}</span></span>
+                {% endif %}
                 </a>
+                <a href="{{ url_for('.collect', id=post.id)}}">
+                {% if Collect.query.filter_by(author=current_user,post=post).first() %}
+                    <span class="label label-primary"><span class="glyphicon glyphicon-star"></span>取消收藏</span>
+                {% else %}
+                    <span class="label label-primary"><span class="glyphicon glyphicon-star-empty"></span>收藏</span>
+                {% endif %}
+                </a>
+                {% else %}
+                <span class="label label-default"><span class="glyphicon glyphicon-thumbs-up" style="">{{post.upvotes.count()}}</span></span>
+                {% endif %}
             </div>
         </div>
     </li>

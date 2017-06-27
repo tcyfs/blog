@@ -77,6 +77,8 @@ class User(UserMixin, db.Model):
                                 lazy='dynamic', cascade='all, delete-orphan')
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
     recomments = db.relationship('ReComment', backref='author', lazy='dynamic')
+    upvotes = db.relationship('Upvote', backref='author', lazy='dynamic')
+    collects = db.relationship('Collect', backref='author', lazy='dynamic')
     messages = db.relationship('Message', backref='author', lazy='dynamic',primaryjoin='Message.author_id==User.id')
     messageds = db.relationship('Message', backref='sendto', lazy='dynamic',primaryjoin='Message.sendto_id==User.id')
 
@@ -263,6 +265,8 @@ class Post(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     comments = db.relationship('Comment', backref='post', lazy='dynamic')
     recomments = db.relationship('ReComment', backref='post', lazy='dynamic')
+    upvotes = db.relationship('Upvote', backref='post', lazy='dynamic')
+    collect = db.relationship('Collect', backref='post', lazy='dynamic')
 
     @staticmethod
     def generate_fake(count=100):
@@ -378,3 +382,17 @@ class Category(db.Model):
                 db.session.add(postcategory)
             db.session.commit()
 
+class Upvote(db.Model):
+    __tablename__ = 'upvotes'
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+
+
+class Collect(db.Model):
+    __tablename__ = 'collects'
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))

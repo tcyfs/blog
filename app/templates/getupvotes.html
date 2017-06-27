@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}我收到的赞{% endblock %}
+{% block page_content %}
+<h1>我收到的赞</h1>
+<ul class="posts">
+    {% for upvote in my_upvotes %}
+    {% if upvote.author != current_user %}
+    
+     <li class="post" style="padding-bottom: 30px">
+        <div class="post-thumbnail">
+            <a href="{{ url_for('.user', username=upvote.author.username) }}">
+            {% if upvote.author.photo %}
+                <img class="img-rounded profile-thumbnail" src="{{ upvote.author.photo}}" style="height: 40px; width: 40px">
+            {% else %}
+                <img class="img-rounded profile-thumbnail" src="{{ upvote.author.gravatar(size=40)}}">
+            {% endif %}
+            
+            </a>
+        </div>
+        <div class="post-content">
+            <div ><a href="{{ url_for('.user', username=upvote.author.username) }}">{{ upvote.author.username }}</a><span style="color: #999">&nbsp;赞了我的文章</span></div>
+            <div style="border: 1px solid;border-radius: 10px;padding-left: 10px;background-color: #ccc;"><a href="{{ url_for('.user', username=current_user.username) }}" style="color: #c13b05">{{ current_user.username }}:</a>
+            <a href="{{ url_for('.post',id=upvote.post.id)}}" style="color: black;text-decoration:none;">
+                {% if upvote.post.body_html %}
+                {{ upvote.post.body_html | safe |truncate(350, True) }}
+                {% else %}
+                {{ upvote.post.body | striptags |truncate(350, True)}}
+                {% endif %}
+            </a>
+            </div>
+            <div class="post-footer" style="text-align: left">
+            {{ moment(upvote.timestamp).format('LLL') }}
+            </div>
+        </div>
+    </li>
+    {%endif%}
+    {% endfor %}
+   
+</ul>
+{% endblock %}
+
+{% block right_side %}
+<div class="widget">
+    <h4 class="title">
+    文章标签
+    <br>
+    </h4>
+    {% for i in Category.query.all() %}
+    <div><a href="{{url_for('.tag', id=i.id)}}" style="line-height: 1.8;color:#2098d1; font-weight: bolder;">{{i.name}}</a><span class="label label-default" style="float:right;">{{i.posts.count()}}</span></div>
+    {% endfor %}
+</div>
+<div class="widget">
+    <h4 class="title">
+    关于网站的信息
+    <br>
+    </h4>
+    <a href="#">关于本站</a>
+</div>
+
+<div class="widget">
+    <h4 class="title">
+    联系我
+    <br>
+    </h4>
+    <p>邮箱:<a href="mailto:tcyfs@sina.com">tcyfs@sina.com</a><p>
+    <p>github:<a href="https://github.com/tcyfs">tcyfs</a></p>
+
+</div>
+{% endblock %}

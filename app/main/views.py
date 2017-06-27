@@ -12,7 +12,7 @@ from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm,
 from ..auth import forms
 from ..email import send_email
 from .. import db
-from ..models import User, Role, Post, Permission, Comment, ReComment, Category,registrations, Message
+from ..models import User, Role, Post, Permission, Comment, ReComment, Category,registrations, Message, Upvote,Collect
 from ..decorators import admin_required, permission_required
 from qiniu import Auth, put_file, etag, urlsafe_base64_encode,put_data
 import qiniu.config
@@ -120,7 +120,7 @@ def index():
     pagination = query.order_by(Post.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
                                                                      error_out=False)
     posts = pagination.items
-    return render_template('index.html', form1=form1, form2=form2,form3=form3, posts=posts, show_followed=show_followed, pagination=pagination, Category=Category,Message=Message)
+    return render_template('index.html', form1=form1, form2=form2,form3=form3, posts=posts, show_followed=show_followed, pagination=pagination, Category=Category,Message=Message,Upvote=Upvote,Collect=Collect)
 
 
 @main.route('/user/<username>')
@@ -129,7 +129,7 @@ def user(username):
     if user is None:
         abort(404)
     posts = user.posts.order_by(Post.timestamp.desc()).all()
-    return render_template('user.html', user=user, posts=posts,Message=Message)
+    return render_template('user.html', user=user, posts=posts,Message=Message,Upvote=Upvote,Collect=Collect)
 
 
 @main.route('/edit-profile', methods=['GET', 'POST'])
@@ -196,7 +196,7 @@ def post(id):
                                                                           error_out=False)
     comments = pagination.items
 
-    return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination, ReComment=ReComment, Category=Category,Message=Message)
+    return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination, ReComment=ReComment, Category=Category,Message=Message,Upvote=Upvote,Collect=Collect)
 
 @main.route('/recomment/<int:id>', methods=['POST'])
 @login_required
@@ -627,3 +627,86 @@ def streamSessionEvents():
         mimetype="text/event-stream"
     )
 
+@main.route('/getcomments/<int:id>', methods=['GET','POST'])
+@login_required
+def get_commnents(id):
+    user = User.query.get_or_404(id)
+    if user != current_user:
+        abort(403)
+    posts = user.posts.all()
+    postcomments_num = 0
+    recomments_num = 0
+    allpostcomments = []
+    for post in posts:
+        postcomments_num = postcomments_num + post.comments.count() + post.recomments.count()
+        allpostcomments = allpostcomments+post.comments.all() + post.recomments.all()
+    l =[]
+    for i in allpostcomments:
+        l.append(i.timestamp)
+    l.sort(reverse = True)
+    print l
+
+    recomments = ReComment.query.filter_by(author=user).all()
+    for i in recomments:
+        recomments_num = recomments_num + ReComment.query.filter_by(reply_id=i.id,reply_type="reply").count()
+    comments = Comment.query.filter_by(author=user).all()
+    for i in comments:
+        recomments_num = recomments_num + ReComment.query.filter_by(reply_id=i.id).count()
+    print recomments_num
+    return "get postcomments num is: %s." %(postcomments_num)
+
+@main.route('/thumbs_up/<int:id>', methods=['GET','POST'])
+@login_required
+def thumbs_up(id):
+    post = Post.query.get(id)
+    a = Upvote.query.filter_by(author=current_user,post=post).first()
+    if a:
+        db.session.delete(a)
+        db.session.commit()
+        flash(u'取消点赞成功', 'success')
+        return redirect(url_for('.index'))
+    thumbs_up = Upvote(post=post,author=current_user._get_current_object())
+    db.session.add(thumbs_up)
+    db.session.commit()
+    flash(u'点赞成功', 'success')
+    return redirect(url_for('.index'))
+
+@main.route('/collect/<int:id>', methods=['GET','POST'])
+@login_required
+def collect(id):
+    post = Post.query.get(id)
+    a = Collect.query.filter_by(author=current_user,post=post).first()
+    if a:
+        db.session.delete(a)
+        db.session.commit()
+        flash(u'取消收藏成功', 'success')
+        return redirect(url_for('.index'))
+    collect = Collect(post=post,author=current_user._get_current_object())
+    db.session.add(collect)
+    db.session.commit()
+    flash(u'收藏成功', 'success')
+    return redirect(url_for('.index'))
+
+@main.route('/collect_posts/<int:id>')
+@login_required
+def collect_posts(id):
+    user = User.query.get(id)
+    if user != current_user:
+        abort(403)
+    collects = current_user.collects.order_by(Collect.timestamp.desc()).all()
+    collectposts = []
+    for i in collects:
+        collectposts.append(i.post)
+    return render_template('collect_posts.html',collectposts=collectposts,Category=Category,Upvote=Upvote,Collect=Collect)
+
+@main.route('/getupvotes/<int:id>')
+@login_required
+def getupvotes(id):
+    user = User.query.get(id)
+    if user != current_user:
+        abort(403)
+    my_upvotes = []
+    for upvote in Upvote.query.order_by(Upvote.timestamp.desc()).all():
+        if upvote.post.author == current_user:
+            my_upvotes.append(upvote)
+    return render_template('getupvotes.html',my_upvotes=my_upvotes,Category=Category)
