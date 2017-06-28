@@ -456,7 +456,7 @@ def tag(id):
     pagination = query.order_by(Post.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
                                                                      error_out=False)
     posts = pagination.items
-    return render_template('tag.html',posts=posts,pagination=pagination,tag=tag,Category=Category,Message=Message)
+    return render_template('tag.html',posts=posts,pagination=pagination,tag=tag,Category=Category,Message=Message,Upvote=Upvote,Collect=Collect)
 
 
 def gen_rnd_filename():
@@ -597,7 +597,7 @@ def seek(kwd):
     pagination = results.order_by(Post.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
                                                                      error_out=False)
     posts = pagination.items
-    return render_template('seek.html', posts=posts, pagination=pagination, Category=Category, Message=Message, kwd=kwd)
+    return render_template('seek.html', posts=posts, pagination=pagination, Category=Category, Message=Message, kwd=kwd,Upvote=Upvote,Collect=Collect)
 
 
 @main.route('/delete_message/<int:id>', methods=["GET", "POST"])
@@ -629,7 +629,7 @@ def streamSessionEvents():
 
 @main.route('/getcomments/<int:id>', methods=['GET','POST'])
 @login_required
-def get_commnents(id):
+def get_comments(id):
     user = User.query.get_or_404(id)
     if user != current_user:
         abort(403)
@@ -644,16 +644,14 @@ def get_commnents(id):
     for i in allpostcomments:
         l.append(i.timestamp)
     l.sort(reverse = True)
-    print l
-
-    recomments = ReComment.query.filter_by(author=user).all()
-    for i in recomments:
-        recomments_num = recomments_num + ReComment.query.filter_by(reply_id=i.id,reply_type="reply").count()
-    comments = Comment.query.filter_by(author=user).all()
-    for i in comments:
-        recomments_num = recomments_num + ReComment.query.filter_by(reply_id=i.id).count()
-    print recomments_num
-    return "get postcomments num is: %s." %(postcomments_num)
+    l2=[]
+    n = 0
+    while n < len(allpostcomments):
+        for i in allpostcomments:
+            if i.timestamp == l[n]:
+                l2.append(i)
+        n+=1
+    return render_template('mycomments.html',l2=l2,Category=Category)
 
 @main.route('/thumbs_up/<int:id>', methods=['GET','POST'])
 @login_required

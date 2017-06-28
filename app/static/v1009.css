@@ -1,6 +1,10 @@
 body { padding-top: 70px; 
     background-attachment: fixed;
-    background-image: url('https://drscdn.500px.org/photo/171351311/q%3D80_m%3D2000/75d4251b1b232c8937775265f3e73d0d');
+    background-image: url('10.jpg');
+}
+a:hover{
+    text-decoration:none;
+
 }
 .profile-thumbnail {
     position: absolute;

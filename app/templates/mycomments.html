@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}我的评论{% endblock %}
+{% block page_content %}
+<h1>我收到的评论</h1>
+<ul class="posts">
+    {% for comment in l2 %}
+    {% if comment.author != current_user %}
+    
+     <li class="post" style="padding-bottom: 30px">
+        <div class="post-thumbnail">
+            <a href="{{ url_for('.user', username=comment.author.username) }}">
+            {% if comment.author.photo %}
+                <img class="img-rounded profile-thumbnail" src="{{ comment.author.photo}}" style="height: 40px; width: 40px">
+            {% else %}
+                <img class="img-rounded profile-thumbnail" src="{{ comment.author.gravatar(size=40)}}">
+            {% endif %}
+            
+            </a>
+        </div>
+        <div class="post-content">
+            <div ><a href="{{ url_for('.user', username=comment.author.username) }}">{{ comment.author.username }}:</a> 
+                {% if comment.body_html %}
+                {{ comment.body_html |safe}}
+                {% else %}
+                {{ comment.body }}
+                {% endif %}</div>
+            
+            <div style="border: 1px solid;border-radius: 10px;padding-left: 10px;background-color: #f5f5f5;"><span style="color: #999">评论我的文章:</span></a>
+            <a href="{{ url_for('.post',id=comment.post.id)}}" style="color: black;text-decoration:none;">
+                {% if comment.post.body_html %}
+                {{ comment.post.body_html | safe |truncate(350, True) }}
+                {% else %}
+                {{ comment.post.body | striptags |truncate(350, True)}}
+                {% endif %}
+            </a>
+            </div>
+            <div class="post-footer" style="text-align: left">
+            {{ moment(comment.timestamp).format('LLL') }}
+            </div>
+        </div>
+    </li>
+    {%endif%}
+    {% endfor %}
+   
+</ul>
+{% endblock %}
+
+{% block right_side %}
+<div class="widget">
+    <h4 class="title">
+    文章标签
+    <br>
+    </h4>
+    {% for i in Category.query.all() %}
+    <div><a href="{{url_for('.tag', id=i.id)}}" style="line-height: 1.8;color:#2098d1; font-weight: bolder;">{{i.name}}</a><span class="label label-default" style="float:right;">{{i.posts.count()}}</span></div>
+    {% endfor %}
+</div>
+<div class="widget">
+    <h4 class="title">
+    关于网站的信息
+    <br>
+    </h4>
+    <a href="#">关于本站</a>
+</div>
+
+<div class="widget">
+    <h4 class="title">
+    联系我
+    <br>
+    </h4>
+    <p>邮箱:<a href="mailto:tcyfs@sina.com">tcyfs@sina.com</a><p>
+    <p>github:<a href="https://github.com/tcyfs">tcyfs</a></p>
+
+</div>
+{% endblock %}
