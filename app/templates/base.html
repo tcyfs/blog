@@ -9,10 +9,15 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='v1009.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='hover.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jd17.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jquery.atwho.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+
+<link href='http://fonts.googleapis.com/css?family=PT+Sans:400,700' rel='stylesheet' type='text/css'>
 <script src="{{ url_for('static', filename='jquery-3.2.1.min.js') }}"></script>
+
 <script src="{{ url_for('static', filename='bst.js') }}"></script>
 <script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
+
 <!--<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
 
 {% endblock %}
@@ -58,6 +63,7 @@
                     <a id="blink{{ current_user.id }}" href="#" class="dropdown-toggle hvr-wobble-skew" data-toggle="dropdown" style="color: white"><span class="glyphicon glyphicon-envelope"></span>&nbsp;消息<b class="caret"></b> </a>
                     <ul class="dropdown-menu" style="background-color: #045bb2">
                     <li><a id="pm{{ current_user.id }}" href="{{ url_for('main.message', id=current_user.id) }}" style="color: white">私信</a></li>
+                    <li><a id="atme{{ current_user.id }}" href="{{url_for('main.atme',id=current_user.id)}}" style="color: white;">@我的</a></li>
                     <li><a id="getcomment{{ current_user.id }}" href="{{url_for('main.get_comments',id=current_user.id)}}" style="color: white;">评论</a></li>
                     <li><a id="thumbs-up{{ current_user.id }}" href="{{url_for('main.getupvotes',id=current_user.id)}}" style="color: white;">赞</a></li>
                     </ul>
@@ -107,6 +113,8 @@
 {{ super() }}
 {{ moment.include_moment() }}
 {{ moment.lang('zh-CN') }}
+<script src="{{ url_for('static', filename='jquery.caret.js') }}"></script>
+<script src="{{ url_for('static', filename='jquery.atwho.js') }}"></script> 
 <script type="text/javascript">
 $(document).ready(function(){
     dropdownOpen();//调用
@@ -202,6 +210,76 @@ else
   $("#resulttest").innerHTML="抱歉，您的浏览器不支持 server-sent 事件 ...";
   }
 </script>
+<script>
+if(typeof(EventSource)!=="undefined")
+  {
+  var source=new EventSource("/getatme");
+  source.onmessage=function(event)
+    {
+    if (event.data != '0'){
+    $('#blink{{ current_user.id }}').html("<a href='#' class='dropdown-toggle hvr-wobble-skew' data-toggle='dropdown' style='color: #f76c06'><span class='glyphicon glyphicon-envelope'></span>&nbsp;有新的消息<b class='caret'></b> </a>");
+    $('#atme{{ current_user.id }}').text("@我的【有"+event.data+"条@你的新消息】")
+    
+    }
+
+    };
+  }
+else
+  {
+  $("#resulttest").innerHTML="抱歉，您的浏览器不支持 server-sent 事件 ...";
+  }
+</script>
+<script>
+var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+$(function(){
+    $.ajax({
+      url:$SCRIPT_ROOT+'/testfollow/'+{{current_user.id}},
+      dataType:'json',
+      success :function(data1){
+      var followes = data1.result;
+      var at_config = {
+          at: "@",
+          data: followes
+      };
+      CKEDITOR.on('instanceReady', function(event) {
+        
+    var editor = event.editor;
+        
+    // Switching from and to source mode
+    editor.on('mode', function(e) {
+        load_atwho(this, at_config);
+    });
+    
+    // First load
+    load_atwho(editor, at_config);
+        
+});
+
+function load_atwho(editor, at_config) {
+    
+    // WYSIWYG mode when switching from source mode
+    if (editor.mode != 'source') {
+
+        editor.document.getBody().$.contentEditable = true;
+        
+        $(editor.document.getBody().$)
+            .atwho('setIframe', editor.window.getFrame().$)
+            .atwho(at_config);
+            
+    }
+    // Source mode when switching from WYSIWYG
+    else {
+        $(editor.container.$).find(".cke_source").atwho(at_config);
+    }
+    
+}
+
+  }
+      })
+  })
+
+
+</script>  
 
 
 

@@ -26,7 +26,7 @@ class Config(object):
         
 class DevelopmentConfig(Config):
     DEBUG = True
-    MAIL_SERVER = 'smtp.sina.com'
+    MAIL_SERVER = 'smtp.sina.cn'
     MAIL_PORT = 25
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
@@ -42,7 +42,7 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = True
-    MAIL_SERVER = 'smtp.sina.com'
+    MAIL_SERVER = 'smtp.sina.cn'
     MAIL_PORT = 25
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')

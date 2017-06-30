@@ -12,11 +12,12 @@ from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm,
 from ..auth import forms
 from ..email import send_email
 from .. import db
-from ..models import User, Role, Post, Permission, Comment, ReComment, Category,registrations, Message, Upvote,Collect
+from ..models import User, Role, Post, Permission, Comment, ReComment, Category,registrations, Message, Upvote,Collect, AtUser
 from ..decorators import admin_required, permission_required
 from qiniu import Auth, put_file, etag, urlsafe_base64_encode,put_data
 import qiniu.config
 import time
+import re
 
 
 class UploadToQiniu():
@@ -80,6 +81,23 @@ def index():
     form3 = forms.RegistrationForm()
     if current_user.can(Permission.WRITE_ARTICLES) and form1.submit1.data and form1.validate_on_submit():
         post = Post(body=form1.body.data, author=current_user._get_current_object())
+        if "@" in form1.body.data:
+            p = re.compile(r'(@)(.*?)( )')
+            m = p.findall(post.body)
+            atusers = []
+            for i in m:
+                print i
+                if '<' in i[1]:
+                    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
+                    atusers.append(m.group(3))   
+                else:
+                    atusers.append(i[1])
+            for atuser in atusers:
+                user = User.query.filter_by(username=atuser).first()
+                if user is not None:
+                    atwho = AtUser(post=post,author=user)
+                    db.session.add(atwho)
+                    db.session.commit()
         db.session.add(post)
         db.session.commit()
         for i in form1.tag.data:
@@ -184,6 +202,24 @@ def post(id):
     form = CommentForm()
     if form.submit.data and form.validate_on_submit():
         comment = Comment(body=form.body.data, post=post, author=current_user._get_current_object())
+        if "@" in form.body.data:
+            p = re.compile(r'(@)(.*?)( )')
+            m = p.findall(form.body.data)
+            atusers = []
+            for i in m:
+                print i
+                if '<' in i[1]:
+                    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
+                    atusers.append(m.group(3))   
+                else:
+                    print i
+                    atusers.append(i[1])
+            for atuser in atusers:
+                user = User.query.filter_by(username=atuser).first()
+                if user is not None:
+                    atwho = AtUser(comment=comment,author=user)
+                    db.session.add(atwho)
+                    db.session.commit()
         db.session.add(comment)
         db.session.commit()
         flash(u'评论提交成功','success')
@@ -208,8 +244,25 @@ def recomment(id):
     print a
     if a.strip() == '':
         return 'input nothing'
+   
     recomment = ReComment(body=a, post=post,comment=comment,author=current_user._get_current_object(),reply_id=comment.id)
-
+    if "@" in a:
+            p = re.compile(r'(@)(.*?)( )')
+            m = p.findall(a)
+            atusers = []
+            for i in m:
+                print i
+                if '<' in i[1]:
+                    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
+                    atusers.append(m.group(3))   
+                else:
+                    atusers.append(i[1])
+            for atuser in atusers:
+                user = User.query.filter_by(username=atuser).first()
+                if user is not None:
+                    atwho = AtUser(recomment=recomment,author=user)
+                    db.session.add(atwho)
+                    db.session.commit()
     db.session.add(recomment)
     db.session.commit()
     return jsonify(result=a)
@@ -227,6 +280,23 @@ def reply(id):
     if a.strip() == '':
         return 'input nothing'
     reply = ReComment(body=a, comment=comment,post=post,author=current_user._get_current_object(),reply_id=recomment.id,reply_type="reply")
+    if "@" in a:
+            p = re.compile(r'(@)(.*?)( )')
+            m = p.findall(a)
+            atusers = []
+            for i in m:
+                print i
+                if '<' in i[1]:
+                    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
+                    atusers.append(m.group(3))   
+                else:
+                    atusers.append(i[1])
+            for atuser in atusers:
+                user = User.query.filter_by(username=atuser).first()
+                if user is not None:
+                    atwho = AtUser(recomment=reply,author=user)
+                    db.session.add(atwho)
+                    db.session.commit()
     db.session.add(reply)
     db.session.commit()
     return jsonify(result=a)
@@ -287,6 +357,23 @@ def edit(id):
     form = PostForm()
     if form.validate_on_submit():
         post.body = form.body.data
+        if "@" in post.body:
+            p = re.compile(r'(@)(.*?)( )')
+            m = p.findall(post.body)
+            atusers = []
+            for i in m:
+                print i
+                if '<' in i[1]:
+                    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
+                    atusers.append(m.group(3))   
+                else:
+                    atusers.append(i[1])
+            for atuser in atusers:
+                user = User.query.filter_by(username=atuser).first()
+                if user is not None:
+                    atwho = AtUser(post=post,author=user)
+                    db.session.add(atwho)
+                    db.session.commit()
         db.session.add(post)
         db.session.commit()
         for i in form.tag.data:
@@ -627,6 +714,18 @@ def streamSessionEvents():
         mimetype="text/event-stream"
     )
 
+def atmestream():
+    if current_user.is_authenticated():
+        a = AtUser.query.filter_by(author_id=current_user.id,confirmed=False).count()
+        return "data: "+str(a)+'\n\n'
+@main.route("/getatme")
+@login_required
+def atmestreamSessionEvents():
+    return Response(
+        atmestream(),
+        mimetype="text/event-stream"
+    )
+
 @main.route('/getcomments/<int:id>', methods=['GET','POST'])
 @login_required
 def get_comments(id):
@@ -634,11 +733,9 @@ def get_comments(id):
     if user != current_user:
         abort(403)
     posts = user.posts.all()
-    postcomments_num = 0
-    recomments_num = 0
+
     allpostcomments = []
     for post in posts:
-        postcomments_num = postcomments_num + post.comments.count() + post.recomments.count()
         allpostcomments = allpostcomments+post.comments.all() + post.recomments.all()
     l =[]
     for i in allpostcomments:
@@ -702,9 +799,38 @@ def collect_posts(id):
 def getupvotes(id):
     user = User.query.get(id)
     if user != current_user:
-        abort(403)
+        abort(403)  
     my_upvotes = []
     for upvote in Upvote.query.order_by(Upvote.timestamp.desc()).all():
-        if upvote.post.author == current_user:
-            my_upvotes.append(upvote)
+        if upvote.post:
+            if upvote.post.author == current_user:
+                my_upvotes.append(upvote)
     return render_template('getupvotes.html',my_upvotes=my_upvotes,Category=Category)
+
+
+@main.route('/testatwho')
+def atwho():
+    return render_template('testat.html')
+
+@main.route('/testfollow/<int:id>')
+def testfollow(id):
+    user = User.query.get_or_404(id)
+    followered = user.followed.all()
+    followed_names = []
+    for i in followered:
+        if i.followed != current_user:
+            followed_names.append(i.followed.username)
+    return jsonify(result=followed_names)
+
+@main.route('/atme/<int:id>')
+@login_required
+def atme(id):
+    user = User.query.get(id)
+    if user != current_user:
+        abort(403)
+    atmes = user.atusers.order_by(AtUser.timestamp.desc()).all()
+    for i in atmes:
+        i.confirmed = True
+        db.session.add(i)
+        db.session.commit()
+    return render_template('atme.html',atmes=atmes,Upvote=Upvote,Category=Category)

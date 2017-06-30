@@ -79,6 +79,7 @@ class User(UserMixin, db.Model):
     recomments = db.relationship('ReComment', backref='author', lazy='dynamic')
     upvotes = db.relationship('Upvote', backref='author', lazy='dynamic')
     collects = db.relationship('Collect', backref='author', lazy='dynamic')
+    atusers = db.relationship('AtUser', backref='author', lazy='dynamic')
     messages = db.relationship('Message', backref='author', lazy='dynamic',primaryjoin='Message.author_id==User.id')
     messageds = db.relationship('Message', backref='sendto', lazy='dynamic',primaryjoin='Message.sendto_id==User.id')
 
@@ -267,6 +268,8 @@ class Post(db.Model):
     recomments = db.relationship('ReComment', backref='post', lazy='dynamic')
     upvotes = db.relationship('Upvote', backref='post', lazy='dynamic')
     collect = db.relationship('Collect', backref='post', lazy='dynamic')
+    atusers = db.relationship('AtUser', backref='post', lazy='dynamic')
+
 
     @staticmethod
     def generate_fake(count=100):
@@ -327,6 +330,7 @@ class Comment(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
     recomments = db.relationship('ReComment', backref='comment', lazy='dynamic')
+    atusers = db.relationship('AtUser', backref='comment', lazy='dynamic')
 
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
@@ -349,6 +353,7 @@ class ReComment(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    atusers = db.relationship('AtUser', backref='recomment', lazy='dynamic')
 
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
@@ -396,3 +401,14 @@ class Collect(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+
+
+class AtUser(db.Model):
+    __tablename__ = 'atusers'
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'))
+    recomment_id = db.Column(db.Integer, db.ForeignKey('recomments.id'))
+    confirmed = db.Column(db.Boolean, default=False)

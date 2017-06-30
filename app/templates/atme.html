@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}@我{% endblock %}
+{% block page_content %}
+<h1>@我的</h1>
+<ul class="posts">
+    {% for atme in atmes %}
+    {% if atme.post %}
+    <li class="post">
+        <div class="post-thumbnail">
+            <a href="{{ url_for('.user', username=atme.post.author.username) }}">
+            {% if atme.post.author.photo %}
+                <img class="img-rounded profile-thumbnail" src="{{ atme.post.author.photo}}" style="height: 40px; width: 40px">
+            {% else %}
+                <img class="img-rounded profile-thumbnail" src="{{ atme.post.author.gravatar(size=40)}}">
+            {% endif %}
+            
+            </a>
+        </div>
+        <div class="post-content">
+            <div class="post-date">{{ moment(atme.post.timestamp).fromNow() }}</div>
+            <div class="post-author"><a href="{{ url_for('.user', username=atme.post.author.username) }}">{{ atme.post.author.username }}</a></div>
+            <div class="post-body" style="">
+                {% if atme.post.body_html %}
+                {{ atme.post.body_html | safe |truncate(350, True) }}
+                {% else %}
+                {{ atme.post.body | striptags |truncate(350, True)}}
+                {% endif %}
+            </div>
+            <div class="post-footer">
+            <span class="glyphicon glyphicon-tags" style="float: left; padding-right: 5px "></span>
+                {% for tag in atme.post.categorys.all() %}
+                <a href="{{url_for('.tag', id=tag.id)}}" style="float: left; padding-left: 5px"><span class="label label-primary" style="background-color: #5a788e">{{tag.name}}</span></a>
+                {% endfor %}
+                {% if current_user == atme.post.author %}
+                <a href="{{ url_for('.edit', id=atme.post.id) }}">
+                    <span class="label label-primary">编辑</span>
+                </a>
+                {% elif current_user.is_administrator() %}
+                <a href="{{ url_for('.edit', id=atme.post.id) }}">
+                    <span class="label label-danger">编辑【管理员】</span>
+                </a>
+                {% endif%}
+                
+                <a href="{{ url_for('.post', id=atme.post.id) }}">
+                    <span class="label label-default">查看全文</span>
+                </a>
+                <a href="{{ url_for('.post', id=atme.post.id)}}#comments">
+                    <span class="label label-primary">{{ atme.post.comments.count() }}评论</span>
+                </a>
+                <a href="{{ url_for('.thumbs_up', id=atme.post.id)}}">
+                {% if Upvote.query.filter_by(author=current_user,post=atme.post).first() %}
+                    <span class="label label-default" style="background: #c3ac83"><span class="glyphicon glyphicon-thumbs-up" style="color:red">{{atme.post.upvotes.count()}}</span></span>
+                {% else %}
+                    <span class="label label-default"><span class="glyphicon glyphicon-thumbs-up" style="">{{atme.post.upvotes.count()}}</span></span>
+                {% endif %}
+                </a>
+                <a href="{{ url_for('.collect', id=atme.post.id)}}">
+                    <span class="label label-primary"><span class="glyphicon glyphicon-star"></span>取消收藏</span>
+                </a>
+            </div>
+        </div>
+    </li>
+    {% endif %}
+    {% if atme.comment %}
+    <li class="comment">
+        <div class="comment-thumbnail">
+            <a href="{{ url_for('.user', username=atme.comment.author.username) }}">
+            {% if atme.comment.author.photo %}
+                <img class="img-rounded profile-thumbnail" src="{{ atme.comment.author.photo}}" style="height: 40px; width: 40px">
+            {% else %}
+                <img class="img-rounded profile-thumbnail" src="{{ atme.comment.author.gravatar(size=40)}}">
+            {% endif %}
+            </a>
+        </div>
+        <div class="comment-content" style="padding-bottom: 5px">
+            <div class="comment-date">{{ moment(atme.comment.timestamp).fromNow() }}</div>
+            <div class="comment-author"><a href="{{ url_for('.user', username=atme.comment.author.username) }}">{{ atme.comment.author.username }}</a></div>
+            <div class="comment-body">
+                {% if atme.comment.disabled %}
+                <p><i>这条评论已被屏蔽</i></p>
+                {% endif %}
+                {% if atme.comment.body_html %}
+                    {{ atme.comment.body_html | safe }}
+                {% else %}
+                    {{ atme.comment.body }}
+                {% endif %}
+            </div>
+            <div style="border: 1px solid;padding: 10px;background-color: #dad7d7">
+             <div class="post-thumbnail">
+            <a href="{{ url_for('.user', username=atme.comment.post.author.username) }}">
+            {% if atme.comment.post.author.photo %}
+                <img class="img-rounded profile-thumbnail" src="{{ atme.comment.post.author.photo}}" style="height: 40px; width: 40px">
+            {% else %}
+                <img class="img-rounded profile-thumbnail" src="{{ atme.comment.post.author.gravatar(size=40)}}">
+            {% endif %}
+            
+            </a>
+        </div>
+        <div class="post-content">
+            <div class="post-date">{{ moment(atme.comment.post.timestamp).fromNow() }}</div>
+            <div class="post-author"><a href="{{ url_for('.user', username=atme.comment.post.author.username) }}">{{ atme.comment.post.author.username }}</a></div>
+            <div class="post-body" style="">
+                {% if atme.comment.post.body_html %}
+                {{ atme.comment.post.body_html | safe |truncate(350, True) }}
+                {% else %}
+                {{ atme.comment.post.body | striptags |truncate(350, True)}}
+                {% endif %}
+            </div>
+            <div class="post-footer">
+            <span class="glyphicon glyphicon-tags" style="float: left; padding-right: 5px "></span>
+                {% for tag in atme.comment.post.categorys.all() %}
+                <a href="{{url_for('.tag', id=tag.id)}}" style="float: left; padding-left: 5px"><span class="label label-primary" style="background-color: #5a788e">{{tag.name}}</span></a>
+                {% endfor %}
+                {% if current_user == atme.post.author %}
+                <a href="{{ url_for('.edit', id=atme.comment.post.id) }}">
+                    <span class="label label-primary">编辑</span>
+                </a>
+                {% elif current_user.is_administrator() %}
+                <a href="{{ url_for('.edit', id=atme.comment.post.id) }}">
+                    <span class="label label-danger">编辑【管理员】</span>
+                </a>
+                {% endif%}
+                
+                <a href="{{ url_for('.post', id=atme.comment.post.id) }}">
+                    <span class="label label-default">查看全文</span>
+                </a>
+                <a href="{{ url_for('.post', id=atme.comment.post.id)}}#comments">
+                    <span class="label label-primary">{{ atme.comment.post.comments.count() }}评论</span>
+                </a>
+                <a href="{{ url_for('.thumbs_up', id=atme.comment.post.id)}}">
+                {% if Upvote.query.filter_by(author=current_user,post=atme.comment.post).first() %}
+                    <span class="label label-default" style="background: #c3ac83"><span class="glyphicon glyphicon-thumbs-up" style="color:red">{{atme.comment.post.upvotes.count()}}</span></span>
+                {% else %}
+                    <span class="label label-default"><span class="glyphicon glyphicon-thumbs-up" style="">{{atme.comment.post.upvotes.count()}}</span></span>
+                {% endif %}
+                </a>
+                <a href="{{ url_for('.collect', id=atme.comment.post.id)}}">
+                    <span class="label label-primary"><span class="glyphicon glyphicon-star"></span>取消收藏</span>
+                </a>
+            </div>
+        </div>
+            </div>
+            </div></li>
+            <hr>
+    {% endif %}
+    {% if atme.recomment %}
+    <li class="comment">
+        <div class="comment-thumbnail">
+            <a href="{{ url_for('.user', username=atme.recomment.author.username) }}">
+            {% if atme.recomment.author.photo %}
+                <img class="img-rounded profile-thumbnail" src="{{ atme.recomment.author.photo}}" style="height: 40px; width: 40px">
+            {% else %}
+                <img class="img-rounded profile-thumbnail" src="{{ atme.recomment.author.gravatar(size=40)}}">
+            {% endif %}
+            </a>
+        </div>
+        <div class="comment-content" style="padding-bottom: 5px">
+            <div class="comment-date">{{ moment(atme.recomment.timestamp).fromNow() }}</div>
+            <div class="comment-author"><a href="{{ url_for('.user', username=atme.recomment.author.username) }}">{{ atme.recomment.author.username }}</a></div>
+            <div class="comment-body">
+                {% if atme.recomment.disabled %}
+                <p><i>这条评论已被屏蔽</i></p>
+                {% endif %}
+                {% if atme.recomment.body_html %}
+                    {{ atme.recomment.body_html | safe }}
+                {% else %}
+                    {{ atme.recomment.body }}
+                {% endif %}
+            </div>
+            <div style="border: 1px solid;padding: 10px;background-color: #dad7d7">
+             <div class="post-thumbnail">
+            <a href="{{ url_for('.user', username=atme.recomment.post.author.username) }}">
+            {% if atme.recomment.post.author.photo %}
+                <img class="img-rounded profile-thumbnail" src="{{ atme.recomment.post.author.photo}}" style="height: 40px; width: 40px">
+            {% else %}
+                <img class="img-rounded profile-thumbnail" src="{{ atme.recomment.post.author.gravatar(size=40)}}">
+            {% endif %}
+            
+            </a>
+        </div>
+        <div class="post-content">
+            <div class="post-date">{{ moment(atme.recomment.post.timestamp).fromNow() }}</div>
+            <div class="post-author"><a href="{{ url_for('.user', username=atme.recomment.post.author.username) }}">{{ atme.recomment.post.author.username }}</a></div>
+            <div class="post-body" style="">
+                {% if atme.recomment.post.body_html %}
+                {{ atme.recomment.post.body_html | safe |truncate(350, True) }}
+                {% else %}
+                {{ atme.recomment.post.body | striptags |truncate(350, True)}}
+                {% endif %}
+            </div>
+            <div class="post-footer">
+            <span class="glyphicon glyphicon-tags" style="float: left; padding-right: 5px "></span>
+                {% for tag in atme.recomment.post.categorys.all() %}
+                <a href="{{url_for('.tag', id=tag.id)}}" style="float: left; padding-left: 5px"><span class="label label-primary" style="background-color: #5a788e">{{tag.name}}</span></a>
+                {% endfor %}
+                {% if current_user == atme.recomment.post.author %}
+                <a href="{{ url_for('.edit', id=atme.recomment.post.id) }}">
+                    <span class="label label-primary">编辑</span>
+                </a>
+                {% elif current_user.is_administrator() %}
+                <a href="{{ url_for('.edit', id=atme.recomment.post.id) }}">
+                    <span class="label label-danger">编辑【管理员】</span>
+                </a>
+                {% endif%}
+                
+                <a href="{{ url_for('.post', id=atme.recomment.post.id) }}">
+                    <span class="label label-default">查看全文</span>
+                </a>
+                <a href="{{ url_for('.post', id=atme.recomment.post.id)}}#comments">
+                    <span class="label label-primary">{{ atme.recomment.post.comments.count() }}评论</span>
+                </a>
+                <a href="{{ url_for('.thumbs_up', id=atme.recomment.post.id)}}">
+                {% if Upvote.query.filter_by(author=current_user,post=atme.recomment.post).first() %}
+                    <span class="label label-default" style="background: #c3ac83"><span class="glyphicon glyphicon-thumbs-up" style="color:red">{{atme.recomment.post.upvotes.count()}}</span></span>
+                {% else %}
+                    <span class="label label-default"><span class="glyphicon glyphicon-thumbs-up" style="">{{atme.recomment.post.upvotes.count()}}</span></span>
+                {% endif %}
+                </a>
+                <a href="{{ url_for('.collect', id=atme.recomment.post.id)}}">
+                    <span class="label label-primary"><span class="glyphicon glyphicon-star"></span>取消收藏</span>
+                </a>
+            </div>
+        </div>
+            </div>
+            </div></li>
+            <hr>
+    {% endif %}
+    {% endfor %}
+</ul>
+{% endblock %}
+
+{% block right_side %}
+<div class="widget">
+    <h4 class="title">
+    文章标签
+    <br>
+    </h4>
+    {% for i in Category.query.all() %}
+    <div><a href="{{url_for('.tag', id=i.id)}}" style="line-height: 1.8;color:#2098d1; font-weight: bolder;">{{i.name}}</a><span class="label label-default" style="float:right;">{{i.posts.count()}}</span></div>
+    {% endfor %}
+</div>
+<div class="widget">
+    <h4 class="title">
+    关于网站的信息
+    <br>
+    </h4>
+    <a href="#">关于本站</a>
+</div>
+
+<div class="widget">
+    <h4 class="title">
+    联系我
+    <br>
+    </h4>
+    <p>邮箱:<a href="mailto:tcyfs@sina.com">tcyfs@sina.com</a><p>
+    <p>github:<a href="https://github.com/tcyfs">tcyfs</a></p>
+
+</div>
+{% endblock %}
