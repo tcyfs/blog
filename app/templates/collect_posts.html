@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% import "_macros.html" as macros %}
 {% block title %}我的收藏{% endblock %}
 {% block page_content %}
 <h1>我的收藏</h1>
@@ -67,7 +67,13 @@
     </li>
     {% endif %}
     {% endfor %}
+
 </ul>
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, '.collect_posts', id=current_user.id) }}
+</div>
+{% endif %}
 {% endblock %}
 
 

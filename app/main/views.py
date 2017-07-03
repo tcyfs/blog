@@ -793,29 +793,32 @@ def collect_posts(id):
     user = User.query.get(id)
     if user != current_user:
         abort(403)
-    collects = current_user.collects.order_by(Collect.timestamp.desc()).all()
+    page = request.args.get('page', 1, type=int)
+    print type(current_user.collects.order_by(Collect.timestamp.desc()))
+    pagination = current_user.collects.order_by(Collect.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],error_out=False)
+    collects= pagination.items
+    #collects = current_user.collects.order_by(Collect.timestamp.desc()).all()
     collectposts = []
     for i in collects:
         collectposts.append(i.post)
-    return render_template('collect_posts.html',collectposts=collectposts,Category=Category,Upvote=Upvote,Collect=Collect)
+    return render_template('collect_posts.html',collectposts=collectposts,pagination=pagination,Category=Category,Upvote=Upvote,Collect=Collect)
 
 @main.route('/getupvotes/<int:id>')
 @login_required
 def getupvotes(id):
     user = User.query.get(id)
     if user != current_user:
-        abort(403)  
+        abort(403)
+    page = request.args.get('page', 1, type=int)
+    pagination = Upvote.query.order_by(Upvote.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],error_out=False)
+    upvotes = pagination.items
     my_upvotes = []
-    for upvote in Upvote.query.order_by(Upvote.timestamp.desc()).all():
+    for upvote in upvotes:
         if upvote.post:
             if upvote.post.author == current_user:
                 my_upvotes.append(upvote)
-    return render_template('getupvotes.html',my_upvotes=my_upvotes,Category=Category)
+    return render_template('getupvotes.html',my_upvotes=my_upvotes,Category=Category,pagination=pagination)
 
-
-@main.route('/testatwho')
-def atwho():
-    return render_template('testat.html')
 
 @main.route('/testfollow/<int:id>')
 def testfollow(id):
@@ -833,9 +836,13 @@ def atme(id):
     user = User.query.get(id)
     if user != current_user:
         abort(403)
-    atmes = user.atusers.order_by(AtUser.timestamp.desc()).all()
+    page = request.args.get('page', 1, type=int)
+    pagination = user.atusers.order_by(AtUser.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
+                                                                          error_out=False)
+    atmes = pagination.items
+    #atmes = user.atusers.order_by(AtUser.timestamp.desc()).all()
     for i in atmes:
         i.confirmed = True
         db.session.add(i)
         db.session.commit()
-    return render_template('atme.html',atmes=atmes,Upvote=Upvote,Category=Category,Collect=Collect)
+    return render_template('atme.html',atmes=atmes,pagination=pagination,Upvote=Upvote,Category=Category,Collect=Collect)

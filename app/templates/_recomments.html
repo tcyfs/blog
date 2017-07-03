@@ -95,9 +95,7 @@
                         dataType: 'json',
                         data: data,
                         success:function(data){
-                            CKEDITOR.instances.rec{{recomment.id}}.setData("")
-                            $("#rawreply{{ recomment.id }}").toggle();
-
+                            
                             $.ajax({
                                 url:$SCRIPT_ROOT + '/post/'+{{comment.post_id}},
                                 dataType: 'html',
@@ -105,7 +103,10 @@
                                     $("#repl{{comment.id}}").prepend('<li id="re{{comment.id}}" class="recomment"  style="list-style-type:none;">'+$(data).find('#re{{comment.id}}').html()+'</li>');
                                     
                                 }
-                            })
+                            });
+                            CKEDITOR.instances.rec{{recomment.id}}.setData("");
+                            $("#rawreply{{ recomment.id }}").toggle();
+
                             
                         },
                         error:function(){

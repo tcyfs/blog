@@ -84,8 +84,7 @@
                         dataType: 'json',
                         data: data,
                         success:function(data){
-                            CKEDITOR.instances.b{{comment.id}}.setData("")
-                            $("#rawcomment{{ comment.id }}").toggle();
+                            
                             
                             $.ajax({
                                 url:$SCRIPT_ROOT + '/post/'+{{comment.post_id}},
@@ -95,6 +94,8 @@
                                     
                                 }
                             })
+                            CKEDITOR.instances.b{{comment.id}}.setData("");
+                            $("#rawcomment{{ comment.id }}").toggle();
                             
                         },
                         error:function(){

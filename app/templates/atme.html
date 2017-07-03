@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_macros.html" as macros %}
 
 {% block title %}@我{% endblock %}
 {% block page_content %}
@@ -245,6 +246,11 @@
     {% endif %}
     {% endfor %}
 </ul>
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, '.atme', id=current_user.id) }}
+</div>
+{% endif %}
 {% endblock %}
 
 {% block right_side %}

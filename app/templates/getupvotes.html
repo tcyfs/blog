@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% import "_macros.html" as macros %}
 {% block title %}我收到的赞{% endblock %}
 {% block page_content %}
 <h1>我收到的赞</h1>
@@ -38,6 +38,11 @@
     {% endfor %}
    
 </ul>
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, '.getupvotes', id=current_user.id) }}
+</div>
+{% endif %}
 {% endblock %}
 
 {% block right_side %}
