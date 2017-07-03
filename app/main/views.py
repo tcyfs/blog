@@ -362,7 +362,6 @@ def edit(id):
             m = p.findall(post.body)
             atusers = []
             for i in m:
-                print i
                 if '<' in i[1]:
                     m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
                     atusers.append(m.group(3))   
@@ -370,10 +369,16 @@ def edit(id):
                     atusers.append(i[1])
             for atuser in atusers:
                 user = User.query.filter_by(username=atuser).first()
+                n = 1
                 if user is not None:
-                    atwho = AtUser(post=post,author=user)
-                    db.session.add(atwho)
-                    db.session.commit()
+                    for i in post.atusers.all():
+                        if i.author == user:
+                            n = 0
+                            break
+                    if n:
+                        atwho = AtUser(post=post,author=user)
+                        db.session.add(atwho)
+                        db.session.commit()
         db.session.add(post)
         db.session.commit()
         for i in form.tag.data:
@@ -833,4 +838,4 @@ def atme(id):
         i.confirmed = True
         db.session.add(i)
         db.session.commit()
-    return render_template('atme.html',atmes=atmes,Upvote=Upvote,Category=Category)
+    return render_template('atme.html',atmes=atmes,Upvote=Upvote,Category=Category,Collect=Collect)

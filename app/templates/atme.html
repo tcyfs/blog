@@ -46,7 +46,7 @@
                     <span class="label label-default">查看全文</span>
                 </a>
                 <a href="{{ url_for('.post', id=atme.post.id)}}#comments">
-                    <span class="label label-primary">{{ atme.post.comments.count() }}评论</span>
+                    <span class="label label-primary">{{ atme.post.comments.count()+atme.post.recomments.count() }}评论</span>
                 </a>
                 <a href="{{ url_for('.thumbs_up', id=atme.post.id)}}">
                 {% if Upvote.query.filter_by(author=current_user,post=atme.post).first() %}
@@ -55,8 +55,13 @@
                     <span class="label label-default"><span class="glyphicon glyphicon-thumbs-up" style="">{{atme.post.upvotes.count()}}</span></span>
                 {% endif %}
                 </a>
+
                 <a href="{{ url_for('.collect', id=atme.post.id)}}">
+                {% if Collect.query.filter_by(author=current_user,post=atme.post).first() %}
                     <span class="label label-primary"><span class="glyphicon glyphicon-star"></span>取消收藏</span>
+                {% else %}
+                    <span class="label label-primary"><span class="glyphicon glyphicon-star-empty"></span>收藏</span>
+                {% endif %}
                 </a>
             </div>
         </div>
