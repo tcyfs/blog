@@ -45,7 +45,7 @@
                     <span class="label label-default">查看全文</span>
                 </a>
                 <a href="{{ url_for('.post', id=post.id)}}#comments">
-                    <span class="label label-primary">{{ post.comments.count() }}评论</span>
+                    <span class="label label-primary">{{ post.comments.count()+post.recomments.count() }}评论</span>
                 </a>
                 <a href="{{ url_for('.thumbs_up', id=post.id)}}">
                 {% if Upvote.query.filter_by(author=current_user,post=post).first() %}
@@ -55,7 +55,11 @@
                 {% endif %}
                 </a>
                 <a href="{{ url_for('.collect', id=post.id)}}">
+                {% if Collect.query.filter_by(author=current_user,post=post).first() %}
                     <span class="label label-primary"><span class="glyphicon glyphicon-star"></span>取消收藏</span>
+                {% else %}
+                    <span class="label label-primary"><span class="glyphicon glyphicon-star-empty"></span>收藏</span>
+                {% endif %}
                 </a>
             </div>
         </div>
