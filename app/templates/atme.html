@@ -68,6 +68,7 @@
     </li>
     {% endif %}
     {% if atme.comment %}
+    {% if atme.comment.post %}
     <li class="comment">
         <div class="comment-thumbnail">
             <a href="{{ url_for('.user', username=atme.comment.author.username) }}">
@@ -153,7 +154,9 @@
             </div></li>
             <hr>
     {% endif %}
+    {% endif %}
     {% if atme.recomment %}
+    {% if atme.recomment.post %}
     <li class="comment">
         <div class="comment-thumbnail">
             <a href="{{ url_for('.user', username=atme.recomment.author.username) }}">
@@ -238,6 +241,7 @@
             </div>
             </div></li>
             <hr>
+    {% endif %}
     {% endif %}
     {% endfor %}
 </ul>

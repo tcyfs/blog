@@ -6,6 +6,7 @@
 <ul class="posts">
     {% for comment in l2 %}
     {% if comment.author != current_user %}
+    {% if comment.post %}
     
      <li class="post" style="padding-bottom: 30px">
         <div class="post-thumbnail">
@@ -41,6 +42,7 @@
         </div>
     </li>
     {%endif%}
+    {% endif %}
     {% endfor %}
    
 </ul>
