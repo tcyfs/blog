@@ -5,6 +5,7 @@
 <h1>我的收藏</h1>
 <ul class="posts">
     {% for post in collectposts %}
+    {% if post%}
     <li class="post">
         <div class="post-thumbnail">
             <a href="{{ url_for('.user', username=post.author.username) }}">
@@ -64,9 +65,11 @@
             </div>
         </div>
     </li>
+    {% endif %}
     {% endfor %}
 </ul>
 {% endblock %}
+
 
 {% block right_side %}
 <div class="widget">
