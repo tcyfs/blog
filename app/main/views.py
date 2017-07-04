@@ -146,8 +146,11 @@ def user(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
         abort(404)
-    posts = user.posts.order_by(Post.timestamp.desc()).all()
-    return render_template('user.html', user=user, posts=posts,Message=Message,Upvote=Upvote,Collect=Collect)
+    page = request.args.get('page', 1, type=int)
+    pagination = user.posts.order_by(Post.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+                                                                     error_out=False)
+    posts = pagination.items
+    return render_template('user.html', user=user, posts=posts,pagination=pagination,Message=Message,Upvote=Upvote,Collect=Collect)
 
 
 @main.route('/edit-profile', methods=['GET', 'POST'])
@@ -740,6 +743,7 @@ def get_comments(id):
     posts = user.posts.all()
 
     allpostcomments = []
+
     for post in posts:
         allpostcomments = allpostcomments+post.comments.all() + post.recomments.all()
     l =[]
@@ -794,7 +798,6 @@ def collect_posts(id):
     if user != current_user:
         abort(403)
     page = request.args.get('page', 1, type=int)
-    print type(current_user.collects.order_by(Collect.timestamp.desc()))
     pagination = current_user.collects.order_by(Collect.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],error_out=False)
     collects= pagination.items
     #collects = current_user.collects.order_by(Collect.timestamp.desc()).all()
@@ -836,7 +839,15 @@ def atme(id):
     user = User.query.get(id)
     if user != current_user:
         abort(403)
+    atmeall=user.atusers.all()
+    for i in atmeall:
+        if i.post or i.comment or i.recomment:
+            continue
+        else:
+            db.session.delete(i)
+            db.session.commit()
     page = request.args.get('page', 1, type=int)
+
     pagination = user.atusers.order_by(AtUser.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
                                                                           error_out=False)
     atmes = pagination.items
