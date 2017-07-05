@@ -275,7 +275,6 @@ def recomment(id):
     post = Post.query.get_or_404(comment.post_id)
     data = json.loads(request.form.get('data'))
     a = data['a']
-    print a
     if a.strip() == '':
         return 'input nothing'
    
