@@ -367,6 +367,14 @@ def reply(id):
 @login_required
 def delete_post(id):
     post = Post.query.get_or_404(id)
+    comments = post.comments.all()
+    for comment in comments:
+        db.session.delete(comment)
+        db.session.commit()
+    recomments = post.recomments.all()
+    for recomment in recomments:
+        db.session.delete(recomment)
+        db.session.commit()
     if current_user != post.author and not current_user.can(Permission.ADMINISTER):
         abort(403)
     db.session.delete(post)
@@ -399,6 +407,10 @@ def delete_recomment(id):
 @login_required
 def delete_comment(id):
     comment = Comment.query.get_or_404(id)
+    recomments = comment.recomments.all()
+    for recomment in recomments:
+        db.session.delete(recomment)
+        db.session.commit()
     db.session.delete(comment)
     db.session.commit()
     try:
