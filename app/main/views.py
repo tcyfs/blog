@@ -80,26 +80,42 @@ def index():
     form2 = forms.LoginForm()
     form3 = forms.RegistrationForm()
     if current_user.can(Permission.WRITE_ARTICLES) and form1.submit1.data and form1.validate_on_submit():
-        post = Post(body=form1.body.data, author=current_user._get_current_object())
+        
         if "@" in form1.body.data:
-            p = re.compile(r'(@)(.*?)( )')
-            m = p.findall(post.body)
+            changedbody = form1.body.data
+            if "data-atwho-at-query" in form1.body.data:
+                pattern = re.compile(r'<span.*?@">(@.*?)</span>')
+                def replaced(match):
+                    rep = match.group(1)+" "
+                    return rep
+                changedbody = pattern.sub(replaced,form1.body.data)
+            p = re.compile(r'(@)(.*?)( |&nbsp;)')
+            def replace(match):
+                rep = "<a href='/user/"+match.group(2)+"'> @"+match.group(2)+" </a>"
+                return rep
+            b = p.sub(replace,changedbody)
+            post = Post(body=b, author=current_user._get_current_object())
+            db.session.add(post)
+            db.session.commit()
+            m = p.findall(changedbody)
             atusers = []
             for i in m:
-                print i
-                if '<' in i[1]:
-                    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
-                    atusers.append(m.group(3))   
-                else:
-                    atusers.append(i[1])
+                #if '</sapn>' in i[1]:
+                #    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
+                #    atusers.append(m.group(3)) 
+                #else:
+                atusers.append(i[1])          
             for atuser in atusers:
                 user = User.query.filter_by(username=atuser).first()
                 if user is not None:
                     atwho = AtUser(post=post,author=user)
                     db.session.add(atwho)
                     db.session.commit()
-        db.session.add(post)
-        db.session.commit()
+            
+        else:
+            post = Post(body=form1.body.data, author=current_user._get_current_object())
+            db.session.add(post)
+            db.session.commit()
         for i in form1.tag.data:
             tag = Category.query.get(i)
             tag.posts.append(post)
@@ -204,27 +220,42 @@ def post(id):
     post = Post.query.get_or_404(id)
     form = CommentForm()
     if form.submit.data and form.validate_on_submit():
-        comment = Comment(body=form.body.data, post=post, author=current_user._get_current_object())
+        
         if "@" in form.body.data:
-            p = re.compile(r'(@)(.*?)( )')
-            m = p.findall(form.body.data)
+            changedbody = form.body.data
+            if "data-atwho-at-query" in form.body.data:
+                pattern = re.compile(r'<span.*?@">(@.*?)</span>')
+                def replaced(match):
+                    rep = match.group(1)+" "
+                    return rep
+                changedbody = pattern.sub(replaced,form.body.data)
+            p = re.compile(r'(@)(.*?)( |&nbsp;)')
+            def replace(match):
+                rep = "<a href='/user/"+match.group(2)+"'> @"+match.group(2)+" </a>"
+                return rep
+            b = p.sub(replace,changedbody)
+            comment = Comment(body=b, post=post, author=current_user._get_current_object())
+            db.session.add(comment)
+            db.session.commit()
+            m = p.findall(changedbody)
             atusers = []
             for i in m:
-                print i
-                if '<' in i[1]:
-                    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
-                    atusers.append(m.group(3))   
-                else:
-                    print i
-                    atusers.append(i[1])
+                #if '<' in i[1]:
+                #    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
+                 #   atusers.append(m.group(3))   
+                #else:
+                #   print i
+                atusers.append(i[1])
             for atuser in atusers:
                 user = User.query.filter_by(username=atuser).first()
                 if user is not None:
                     atwho = AtUser(comment=comment,author=user)
                     db.session.add(atwho)
                     db.session.commit()
-        db.session.add(comment)
-        db.session.commit()
+        else:
+            comment = Comment(body=form.body.data, post=post, author=current_user._get_current_object())
+            db.session.add(comment)
+            db.session.commit()
         flash(u'评论提交成功','success')
         return redirect(url_for('.post', id=post.id, page=-1))
 
@@ -248,26 +279,40 @@ def recomment(id):
     if a.strip() == '':
         return 'input nothing'
    
-    recomment = ReComment(body=a, post=post,comment=comment,author=current_user._get_current_object(),reply_id=comment.id)
     if "@" in a:
-            p = re.compile(r'(@)(.*?)( )')
-            m = p.findall(a)
-            atusers = []
-            for i in m:
-                print i
-                if '<' in i[1]:
-                    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
-                    atusers.append(m.group(3))   
-                else:
-                    atusers.append(i[1])
-            for atuser in atusers:
-                user = User.query.filter_by(username=atuser).first()
-                if user is not None:
-                    atwho = AtUser(recomment=recomment,author=user)
-                    db.session.add(atwho)
-                    db.session.commit()
-    db.session.add(recomment)
-    db.session.commit()
+        changedbody = a
+        if "data-atwho-at-query" in a:
+            pattern = re.compile(r'<span.*?@">(@.*?)</span>')
+            def replaced(match):
+                rep = match.group(1)+" "
+                return rep
+            changedbody = pattern.sub(replaced,a)
+        p = re.compile(r'(@)(.*?)( |&nbsp;)')
+        def replace(match):
+            rep = "<a href='/user/"+match.group(2)+"'> @"+match.group(2)+" </a>"
+            return rep
+        b = p.sub(replace,changedbody)
+        recomment = ReComment(body=b, post=post,comment=comment, author=current_user._get_current_object(),reply_id=comment.id)
+        db.session.add(recomment)
+        db.session.commit()
+        m = p.findall(changedbody)
+        atusers = []
+        for i in m:
+            #if '<' in i[1]:
+            #    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
+            #    atusers.append(m.group(3))   
+            #else:
+            atusers.append(i[1])
+        for atuser in atusers:
+            user = User.query.filter_by(username=atuser).first()
+            if user is not None:
+                atwho = AtUser(recomment=recomment,author=user)
+                db.session.add(atwho)
+                db.session.commit()
+    else:
+        recomment = ReComment(body=a, post=post,comment=comment,author=current_user._get_current_object(),reply_id=comment.id)
+        db.session.add(recomment)
+        db.session.commit()
     return jsonify(result=a)
     # return redirect(url_for('.post', id=comment.post_id))
 
@@ -282,26 +327,40 @@ def reply(id):
     a = data['a']
     if a.strip() == '':
         return 'input nothing'
-    reply = ReComment(body=a, comment=comment,post=post,author=current_user._get_current_object(),reply_id=recomment.id,reply_type="reply")
     if "@" in a:
-            p = re.compile(r'(@)(.*?)( )')
-            m = p.findall(a)
-            atusers = []
-            for i in m:
-                print i
-                if '<' in i[1]:
-                    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
-                    atusers.append(m.group(3))   
-                else:
-                    atusers.append(i[1])
-            for atuser in atusers:
-                user = User.query.filter_by(username=atuser).first()
-                if user is not None:
-                    atwho = AtUser(recomment=reply,author=user)
-                    db.session.add(atwho)
-                    db.session.commit()
-    db.session.add(reply)
-    db.session.commit()
+        changedbody = a
+        if "data-atwho-at-query" in a:
+            pattern = re.compile(r'<span.*?@">(@.*?)</span>')
+            def replaced(match):
+                rep = match.group(1)+" "
+                return rep
+            changedbody = pattern.sub(replaced,a)
+        p = re.compile(r'(@)(.*?)( |&nbsp;)')
+        def replace(match):
+            rep = "<a href='/user/"+match.group(2)+"'> @"+match.group(2)+" </a>"
+            return rep
+        b = p.sub(replace,changedbody)
+        reply = ReComment(body=b, post=post,comment=comment, author=current_user._get_current_object(),reply_id=comment.id,reply_type="reply")
+        db.session.add(reply)
+        db.session.commit()
+        m = p.findall(changedbody)
+        atusers = []
+        for i in m:
+                #if '<' in i[1]:
+                #    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
+                #   atusers.append(m.group(3))   
+                #else:
+            atusers.append(i[1])
+        for atuser in atusers:
+            user = User.query.filter_by(username=atuser).first()
+            if user is not None:
+                atwho = AtUser(recomment=reply,author=user)
+                db.session.add(atwho)
+                db.session.commit()
+    else:
+        reply = ReComment(body=a, comment=comment,post=post,author=current_user._get_current_object(),reply_id=recomment.id,reply_type="reply")
+        db.session.add(reply)
+        db.session.commit()
     return jsonify(result=a)
 
 
@@ -361,13 +420,27 @@ def edit(id):
     if form.validate_on_submit():
         post.body = form.body.data
         if "@" in post.body:
-            p = re.compile(r'(@)(.*?)( )')
-            m = p.findall(post.body)
-            atusers = []
+            changedbody = form.body.data
+            if "data-atwho-at-query" in form.body.data:
+                pattern = re.compile(r'<span.*?@">(@.*?)</span>')
+                def replaced(match):
+                    rep = match.group(1)+" "
+                    return rep
+                changedbody = pattern.sub(replaced,form.body.data)
+            p = re.compile(r'(@)(.*?)( |&nbsp;)')
+            def replace(match):
+                rep = "<a href='/user/"+match.group(2)+"'> @"+match.group(2)+" </a>"
+                return rep
+            b = p.sub(replace,changedbody)
+            post.body = b
+            #post = Post(body=b, author=current_user._get_current_object())
+            db.session.add(post)
+            db.session.commit()
+            m = p.findall(changedbody)
+            atusers = []      
             for i in m:
-                if '<' in i[1]:
-                    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
-                    atusers.append(m.group(3))   
+                if '</a>' in i[1]:
+                    continue  
                 else:
                     atusers.append(i[1])
             for atuser in atusers:
@@ -382,8 +455,9 @@ def edit(id):
                         atwho = AtUser(post=post,author=user)
                         db.session.add(atwho)
                         db.session.commit()
-        db.session.add(post)
-        db.session.commit()
+        else:
+            db.session.add(post)
+            db.session.commit()
         for i in form.tag.data:
             tag = Category.query.get(i)
             if tag in post.categorys.all():

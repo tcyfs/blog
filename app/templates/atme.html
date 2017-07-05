@@ -35,33 +35,33 @@
                 {% endfor %}
                 {% if current_user == atme.post.author %}
                 <a href="{{ url_for('.edit', id=atme.post.id) }}">
-                    <span class="label label-primary">编辑</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767">编辑</span>
                 </a>
                 {% elif current_user.is_administrator() %}
                 <a href="{{ url_for('.edit', id=atme.post.id) }}">
-                    <span class="label label-danger">编辑【管理员】</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767">编辑【管理员】</span>
                 </a>
                 {% endif%}
                 
                 <a href="{{ url_for('.post', id=atme.post.id) }}">
-                    <span class="label label-default">查看全文</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767">查看全文</span>
                 </a>
                 <a href="{{ url_for('.post', id=atme.post.id)}}#comments">
-                    <span class="label label-primary">{{ atme.post.comments.count()+atme.post.recomments.count() }}评论</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767">{{ atme.post.comments.count()+atme.post.recomments.count() }}评论</span>
                 </a>
                 <a href="{{ url_for('.thumbs_up', id=atme.post.id)}}">
                 {% if Upvote.query.filter_by(author=current_user,post=atme.post).first() %}
-                    <span class="label label-default" style="background: #c3ac83"><span class="glyphicon glyphicon-thumbs-up" style="color:red">{{atme.post.upvotes.count()}}</span></span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767"><span class="glyphicon glyphicon-thumbs-up" style="color:red">{{atme.post.upvotes.count()}}</span></span>
                 {% else %}
-                    <span class="label label-default"><span class="glyphicon glyphicon-thumbs-up" style="">{{atme.post.upvotes.count()}}</span></span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767"><span class="glyphicon glyphicon-thumbs-up" style="">{{atme.post.upvotes.count()}}</span></span>
                 {% endif %}
                 </a>
 
                 <a href="{{ url_for('.collect', id=atme.post.id)}}">
                 {% if Collect.query.filter_by(author=current_user,post=atme.post).first() %}
-                    <span class="label label-primary"><span class="glyphicon glyphicon-star"></span>取消收藏</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767"><span class="glyphicon glyphicon-star"></span>取消收藏</span>
                 {% else %}
-                    <span class="label label-primary"><span class="glyphicon glyphicon-star-empty"></span>收藏</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767"><span class="glyphicon glyphicon-star-empty"></span>收藏</span>
                 {% endif %}
                 </a>
             </div>
@@ -121,32 +121,32 @@
                 {% endfor %}
                 {% if current_user == atme.post.author %}
                 <a href="{{ url_for('.edit', id=atme.comment.post.id) }}">
-                    <span class="label label-primary">编辑</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767">编辑</span>
                 </a>
                 {% elif current_user.is_administrator() %}
                 <a href="{{ url_for('.edit', id=atme.comment.post.id) }}">
-                    <span class="label label-danger">编辑【管理员】</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767">编辑【管理员】</span>
                 </a>
                 {% endif%}
                 
                 <a href="{{ url_for('.post', id=atme.comment.post.id) }}">
-                    <span class="label label-default">查看全文</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767">查看全文</span>
                 </a>
                 <a href="{{ url_for('.post', id=atme.comment.post.id)}}#comments">
-                    <span class="label label-primary">{{ atme.comment.post.comments.count()+atme.comment.post.recomments.count() }}评论</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767">{{ atme.comment.post.comments.count()+atme.comment.post.recomments.count() }}评论</span>
                 </a>
                 <a href="{{ url_for('.thumbs_up', id=atme.comment.post.id)}}">
                 {% if Upvote.query.filter_by(author=current_user,post=atme.comment.post).first() %}
-                    <span class="label label-default" style="background: #c3ac83"><span class="glyphicon glyphicon-thumbs-up" style="color:red">{{atme.comment.post.upvotes.count()}}</span></span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767"><span class="glyphicon glyphicon-thumbs-up" style="color:red">{{atme.comment.post.upvotes.count()}}</span></span>
                 {% else %}
-                    <span class="label label-default"><span class="glyphicon glyphicon-thumbs-up" style="">{{atme.comment.post.upvotes.count()}}</span></span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767"><span class="glyphicon glyphicon-thumbs-up" style="">{{atme.comment.post.upvotes.count()}}</span></span>
                 {% endif %}
                 </a>
                 <a href="{{ url_for('.collect', id=atme.comment.post.id)}}">
                 {% if Collect.query.filter_by(author=current_user,post=atme.comment.post).first() %}
-                    <span class="label label-primary"><span class="glyphicon glyphicon-star"></span>取消收藏</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767"><span class="glyphicon glyphicon-star"></span>取消收藏</span>
                 {% else %}
-                    <span class="label label-primary"><span class="glyphicon glyphicon-star-empty"></span>收藏</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767"><span class="glyphicon glyphicon-star-empty"></span>收藏</span>
                 {% endif %}
                 </a>
             </div>
@@ -209,32 +209,32 @@
                 {% endfor %}
                 {% if current_user == atme.recomment.post.author %}
                 <a href="{{ url_for('.edit', id=atme.recomment.post.id) }}">
-                    <span class="label label-primary">编辑</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767">编辑</span>
                 </a>
                 {% elif current_user.is_administrator() %}
                 <a href="{{ url_for('.edit', id=atme.recomment.post.id) }}">
-                    <span class="label label-danger">编辑【管理员】</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767">编辑【管理员】</span>
                 </a>
                 {% endif%}
                 
                 <a href="{{ url_for('.post', id=atme.recomment.post.id) }}">
-                    <span class="label label-default">查看全文</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767">查看全文</span>
                 </a>
                 <a href="{{ url_for('.post', id=atme.recomment.post.id)}}#comments">
-                    <span class="label label-primary">{{ atme.recomment.post.comments.count()+atme.recomment.post.recomments.count() }}评论</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767">{{ atme.recomment.post.comments.count()+atme.recomment.post.recomments.count() }}评论</span>
                 </a>
                 <a href="{{ url_for('.thumbs_up', id=atme.recomment.post.id)}}">
                 {% if Upvote.query.filter_by(author=current_user,post=atme.recomment.post).first() %}
-                    <span class="label label-default" style="background: #c3ac83"><span class="glyphicon glyphicon-thumbs-up" style="color:red">{{atme.recomment.post.upvotes.count()}}</span></span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767"><span class="glyphicon glyphicon-thumbs-up" style="color:red">{{atme.recomment.post.upvotes.count()}}</span></span>
                 {% else %}
-                    <span class="label label-default"><span class="glyphicon glyphicon-thumbs-up" style="">{{atme.recomment.post.upvotes.count()}}</span></span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767"><span class="glyphicon glyphicon-thumbs-up" style="">{{atme.recomment.post.upvotes.count()}}</span></span>
                 {% endif %}
                 </a>
                 <a href="{{ url_for('.collect', id=atme.recomment.post.id)}}">
                     {% if Collect.query.filter_by(author=current_user,post=atme.recomment.post).first() %}
-                    <span class="label label-primary"><span class="glyphicon glyphicon-star"></span>取消收藏</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767"><span class="glyphicon glyphicon-star"></span>取消收藏</span>
                 {% else %}
-                    <span class="label label-primary"><span class="glyphicon glyphicon-star-empty"></span>收藏</span>
+                    <span class="label label-default hvr-radial-out" style="background: #696767"><span class="glyphicon glyphicon-star-empty"></span>收藏</span>
                 {% endif %}
                 </a>
             </div>
