@@ -339,7 +339,7 @@ def reply(id):
             rep = "<a href='/user/"+match.group(2)+"'> @"+match.group(2)+" </a>"
             return rep
         b = p.sub(replace,changedbody)
-        reply = ReComment(body=b, post=post,comment=comment, author=current_user._get_current_object(),reply_id=comment.id,reply_type="reply")
+        reply = ReComment(body=b, post=post,comment=comment, author=current_user._get_current_object(),reply_id=recomment.id,reply_type="reply")
         db.session.add(reply)
         db.session.commit()
         m = p.findall(changedbody)
