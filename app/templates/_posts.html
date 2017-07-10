@@ -27,7 +27,7 @@
                 <a href="{{url_for('.tag', id=tag.id)}}" style="float: left; padding-left: 5px"><span class="label label-primary" style="background-color: #5a788e">{{tag.name}}</span></a>
                 {% endfor %}
                 {% if current_user == post.author %}
-                <a href="{{ url_for('.edit', id=post.id) }}">
+                <a href="{{ url_for('.edit', id=post.id) }}" >
                     <span class="label label-default hvr-radial-out" style="background: #696767">编辑</span>
                 </a>
                 {% elif current_user.is_administrator() %}

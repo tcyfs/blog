@@ -64,7 +64,21 @@
               });
             </script>
 
-            <a id="delcomment{{comment.id}}" href="{{ url_for('.delete_comment', id=comment.id) }}" style="color: #e14d4d; float: right; visibility: hidden;" >删除</a>
+            <a id="delcomment{{comment.id}}" href="javascript:void(0)" data-toggle="modal" data-target="#myModaldelcomment{{comment.id}}" style="color: #e14d4d; float: right; visibility: hidden;" >删除</a>
+            <div class="modal fade" id="myModaldelcomment{{comment.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">确定要删除评论吗？</h4>
+      </div>
+      <div class="modal-footer">
+      <button type="button" data-dismiss="modal">取消</button>
+        <a  href="{{ url_for('.delete_comment', id=comment.id) }}"><button style="color: red">确定</button></a>
+      </div>
+    </div>
+  </div>
+</div>
             {% endif %}      
             <div id="rawcomment{{ comment.id}}" style="display: none;">
 
