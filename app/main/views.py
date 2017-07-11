@@ -3,18 +3,17 @@ import os
 import json
 from datetime import datetime,timedelta
 import random
-# import urllib
-from flask import render_template, abort, redirect, flash, url_for, request, current_app, make_response,jsonify,Response
+from flask import render_template, abort, redirect, flash, url_for, request, current_app, make_response, jsonify, Response
 from werkzeug import secure_filename
 from flask_login import login_required, current_user, login_user
 from . import main
-from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm, ReCommentForm,MessageForm
+from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm, ReCommentForm, MessageForm
 from ..auth import forms
 from ..email import send_email
 from .. import db
-from ..models import User, Role, Post, Permission, Comment, ReComment, Category,registrations, Message, Upvote,Collect, AtUser
+from ..models import User, Role, Post, Permission, Comment, ReComment, Category, registrations, Message, Upvote,Collect, AtUser
 from ..decorators import admin_required, permission_required
-from qiniu import Auth, put_file, etag, urlsafe_base64_encode,put_data
+from qiniu import Auth, put_file, etag, urlsafe_base64_encode, put_data
 import qiniu.config
 import time
 import re
@@ -39,7 +38,7 @@ class UploadToQiniu():
         return put_data(token, k, self.file.read())
 
 
-@main.route('/upfile/<username>',methods = ['GET','POST'])
+@main.route('/upfile/<username>', methods=['GET', 'POST'])
 def upfile(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
@@ -54,12 +53,12 @@ def upfile(username):
             current_user.photo = file_url
             db.session.add(current_user)
             db.session.commit()
-            return render_template('user.html', user=user, posts=posts,Message=Message)
+            return render_template('user.html', user=user, posts=posts, Message=Message)
             
         except:
             flash(u'上传失败，请确认上传文件是图片','warning')
-            return render_template('upload.html',Message=Message)
-    return render_template('upload.html',Message=Message)
+            return render_template('upload.html', Message=Message)
+    return render_template('upload.html', Message=Message)
 
 
 @main.route('/about_web')
@@ -71,7 +70,7 @@ def about_web():
 def index():
     for i in Category.query.all():
         if i.posts.count() == 0:
-            if i.name in ['Python','Flask',u'数据库','Dota','Web',u'杂记']:
+            if i.name in ['Python', 'Flask', u'数据库', 'Dota', 'Web', u'杂记']:
                 continue
             db.session.delete(i)
             db.session.commit()
@@ -100,15 +99,11 @@ def index():
             m = p.findall(changedbody)
             atusers = []
             for i in m:
-                #if '</sapn>' in i[1]:
-                #    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
-                #    atusers.append(m.group(3)) 
-                #else:
                 atusers.append(i[1])          
             for atuser in atusers:
                 user = User.query.filter_by(username=atuser).first()
                 if user is not None:
-                    atwho = AtUser(post=post,author=user)
+                    atwho = AtUser(post=post, author=user)
                     db.session.add(atwho)
                     db.session.commit()
             
@@ -154,7 +149,8 @@ def index():
     pagination = query.order_by(Post.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
                                                                      error_out=False)
     posts = pagination.items
-    return render_template('index.html', form1=form1, form2=form2,form3=form3, posts=posts, show_followed=show_followed, pagination=pagination, Category=Category,Message=Message,Upvote=Upvote,Collect=Collect)
+    return render_template('index.html', form1=form1, form2=form2,form3=form3, posts=posts, show_followed=show_followed,
+                           pagination=pagination, Category=Category, Message=Message, Upvote=Upvote, Collect=Collect)
 
 
 @main.route('/user/<username>')
@@ -166,7 +162,8 @@ def user(username):
     pagination = user.posts.order_by(Post.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
                                                                      error_out=False)
     posts = pagination.items
-    return render_template('user.html', user=user, posts=posts,pagination=pagination,Message=Message,Upvote=Upvote,Collect=Collect)
+    return render_template('user.html', user=user, posts=posts, pagination=pagination, Message=Message, Upvote=Upvote,
+                           Collect=Collect)
 
 
 @main.route('/edit-profile', methods=['GET', 'POST'])
@@ -203,7 +200,7 @@ def edit_profile_admin(id):
         user.about_me = form.about_me.data
         db.session.add(user)
         db.session.commit()
-        flash(u'信息修改成功.','success')
+        flash(u'信息修改成功.', 'success')
         return redirect(url_for('.user', username=user.username))
     form.email.data = user.email
     form.username.data = user.username
@@ -212,7 +209,7 @@ def edit_profile_admin(id):
     form.name.data = user.name
     form.location.data = user.location
     form.about_me.data = user.about_me
-    return render_template('edit_profile.html', form=form, user=user,Message=Message)
+    return render_template('edit_profile.html', form=form, user=user, Message=Message)
 
 
 @main.route('/post/<int:id>', methods=['GET', 'POST'])
@@ -240,11 +237,7 @@ def post(id):
             m = p.findall(changedbody)
             atusers = []
             for i in m:
-                #if '<' in i[1]:
-                #    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
-                 #   atusers.append(m.group(3))   
-                #else:
-                #   print i
+
                 atusers.append(i[1])
             for atuser in atusers:
                 user = User.query.filter_by(username=atuser).first()
@@ -256,17 +249,20 @@ def post(id):
             comment = Comment(body=form.body.data, post=post, author=current_user._get_current_object())
             db.session.add(comment)
             db.session.commit()
-        flash(u'评论提交成功','success')
+        flash(u'评论提交成功', 'success')
         return redirect(url_for('.post', id=post.id, page=-1))
 
     page = request.args.get('page', 1, type=int)
     if page == -1:
         page = (post.comments.count()-1) // current_app.config['FLASKY_COMMENTS_PER_PAGE']+1
-    pagination = post.comments.order_by(Comment.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
-                                                                          error_out=False)
+    pagination = post.comments.order_by(Comment.timestamp.desc()).paginate(page,
+                                                                           per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
+                                                                           error_out=False)
     comments = pagination.items
 
-    return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination, ReComment=ReComment, Category=Category,Message=Message,Upvote=Upvote,Collect=Collect)
+    return render_template('post.html', posts=[post], form=form, comments=comments, pagination=pagination,
+                           ReComment=ReComment, Category=Category, Message=Message, Upvote=Upvote, Collect=Collect)
+
 
 @main.route('/recomment/<int:id>', methods=['POST'])
 @login_required
@@ -282,25 +278,24 @@ def recomment(id):
         changedbody = a
         if "data-atwho-at-query" in a:
             pattern = re.compile(r'<span.*?@">(@.*?)</span>')
+
             def replaced(match):
                 rep = match.group(1)+" "
                 return rep
             changedbody = pattern.sub(replaced,a)
         p = re.compile(r'(@)(.*?)( |&nbsp;)')
+
         def replace(match):
             rep = "<a href='/user/"+match.group(2)+"'> @"+match.group(2)+" </a>"
             return rep
         b = p.sub(replace,changedbody)
-        recomment = ReComment(body=b, post=post,comment=comment, author=current_user._get_current_object(),reply_id=comment.id)
+        recomment = ReComment(body=b, post=post, comment=comment, author=current_user._get_current_object(),
+                              reply_id=comment.id)
         db.session.add(recomment)
         db.session.commit()
         m = p.findall(changedbody)
         atusers = []
         for i in m:
-            #if '<' in i[1]:
-            #    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
-            #    atusers.append(m.group(3))   
-            #else:
             atusers.append(i[1])
         for atuser in atusers:
             user = User.query.filter_by(username=atuser).first()
@@ -309,11 +304,11 @@ def recomment(id):
                 db.session.add(atwho)
                 db.session.commit()
     else:
-        recomment = ReComment(body=a, post=post,comment=comment,author=current_user._get_current_object(),reply_id=comment.id)
+        recomment = ReComment(body=a, post=post, comment=comment, author=current_user._get_current_object(),
+                              reply_id=comment.id)
         db.session.add(recomment)
         db.session.commit()
     return jsonify(result=a)
-    # return redirect(url_for('.post', id=comment.post_id))
 
 
 @main.route('/reply/<int:id>', methods=['POST'])
@@ -339,16 +334,13 @@ def reply(id):
             rep = "<a href='/user/"+match.group(2)+"'> @"+match.group(2)+" </a>"
             return rep
         b = p.sub(replace,changedbody)
-        reply = ReComment(body=b, post=post,comment=comment, author=current_user._get_current_object(),reply_id=recomment.id,reply_type="reply")
+        reply = ReComment(body=b, post=post, comment=comment, author=current_user._get_current_object(),
+                          reply_id=recomment.id, reply_type="reply")
         db.session.add(reply)
         db.session.commit()
         m = p.findall(changedbody)
         atusers = []
         for i in m:
-                #if '<' in i[1]:
-                #    m = re.match(r'(.*?)(@)(.*?)(<)(.*?)',i[1])
-                #   atusers.append(m.group(3))   
-                #else:
             atusers.append(i[1])
         for atuser in atusers:
             user = User.query.filter_by(username=atuser).first()
@@ -357,13 +349,14 @@ def reply(id):
                 db.session.add(atwho)
                 db.session.commit()
     else:
-        reply = ReComment(body=a, comment=comment,post=post,author=current_user._get_current_object(),reply_id=recomment.id,reply_type="reply")
+        reply = ReComment(body=a, comment=comment, post=post, author=current_user._get_current_object(),
+                          reply_id=recomment.id, reply_type="reply")
         db.session.add(reply)
         db.session.commit()
     return jsonify(result=a)
 
 
-@main.route('/delete_post/<int:id>', methods=['GET','POST'])
+@main.route('/delete_post/<int:id>', methods=['GET', 'POST'])
 @login_required
 def delete_post(id):
     post = Post.query.get_or_404(id)
@@ -383,7 +376,7 @@ def delete_post(id):
     return redirect(url_for('main.index'))
 
 
-@main.route('/delete_recomment/<int:id>', methods=['GET','POST'])
+@main.route('/delete_recomment/<int:id>', methods=['GET', 'POST'])
 @login_required
 def delete_recomment(id):
     recomment = ReComment.query.get_or_404(id)
@@ -403,7 +396,7 @@ def delete_recomment(id):
         return redirect(url_for('main.index'))
 
 
-@main.route('/delete_comment/<int:id>', methods=['GET','POST'])
+@main.route('/delete_comment/<int:id>', methods=['GET', 'POST'])
 @login_required
 def delete_comment(id):
     comment = Comment.query.get_or_404(id)
@@ -442,9 +435,8 @@ def edit(id):
             def replace(match):
                 rep = "<a href='/user/"+match.group(2)+"'> @"+match.group(2)+" </a>"
                 return rep
-            b = p.sub(replace,changedbody)
+            b = p.sub(replace, changedbody)
             post.body = b
-            #post = Post(body=b, author=current_user._get_current_object())
             db.session.add(post)
             db.session.commit()
             m = p.findall(changedbody)
@@ -463,7 +455,7 @@ def edit(id):
                             n = 0
                             break
                     if n:
-                        atwho = AtUser(post=post,author=user)
+                        atwho = AtUser(post=post, author=user)
                         db.session.add(atwho)
                         db.session.commit()
         else:
@@ -482,10 +474,10 @@ def edit(id):
             tag.posts.append(post)
             db.session.add(tag)
             db.session.commit()
-        flash(u'文章修改成功!','success')
+        flash(u'文章修改成功!', 'success')
         return redirect(url_for('.post', id=post.id))
     form.body.data = post.body
-    return render_template('edit_post.html', form=form,id=post.id,Message=Message)
+    return render_template('edit_post.html', form=form, id=post.id, Message=Message)
 
 
 @main.route('/follow/<username>')
@@ -494,7 +486,7 @@ def edit(id):
 def follow(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash(u'用户不存在','warning')
+        flash(u'用户不存在', 'warning')
         return redirect(url_for('.index'))
     if current_user.is_following(user):
         flash(u'你已经关注了此用户', 'info')
@@ -534,7 +526,7 @@ def followers(username):
                for item in pagination.items]
     return render_template('followers.html', user=user, title=u"的关注者",
                            endpoint='.followers', pagination=pagination,
-                           follows=follows,Message=Message)
+                           follows=follows, Message=Message)
 
 
 @main.route('/followed-by/<username>')
@@ -551,7 +543,7 @@ def followed_by(username):
                for item in pagination.items]
     return render_template('followers.html', user=user, title=u"关注的人",
                            endpoint='.followed_by', pagination=pagination,
-                           follows=follows,Message=Message)
+                           follows=follows, Message=Message)
 
 
 @main.route('/all')
@@ -575,10 +567,12 @@ def show_followed():
 @permission_required(Permission.MODERATE_COMMENTS)
 def moderate():
     page = request.args.get('page', 1, type=int)
-    pagination = Comment.query.order_by(Comment.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
+    pagination = Comment.query.order_by(Comment.timestamp.desc()).paginate(page,
+                                                                           per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
                                                                            error_out=False)
     comments = pagination.items
-    return render_template('moderate.html', comments=comments, pagination=pagination, page=page, ReComment=ReComment,Message=Message)
+    return render_template('moderate.html', comments=comments, pagination=pagination, page=page, ReComment=ReComment,
+                           Message=Message)
 
 
 @main.route('/moderate/enable/<int:id>')
@@ -633,10 +627,12 @@ def tag(id):
     tag = Category.query.get_or_404(id)
     page = request.args.get('page', 1, type=int)
     query = tag.posts
-    pagination = query.order_by(Post.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-                                                                     error_out=False)
+    pagination = query.order_by(Post.timestamp.desc()).paginate(page,
+                                                                per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+                                                                error_out=False)
     posts = pagination.items
-    return render_template('tag.html',posts=posts,pagination=pagination,tag=tag,Category=Category,Message=Message,Upvote=Upvote,Collect=Collect)
+    return render_template('tag.html', posts=posts, pagination=pagination, tag=tag, Category=Category,
+                           Message=Message, Upvote=Upvote, Collect=Collect)
 
 
 def gen_rnd_filename():
@@ -703,7 +699,8 @@ def se_message(id):
             if i.author.id not in contectors:
                 contectors.append(i.author_id)
 
-    return render_template('se_message.html',Category=Category,contector=contector,User=User,fmessgs=fmessgs, unreadmessages=unreadmessages,Message=Message,contectors=contectors)
+    return render_template('se_message.html', Category=Category, contector=contector, User=User,
+                           fmessgs=fmessgs, unreadmessages=unreadmessages, Message=Message, contectors=contectors)
 
 
 @main.route('/message/<int:id>', methods=['GET', 'POST'])
@@ -733,14 +730,14 @@ def message(id):
 
 @main.route('/testmsg/<int:id>')
 def testmsg(id):
-    unread = Message.query.filter_by(sendto_id=current_user.id,author_id=id,confirmed=False).order_by(Message.timestamp.asc()).first()
+    unread = Message.query.filter_by(sendto_id=current_user.id ,author_id=id, confirmed=False).order_by(Message.timestamp.asc()).first()
     if unread:
         unread.confirmed = True
         db.session.add(unread)
         db.session.commit()
         msgtime = unread.timestamp+timedelta(hours=8)
         msgtime = msgtime.strftime('%Y-%m-%d, %H:%M')
-        return jsonify(result=unread.body_html, t=msgtime,msgid=unread.id)
+        return jsonify(result=unread.body_html, t=msgtime, msgid=unread.id)
     
     return jsonify()
 
@@ -757,10 +754,10 @@ def remsg(id):
     db.session.commit()
     msgtime = msg.timestamp+timedelta(hours=8)
     msgtime = msgtime.strftime('%Y-%m-%d, %H:%M')
-    return jsonify(result=msg.body_html,t=msgtime,msgid=msg.id)
+    return jsonify(result=msg.body_html, t=msgtime, msgid=msg.id)
 
 
-@main.route('/search', methods=['GET','POST'])
+@main.route('/search', methods=['GET', 'POST'])
 def cz():
     data = json.loads(request.form.get('data'))
     a = data['a']
@@ -774,10 +771,12 @@ def cz():
 def seek(kwd):
     results = Post.query.whoosh_search(kwd)
     page = request.args.get('page', 1, type=int)
-    pagination = results.order_by(Post.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
-                                                                     error_out=False)
+    pagination = results.order_by(Post.timestamp.desc()).paginate(page,
+                                                                  per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+                                                                  error_out=False)
     posts = pagination.items
-    return render_template('seek.html', posts=posts, pagination=pagination, Category=Category, Message=Message, kwd=kwd,Upvote=Upvote,Collect=Collect)
+    return render_template('seek.html', posts=posts, pagination=pagination, Category=Category, Message=Message, kwd=kwd,
+                           Upvote=Upvote, Collect=Collect)
 
 
 @main.route('/delete_message/<int:id>', methods=["GET", "POST"])
@@ -795,10 +794,13 @@ def delte_message(id):
         db.session.commit()
     return jsonify(rusult="true")
 
+
 def stream():
     if current_user.is_authenticated():
         a = Message.query.filter_by(sendto_id=current_user.id,confirmed=False).count()
         return "data: "+str(a)+'\n\n'
+
+
 @main.route("/events")
 @login_required
 def streamSessionEvents():
@@ -807,10 +809,13 @@ def streamSessionEvents():
         mimetype="text/event-stream"
     )
 
+
 def atmestream():
     if current_user.is_authenticated():
-        a = AtUser.query.filter_by(author_id=current_user.id,confirmed=False).count()
+        a = AtUser.query.filter_by(author_id=current_user.id, confirmed=False).count()
         return "data: "+str(a)+'\n\n'
+
+
 @main.route("/getatme")
 @login_required
 def atmestreamSessionEvents():
@@ -819,7 +824,8 @@ def atmestreamSessionEvents():
         mimetype="text/event-stream"
     )
 
-@main.route('/getcomments/<int:id>', methods=['GET','POST'])
+
+@main.route('/getcomments/<int:id>', methods=['GET', 'POST'])
 @login_required
 def get_comments(id):
     user = User.query.get_or_404(id)
@@ -835,46 +841,49 @@ def get_comments(id):
     for i in allpostcomments:
         l.append(i.timestamp)
     l.sort(reverse = True)
-    l2=[]
+    l2 = []
     n = 0
     while n < len(allpostcomments):
         for i in allpostcomments:
             if i.timestamp == l[n]:
                 l2.append(i)
-        n+=1
-    return render_template('mycomments.html',l2=l2,Category=Category)
+        n += 1
+    return render_template('mycomments.html', l2=l2, Category=Category)
 
-@main.route('/thumbs_up/<int:id>', methods=['GET','POST'])
+
+@main.route('/thumbs_up/<int:id>', methods=['GET', 'POST'])
 @login_required
 def thumbs_up(id):
     post = Post.query.get(id)
-    a = Upvote.query.filter_by(author=current_user,post=post).first()
+    a = Upvote.query.filter_by(author=current_user, post=post).first()
     if a:
         db.session.delete(a)
         db.session.commit()
         flash(u'取消点赞成功', 'success')
         return redirect(url_for('.index'))
-    thumbs_up = Upvote(post=post,author=current_user._get_current_object())
+    thumbs_up = Upvote(post=post, author=current_user._get_current_object())
     db.session.add(thumbs_up)
     db.session.commit()
     flash(u'点赞成功', 'success')
     return redirect(url_for('.index'))
 
-@main.route('/collect/<int:id>', methods=['GET','POST'])
+
+@main.route('/collect/<int:id>', methods=['GET', 'POST'])
 @login_required
 def collect(id):
     post = Post.query.get(id)
-    a = Collect.query.filter_by(author=current_user,post=post).first()
+    a = Collect.query.filter_by(author=current_user, post=post).first()
     if a:
         db.session.delete(a)
         db.session.commit()
         flash(u'取消收藏成功', 'success')
         return redirect(url_for('.index'))
-    collect = Collect(post=post,author=current_user._get_current_object())
+    collect = Collect(post=post, author=current_user._get_current_object())
     db.session.add(collect)
     db.session.commit()
     flash(u'收藏成功', 'success')
     return redirect(url_for('.index'))
+
 
 @main.route('/collect_posts/<int:id>')
 @login_required
@@ -885,11 +894,12 @@ def collect_posts(id):
     page = request.args.get('page', 1, type=int)
     pagination = current_user.collects.order_by(Collect.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],error_out=False)
     collects= pagination.items
-    #collects = current_user.collects.order_by(Collect.timestamp.desc()).all()
     collectposts = []
     for i in collects:
         collectposts.append(i.post)
-    return render_template('collect_posts.html',collectposts=collectposts,pagination=pagination,Category=Category,Upvote=Upvote,Collect=Collect)
+    return render_template('collect_posts.html',collectposts=collectposts, pagination=pagination, Category=Category,
+                           Upvote=Upvote, Collect=Collect)
+
 
 @main.route('/getupvotes/<int:id>')
 @login_required
@@ -905,7 +915,7 @@ def getupvotes(id):
         if upvote.post:
             if upvote.post.author == current_user:
                 my_upvotes.append(upvote)
-    return render_template('getupvotes.html',my_upvotes=my_upvotes,Category=Category,pagination=pagination)
+    return render_template('getupvotes.html', my_upvotes=my_upvotes, Category=Category, pagination=pagination)
 
 
 @main.route('/testfollow/<int:id>')
@@ -917,6 +927,7 @@ def testfollow(id):
         if i.followed != current_user:
             followed_names.append(i.followed.username)
     return jsonify(result=followed_names)
+
 
 @main.route('/atme/<int:id>')
 @login_required
@@ -934,11 +945,11 @@ def atme(id):
     page = request.args.get('page', 1, type=int)
 
     pagination = user.atusers.order_by(AtUser.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
-                                                                          error_out=False)
+                                                                         error_out=False)
     atmes = pagination.items
-    #atmes = user.atusers.order_by(AtUser.timestamp.desc()).all()
     for i in atmes:
         i.confirmed = True
         db.session.add(i)
         db.session.commit()
-    return render_template('atme.html',atmes=atmes,pagination=pagination,Upvote=Upvote,Category=Category,Collect=Collect)
+    return render_template('atme.html', atmes=atmes, pagination=pagination, Upvote=Upvote,
+                           Category=Category, Collect=Collect)

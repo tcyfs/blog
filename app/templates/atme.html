@@ -69,7 +69,7 @@
     </li>
     {% endif %}
     {% if atme.comment %}
-    {% if atme.comment.post %}
+    
     <li class="comment">
         <div class="comment-thumbnail">
             <a href="{{ url_for('.user', username=atme.comment.author.username) }}">
@@ -94,7 +94,9 @@
                 {% endif %}
             </div>
             <div style="border: 1px solid;padding: 10px;background-color: #dad7d7">
+            {% if atme.comment.post %}
              <div class="post-thumbnail">
+
             <a href="{{ url_for('.user', username=atme.comment.post.author.username) }}">
             {% if atme.comment.post.author.photo %}
                 <img class="img-rounded profile-thumbnail" src="{{ atme.comment.post.author.photo}}" style="height: 40px; width: 40px">
@@ -151,13 +153,16 @@
                 </a>
             </div>
         </div>
+        {% else %}
+        <p style="color: red;">此文章已被删除</p>
+        {% endif %}
             </div>
             </div></li>
             <hr>
-    {% endif %}
+    
     {% endif %}
     {% if atme.recomment %}
-    {% if atme.recomment.post %}
+    
     <li class="comment">
         <div class="comment-thumbnail">
             <a href="{{ url_for('.user', username=atme.recomment.author.username) }}">
@@ -182,6 +187,7 @@
                 {% endif %}
             </div>
             <div style="border: 1px solid;padding: 10px;background-color: #dad7d7">
+            {% if atme.recomment.post %}
              <div class="post-thumbnail">
             <a href="{{ url_for('.user', username=atme.recomment.post.author.username) }}">
             {% if atme.recomment.post.author.photo %}
@@ -239,10 +245,13 @@
                 </a>
             </div>
         </div>
+        {% else %}
+        <p style="color:red;">此文章已被删除</p>
+        {% endif%}
             </div>
             </div></li>
             <hr>
-    {% endif %}
+    
     {% endif %}
     {% endfor %}
 </ul>

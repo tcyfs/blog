@@ -8,7 +8,9 @@ from flask_login import LoginManager
 from flask_pagedown import PageDown
 from flask_uploads import UploadSet, configure_uploads, IMAGES
 from jieba.analyse import ChineseAnalyzer
+from flask_babel import Babel
 
+babel = Babel()
 bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
@@ -27,7 +29,8 @@ def create_app(config_name):
     if not app.debug and not app.testing and not app.config['SSL_DISABLE']:
         from flask.ext.sslify import SSLify
         sslify = SSLify(app)
-
+    
+    babel.init_app(app)
     bootstrap.init_app(app)
     mail.init_app(app)
     moment.init_app(app)
