@@ -9,15 +9,9 @@ from ..decorators import admin_required, permission_required
 from flask_login import UserMixin, AnonymousUserMixin
 
 @admin.route('/index', methods=['GET', 'POST'])
-#@login_required
-#@admin_required
+@login_required
+@admin_required
 def index():
-    allusers = User.query.all()
-    for i in allusers:
-        i.allowlogin = True
-        db.session.add(i)
-        db.session.commit()
-    
     return render_template('admin/index.html',allusers=allusers)
 
 @admin.route('/manage_userlogin/<int:id>', methods=['GET', 'POST'])
