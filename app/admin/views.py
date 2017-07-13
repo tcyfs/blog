@@ -12,6 +12,7 @@ from flask_login import UserMixin, AnonymousUserMixin
 @login_required
 @admin_required
 def index():
+    allusers = User.query.all()
     return render_template('admin/index.html',allusers=allusers)
 
 @admin.route('/manage_userlogin/<int:id>', methods=['GET', 'POST'])
