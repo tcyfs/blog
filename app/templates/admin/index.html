@@ -100,34 +100,86 @@
     </div>
 </nav>
 {% endblock %}
-
 {% block content %}
 <div class="container" style="background-color: white;padding-left: 10px">
-{% block pic%}{% endblock %}
+<h1>用户管理</h1>
+<hr>
+<form name="input" action="/admin/index" method="post">
 
-    <div class="row">
-        <div class="col-md-9">
-    {% for message in get_flashed_messages(with_categories=True) %}
-    <div class="alert alert-{{ message[0] }}">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        {{ message[1] }}
-    </div>
-    {% endfor %}
-    {% block page_content %}{% endblock %}
-        </div>
-        <div class="col-md-3 sidebar">
-            {% block right_side %}{% endblock %}
-        </div>
-    </div>
-</div>
+<div class="row">
+    <div class="col-md-2">
+	<span class="label label-default" style="background-color: orange; font-size: 13px">用户名</span>
+	</div>
+	<div class="col-md-2">
+	<span class="label label-default" style="background-color: orange; font-size: 13px">邮箱</span>
+	</div>
+	<div class="col-md-1">
+	<span class="label label-default" style="background-color: orange; font-size: 13px">最后登录</span>
+	</div>
+	<div class="col-md-1">
+    <span class="label label-default" style="background-color: orange; font-size: 13px">角色</span>
+	</div>
+	<div class="col-md-1">
+    <span class="label label-default" style="background-color: orange; font-size: 13px">状态</span>
+	</div>
+	<div class="col-md-1">
+    <span class="label label-default" style="background-color: orange; font-size: 13px">登录</span>
+	</div>
+	<div class="col-md-2">
+    <span class="label label-default" style="background-color: orange; font-size: 13px">删除</span>
+	</div>
+	<div class="col-md-2">
+    <span style="float: right;">全选<input type="checkbox" name="checkall" /></span>
+
+	</div>
+	</div>
+	<hr>
+	{% for i in allusers %}
+<div class="row">
+    <div class="col-md-2">
+	{{i.username}}
+	</div>
+	<div class="col-md-2">
+	{{i.email}}
+	</div>
+	<div class="col-md-1">
+	{{ moment(i.last_seen).fromNow() }}
+	</div>
+	<div class="col-md-1">
+	{{i.role.name}}
+	</div>
+	<div class="col-md-1">
+	{% if i.allowlogin %}
+	<span style="color:green">正常</span>
+	{% else %}
+	<span style="color:red">受限</span>
+	{% endif %}
+	</div>
+	<div class="col-md-1">
+	{% if i.allowlogin %}
+	<a href="{{url_for('admin.manage_userlogin', id=i.id)}}" style="color: red">限制</a>
+	{% else %}
+	<a href="{{url_for('admin.manage_userlogin', id=i.id)}}" style="color: green">解除</a>
+	{% endif %}
+    
+	</div>
+	<div class="col-md-2">
+	<a href="{{url_for('admin.manage_userdelete', id=i.id)}}" style="color: red">删除</a>	
+	</div>
+	<div class="col-md-2">
+    <input type="checkbox" name="user" value="{{i.id}}" style="float: right;" />
+	</div>
+	</div>
+	<hr>
+{% endfor %}
+	<input type="submit" value="Submit" />
+	</form>
+	</div>
 {% endblock %}
-
 {% block scripts %}
 {{ super() }}
 {{ moment.include_moment() }}
 {{ moment.lang('zh-CN') }}
-<script src="{{ url_for('static', filename='jquery.caret.js') }}"></script>
-<script src="{{ url_for('static', filename='jquery.atwho.js') }}"></script> 
 <script type="text/javascript">
 $(document).ready(function(){
     dropdownOpen();//调用
@@ -153,148 +205,5 @@ $(document).ready(function(){
 });
 
 </script>
-
-<script type="text/javascript">
-var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-                    $("#searchbutton").click(function(){
-                    var a=$('input[name="search"]').val();
-                    var data={
-                        data: JSON.stringify({
-                            'a': a
-                        }),
-                    }
-                    $.ajax({
-                        url: $SCRIPT_ROOT + '/search',
-                        type: 'POST',
-                        dataType: 'json',
-                        data: data,
-                        success:function(data){
-                            $('input[name="search"]').val("");
-                            if (data.result){
-                                window.location.href=$SCRIPT_ROOT+"/seek/"+data.result;
-                            }
-                            
-
-                        },
-                      })
-                    })
-                    $('input[type=text]').bind('keydown', function(e) {
-                  if (e.keyCode == 13) {
-                    var a=$('input[name="search"]').val();
-                    var data={
-                        data: JSON.stringify({
-                            'a': a
-                        }),
-                    }
-                    $.ajax({
-                        url: $SCRIPT_ROOT + '/search',
-                        type: 'POST',
-                        dataType: 'json',
-                        data: data,
-                        success:function(data){
-                            $('input[name="search"]').val("");
-                            if (data.result){
-                                window.location.href=$SCRIPT_ROOT+"/seek/"+data.result;
-                            }
-                            
-
-                        },
-                      })
-                    
-      }
-    });
-</script>
-<script>
-if(typeof(EventSource)!=="undefined")
-  {
-  var source=new EventSource("/events");
-  source.onmessage=function(event)
-    {
-    if (event.data != '0'){
-    $('#blink{{ current_user.id }}').html("<a href='#' class='dropdown-toggle hvr-wobble-skew' data-toggle='dropdown' style='color: #f76c06'><span class='glyphicon glyphicon-envelope'></span>&nbsp;有新的消息<b class='caret'></b> </a>");
-    $('#pm{{ current_user.id }}').text("私信【你有"+event.data+"条新消息】")
-    
-    }
-
-    };
-  }
-else
-  {
-  $("#resulttest").innerHTML="抱歉，您的浏览器不支持 server-sent 事件 ...";
-  }
-</script>
-<script>
-if(typeof(EventSource)!=="undefined")
-  {
-  var source=new EventSource("/getatme");
-  source.onmessage=function(event)
-    {
-    if (event.data != '0'){
-    $('#blink{{ current_user.id }}').html("<a href='#' class='dropdown-toggle hvr-wobble-skew' data-toggle='dropdown' style='color: #f76c06'><span class='glyphicon glyphicon-envelope'></span>&nbsp;有新的消息<b class='caret'></b> </a>");
-    $('#atme{{ current_user.id }}').text("@我的【有"+event.data+"条@你的新消息】")
-    
-    }
-
-    };
-  }
-else
-  {
-  $("#resulttest").innerHTML="抱歉，您的浏览器不支持 server-sent 事件 ...";
-  }
-</script>
-<script>
-var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-$(function(){
-    $.ajax({
-      url:$SCRIPT_ROOT+'/testfollow/'+{{current_user.id}},
-      dataType:'json',
-      success :function(data1){
-      var followes = data1.result;
-      var at_config = {
-          at: "@",
-          data: followes
-      };
-      CKEDITOR.on('instanceReady', function(event) {
-        
-    var editor = event.editor;
-        
-    // Switching from and to source mode
-    editor.on('mode', function(e) {
-        load_atwho(this, at_config);
-    });
-    
-    // First load
-    load_atwho(editor, at_config);
-        
-});
-
-function load_atwho(editor, at_config) {
-    
-    // WYSIWYG mode when switching from source mode
-    if (editor.mode != 'source') {
-
-        editor.document.getBody().$.contentEditable = true;
-        
-        $(editor.document.getBody().$)
-            .atwho('setIframe', editor.window.getFrame().$)
-            .atwho(at_config);
-            
-    }
-    // Source mode when switching from WYSIWYG
-    else {
-        $(editor.container.$).find(".cke_source").atwho(at_config);
-    }
-    
-}
-
-  }
-      })
-  })
-
-
-</script> 
-
-
-
-
 {% endblock %}
+

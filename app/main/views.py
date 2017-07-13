@@ -126,10 +126,13 @@ def index():
         return redirect(url_for(".index"))
     if form2.submit2.data and form2.validate_on_submit():
         user = User.query.filter_by(email=form2.email.data).first()
-        if user is not None and user.verify_password(form2.password.data):
+        if user is not None and user.verify_password(form2.password.data) and user.allowlogin:
             login_user(user, form2.rember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
-        flash(u'邮箱或密码错误0.0', 'warning')
+        if not user.allowlogin:
+            flash(u'您的账户已被禁止登陆', 'warning')
+        else:
+            flash(u'邮箱或密码错误0.0', 'warning')
     if form3.submit3.data and form3.validate_on_submit():
         user = User(email=form3.email.data, username=form3.username.data, password=form3.password.data)
         db.session.add(user)
@@ -171,6 +174,7 @@ def user(username):
 def edit_profile():
     form = EditProfileForm()
     if form.validate_on_submit():
+        current_user.username = form.nickname.data
         current_user.name = form.name.data
         current_user.location = form.location.data
         current_user.about_me = form.about_me.data
@@ -237,7 +241,6 @@ def post(id):
             m = p.findall(changedbody)
             atusers = []
             for i in m:
-
                 atusers.append(i[1])
             for atuser in atusers:
                 user = User.query.filter_by(username=atuser).first()
@@ -892,6 +895,10 @@ def collect_posts(id):
     if user != current_user:
         abort(403)
     page = request.args.get('page', 1, type=int)
+    for i in current_user.collects.all():
+        if not i.post:
+            db.session.delete(i)
+            db.session.commit()
     pagination = current_user.collects.order_by(Collect.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],error_out=False)
     collects= pagination.items
     collectposts = []

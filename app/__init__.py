@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 from flask import Flask, render_template
 from flask_bootstrap import Bootstrap
 from flask_mail import Mail
@@ -21,6 +22,8 @@ login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
 photos = UploadSet('photos', IMAGES)
 
+
+
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
@@ -43,4 +46,6 @@ def create_app(config_name):
     app.register_blueprint(main_blueprint)
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
+    from .admin import admin as admin_blueprint
+    app.register_blueprint(admin_blueprint, url_prefix='/admin')
     return app

@@ -8,6 +8,7 @@ from ..models import Role, User, Category
 
 
 class EditProfileForm(Form):
+    nickname = StringField(u'修改昵称', validators=[Length(0, 64)], render_kw={'placeholder': u'请不要经常使用，以后可能限制此功能'})
     name = StringField(u'真实姓名', validators=[Length(0, 64)])
     location = StringField(u'位置', validators=[Length(0, 64)])
     about_me = TextField(u'自我介绍')

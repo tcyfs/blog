@@ -22,10 +22,13 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user is not None and user.verify_password(form.password.data):
+        if user is not None and user.verify_password(form.password.data) and user.allowlogin:
             login_user(user, form.rember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
-        flash(u'邮箱或密码错误', 'warning')
+        if not user.allowlogin:
+            flash(u'您的账户已被禁止登陆', 'warning')
+        else:
+            flash(u'邮箱或密码错误', 'warning')
     return render_template('auth/login.html', form=form,Message=Message)
 
 

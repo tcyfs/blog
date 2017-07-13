@@ -4,10 +4,16 @@
 {% block title %}修改邮箱地址{% endblock %}
 
 {% block page_content %}
-<div class="page-header">
-    <h1>修改您的注册邮箱</h1>
+<div class="col-md-5">
+    
 </div>
-<div class="col-md-4">
+
+
+<div class="col-md-4" style="padding-bottom: 10px">
+<div class="page-header">
+    <h1>修改注册邮箱</h1>
+</div>
     {{ wtf.quick_form(form) }}
 </div>
+
 {% endblock %}

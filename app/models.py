@@ -63,6 +63,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     confirmed = db.Column(db.Boolean, default=False)
+    allowlogin = db.Column(db.Boolean, default=True)
     name = db.Column(db.String(64))
     photo = db.Column(db.String(64)) #touxiang
     location = db.Column(db.String(64))
