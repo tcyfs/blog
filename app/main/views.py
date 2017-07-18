@@ -182,6 +182,7 @@ def edit_profile():
         db.session.commit()
         flash(u'个人信息修改成功', 'success')
         return redirect(url_for('.user', username=current_user.username))
+    form.nickname.data = current_user.username
     form.name.data = current_user.name
     form.location.data = current_user.location
     form.about_me.data = current_user.about_me

@@ -6,7 +6,7 @@
 {{ super() }}
 <link rel="shortcut icon" href="{{ url_for('static', filename='cat.ico') }}" type="image/x-icon">
 <link id="webphoto" rel="icon" href="{{ url_for('static', filename='cat.ico') }}" type="image/x-icon">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='v1009.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='v1011.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='hover.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jd17.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jquery.atwho.css') }}">
@@ -127,7 +127,8 @@
 {{ moment.include_moment() }}
 {{ moment.lang('zh-CN') }}
 <script src="{{ url_for('static', filename='jquery.caret.js') }}"></script>
-<script src="{{ url_for('static', filename='jquery.atwho.js') }}"></script> 
+<script src="{{ url_for('static', filename='jquery.atwho.js') }}"></script>
+<script type="text/javascript">$(function () { $("[data-toggle='tooltip']").tooltip({html:true,delay : {show : 100,hide : 500,}}); });</script>
 <script type="text/javascript">
 $(document).ready(function(){
     dropdownOpen();//调用
