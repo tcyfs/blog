@@ -1,7 +1,7 @@
 {%block comments%}
 <ul id="pl" class="comments">
     {% for comment in comments %}
-    <li class="comment">
+    <li id="comment{{comment.id}}" class="comment">
         <div class="comment-thumbnail">
             <a href="{{ url_for('.user', username=comment.author.username) }}">
             {% if comment.author.photo %}
@@ -73,12 +73,35 @@
         <h4 class="modal-title" id="myModalLabel">确定要删除评论吗？</h4>
       </div>
       <div class="modal-footer">
-      <button type="button" data-dismiss="modal">取消</button>
-        <a  href="{{ url_for('.delete_comment', id=comment.id) }}"><button style="color: red">确定</button></a>
+      <button  type="button" data-dismiss="modal">取消</button>
+      <button id="deletecomment{{comment.id}}" data-dismiss="modal" style="color: red">确定</button>
       </div>
     </div>
   </div>
 </div>
+<script type="text/javascript">
+var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+            $(function(){
+                $("#deletecomment{{comment.id}}").click(function(){
+                    var data={
+                        data: JSON.stringify({
+                            'a': "test"
+                        }),
+                    }
+                    $.ajax({
+                        url: $SCRIPT_ROOT + '/delete_comment/'+{{comment.id}},
+                        type: 'POST',
+                        dataType: 'json',
+                        data: data,
+                        success:function(data){
+                        $("#comment{{comment.id}}").remove();
+
+                        },
+                      })
+                    })
+                })
+
+</script>
             {% endif %}      
             <div id="rawcomment{{ comment.id}}" style="display: none;">
 

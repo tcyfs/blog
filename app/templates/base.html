@@ -65,7 +65,7 @@
                     <li><a href="{{ url_for('main.moderate')}}" style="color: white">评论管理</a> </li>
                     {% endif %}
                     {% if current_user.can(Permission.ADMINISTER) %}
-                    <li><a href="{{ url_for('admin.index')}}" style="color: white"></span>&nbsp;用户管理</a> </li>
+                    <li><a href="{{ url_for('admin.index')}}" style="color: white"></span>用户管理</a> </li>
                     {% endif %}
                         
                     </ul>

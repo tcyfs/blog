@@ -384,20 +384,23 @@ def delete_post(id):
 @login_required
 def delete_recomment(id):
     recomment = ReComment.query.get_or_404(id)
-    replys = ReComment.query.filter_by(reply_id=id).all()
+    replys = ReComment.query.filter_by(reply_id=id,reply_type="reply").all()
     for reply in replys:
         delreply =  ReComment.query.get_or_404(reply.id)
         db.session.delete(delreply)
         db.session.commit()
+        print reply.body
     comment = Comment.query.get_or_404(recomment.comment_id)
+    print recomment.body
     db.session.delete(recomment)
     db.session.commit()
     try:
         flash(u'回复已删除', 'danger')
-        return redirect(url_for('.post', id=comment.post_id))
+        return redirect(url_for('.post', id=recomment.post_id))
     except:
         flash(u'此评论文章不存在', 'danger')
         return redirect(url_for('main.index'))
+    #return jsonify(rusult="true")
 
 
 @main.route('/delete_comment/<int:id>', methods=['GET', 'POST'])
@@ -410,12 +413,15 @@ def delete_comment(id):
         db.session.commit()
     db.session.delete(comment)
     db.session.commit()
-    try:
+    return jsonify(rusult="true")
+    """try:
         flash(u'回复已删除', 'danger')
         return redirect(url_for('.post', id=comment.post_id))
     except:
         flash(u'此评论文章不存在', 'danger')
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.index'))"""
+
+    
 
 
 @main.route('/edit/<int:id>', methods=['GET', 'POST'])
@@ -916,6 +922,13 @@ def getupvotes(id):
     if user != current_user:
         abort(403)
     page = request.args.get('page', 1, type=int)
+    allupvotes = Upvote.query.all()
+    for i in allupvotes:
+        if i.post:
+            continue
+        else:
+            db.session.delete(i)
+            db.session.commit()
     pagination = Upvote.query.order_by(Upvote.timestamp.desc()).paginate(page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],error_out=False)
     upvotes = pagination.items
     my_upvotes = []

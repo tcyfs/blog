@@ -84,11 +84,12 @@
       </div>
       <div class="modal-footer">
       <button type="button" data-dismiss="modal">取消</button>
-        <a  href="{{ url_for('.delete_recomment', id=recomment.id) }}"><button style="color: red">确定</button></a>
+        <a href="{{url_for('.delete_recomment',id=recomment.id)}}"><button  style="color: red">确定</button></a>
       </div>
     </div>
   </div>
 </div>
+
             <div>
             {% endif %}
 
