@@ -31,7 +31,7 @@ CKEDITOR.editorConfig = function( config ) {
 
     config.smiley_descriptions = [
 
-    '微笑','生气','心碎','困惑','大哭','恶魔'
+    
 
     ]
 

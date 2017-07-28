@@ -384,14 +384,14 @@ def delete_post(id):
 @login_required
 def delete_recomment(id):
     recomment = ReComment.query.get_or_404(id)
+    if current_user != recomment.author and not current_user.can(Permission.ADMINISTER):
+        abort(403)
     replys = ReComment.query.filter_by(reply_id=id,reply_type="reply").all()
     for reply in replys:
         delreply =  ReComment.query.get_or_404(reply.id)
         db.session.delete(delreply)
         db.session.commit()
-        print reply.body
     comment = Comment.query.get_or_404(recomment.comment_id)
-    print recomment.body
     db.session.delete(recomment)
     db.session.commit()
     try:
@@ -407,6 +407,8 @@ def delete_recomment(id):
 @login_required
 def delete_comment(id):
     comment = Comment.query.get_or_404(id)
+    if current_user != comment.author and not current_user.can(Permission.ADMINISTER):
+        abort(403)
     recomments = comment.recomments.all()
     for recomment in recomments:
         db.session.delete(recomment)

@@ -11,6 +11,10 @@ from flask_uploads import UploadSet, configure_uploads, IMAGES
 from jieba.analyse import ChineseAnalyzer
 from flask_babel import Babel
 
+from flask import Flask, jsonify, render_template
+from flask_sqlalchemy import SQLAlchemy
+
+
 babel = Babel()
 bootstrap = Bootstrap()
 mail = Mail()

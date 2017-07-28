@@ -11,9 +11,22 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jd17.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jquery.atwho.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
-
-
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/tip-yellowsimple/tip-yellowsimple.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/tip-yellow/tip-yellow.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/tip-violet/tip-violet.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/tip-darkgray/tip-darkgray.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/tip-skyblue/tip-skyblue.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/tip-twitter/tip-twitter.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='src/tip-green/tip-green.css') }}">
+<script src="http://cdn.jquerytools.org/1.2.6/full/jquery.tools.min.js"></script>
 <script src="{{ url_for('static', filename='jquery-3.2.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='src/jquery.poshytip.js') }}"></script>
+</script> 
+<script type="text/javascript">
+$(function(){
+  $("#testtip").tooltip()
+    ;})
+</script>
 
 <script src="{{ url_for('static', filename='bst.js') }}"></script>
 <script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
@@ -292,8 +305,6 @@ function load_atwho(editor, at_config) {
       })
   })
 
-
-</script> 
 
 
 
