@@ -7,8 +7,8 @@ from ..models import User
 
 
 class LoginForm(Form):
-    email = StringField(u'邮箱', validators=[DataRequired(), Length(1, 64), Email()])
-    password = PasswordField(u'密码', validators=[DataRequired()])
+    email = StringField(u'邮箱', validators=[DataRequired(), Length(1, 64), Email()], render_kw={'placeholder': u'邮箱'})
+    password = PasswordField(u'密码', validators=[DataRequired()],render_kw={'placeholder': u'密码'})
     rember_me = BooleanField(u'记住我')
     submit2 = SubmitField(u'登录')
 

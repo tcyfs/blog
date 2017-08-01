@@ -400,8 +400,7 @@ def delete_recomment(id):
     except:
         flash(u'此评论文章不存在', 'danger')
         return redirect(url_for('main.index'))
-    #return jsonify(rusult="true")
-
+        
 
 @main.route('/delete_comment/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -416,15 +415,7 @@ def delete_comment(id):
     db.session.delete(comment)
     db.session.commit()
     return jsonify(rusult="true")
-    """try:
-        flash(u'回复已删除', 'danger')
-        return redirect(url_for('.post', id=comment.post_id))
-    except:
-        flash(u'此评论文章不存在', 'danger')
-        return redirect(url_for('main.index'))"""
-
     
-
 
 @main.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required

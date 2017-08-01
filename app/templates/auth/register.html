@@ -6,7 +6,7 @@
 {{ super() }}
 <link rel="shortcut icon" href="{{ url_for('static', filename='cat.ico') }}" type="image/x-icon">
 <link id="webphoto" rel="icon" href="{{ url_for('static', filename='cat.ico') }}" type="image/x-icon">
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='v1011.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='v1014.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='hover.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jd17.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
@@ -70,9 +70,9 @@
 <div class="row">
 <div class="col-md-4"></div>
 
-<div class="col-md-4" style="background-color: #999;padding-bottom: 10px">
+<div class="col-md-4" style="background-color: white;padding-bottom: 10px">
 <div class="page-header">
-    <h1>注册</h1>
+    <h3 style="text-align: center;"><a href="{{ url_for('auth.login' )}}" style="color: #999; padding: 10px">登录</a><b>·</b><a href="{{ url_for('auth.register' )}}" style="padding: 10px;color: #ea6f5a;border-bottom :2px solid #ea6f5a;">注册</a></h3>
 </div>
     {{ wtf.quick_form(form) }}
 </div>
