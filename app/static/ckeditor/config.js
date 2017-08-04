@@ -6,7 +6,7 @@
 CKEDITOR.editorConfig = function( config ) {
 	// Define changes to default configuration here.
 	config.filebrowserImageUploadUrl= '/ckupload/';
-	config.extraPlugins = 'smiley';
+	config.extraPlugins = 'codesnippet,smiley';
 	config.smiley_columns = 16;
 
 
