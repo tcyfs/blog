@@ -21,8 +21,8 @@ import re
 
 class UploadToQiniu():
     def __init__(self, file, domian_name='http://oqytm3mqj.bkt.clouddn.com', bucket_name='flaskblog',  expire=3600):
-        self.access_key = 'TvQoGbSnVvStgs6brjwPzCS3nADzEQ_kjSzHGotm'
-        self.secret_key = 'Q--6LAxGsiySHpNxcxBiGh1Ud79-0LvzT3jPpvUu'
+        self.access_key = '**************'
+        self.secret_key = '**************'
         self.bucket_name = bucket_name
         self.domian_name = domian_name
         self.file = file
